@@ -1,0 +1,2468 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AMU • Study Manager Ultimate</title>
+    <style>
+        :root {
+            /* Palette AMU Luminy */
+            --bg-gradient-start: #0f172a;
+            --bg-gradient-end: #1e293b;
+            
+            --sidebar-bg: rgba(15, 23, 42, 0.95);
+            --card-bg: rgba(30, 41, 59, 0.7);
+            
+            --accent-color: #38bdf8;
+            --accent-secondary: #fbbf24;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            
+            --border-color: rgba(56, 189, 248, 0.2);
+        }
+
+        [data-theme="ocean"] {
+            --accent-color: #06b6d4;
+            --accent-secondary: #0ea5e9;
+        }
+
+        [data-theme="sunset"] {
+            --accent-color: #f59e0b;
+            --accent-secondary: #ef4444;
+        }
+
+        [data-theme="forest"] {
+            --accent-color: #10b981;
+            --accent-secondary: #059669;
+        }
+
+        [data-theme="purple"] {
+            --accent-color: #a855f7;
+            --accent-secondary: #8b5cf6;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- Sidebar --- */
+        #sidebar {
+            width: 300px;
+            background-color: var(--sidebar-bg);
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--border-color);
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            box-shadow: 5px 0 25px rgba(0,0,0,0.2);
+            z-index: 10;
+            transition: transform 0.3s ease;
+        }
+
+        .logo-area {
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+        }
+
+        .logo-circle {
+            width: 12px;
+            height: 12px;
+            background-color: var(--accent-secondary);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent-secondary);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(0.95); }
+        }
+
+        h1 {
+            font-size: 22px;
+            margin: 0;
+            color: white;
+            font-weight: 700;
+            letter-spacing: 1px;
+            flex: 1;
+        }
+        
+        h1 span { color: var(--accent-color); }
+
+        .theme-selector {
+            position: relative;
+        }
+
+        .theme-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .theme-btn:hover {
+            background: rgba(255,255,255,0.1);
+            color: var(--accent-color);
+        }
+
+        .theme-dropdown {
+            position: absolute;
+            top: 40px;
+            right: 0;
+            background: var(--sidebar-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 10px;
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 100;
+            min-width: 150px;
+        }
+
+        .theme-dropdown.active {
+            display: flex;
+        }
+
+        .theme-option {
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        .theme-option:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .theme-option.active {
+            background: rgba(56, 189, 248, 0.15);
+            color: var(--accent-color);
+        }
+
+        .theme-color-preview {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        /* Quick stats */
+        .sidebar-stats {
+            background: rgba(56, 189, 248, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .sidebar-stat {
+            text-align: center;
+        }
+
+        .sidebar-stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+
+        .sidebar-stat-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .search-box {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 40px 12px 15px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: rgba(255,255,255,0.05);
+            color: var(--text-main);
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            background: rgba(255,255,255,0.08);
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
+        }
+
+        .search-box::after {
+            content: "🔍";
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        .btn-add {
+            background: linear-gradient(90deg, #0ea5e9, #38bdf8);
+            color: #0f172a;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: 0.3s;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
+        }
+
+        .btn-add:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(56, 189, 248, 0.5);
+            filter: brightness(1.1);
+        }
+
+        .btn-add:active {
+            transform: translateY(0);
+        }
+
+        .section-header {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 5px;
+        }
+
+        .view-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            transition: 0.2s;
+        }
+
+        .view-btn:hover,
+        .view-btn.active {
+            color: var(--accent-color);
+            background: rgba(56, 189, 248, 0.1);
+        }
+
+        #folder-list {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding-right: 5px;
+        }
+
+        .folder-item {
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            color: var(--text-muted);
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid transparent;
+            position: relative;
+        }
+
+        .folder-item.dragging {
+            opacity: 0.5;
+        }
+
+        .folder-item.drag-over {
+            border-color: var(--accent-color);
+            background: rgba(56, 189, 248, 0.1);
+        }
+
+        .folder-item:hover {
+            background-color: rgba(255,255,255,0.05);
+            color: white;
+        }
+
+        .folder-item.active {
+            background-color: rgba(14, 165, 233, 0.15);
+            color: var(--accent-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .folder-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: var(--accent-color);
+            border-radius: 0 0 10px 10px;
+            transition: width 0.3s;
+        }
+
+        .folder-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .folder-emoji {
+            font-size: 18px;
+        }
+
+        .folder-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .folder-name {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .folder-count {
+            background: rgba(56, 189, 248, 0.2);
+            color: var(--accent-color);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-left: 8px;
+        }
+
+        .folder-actions {
+            display: flex;
+            gap: 5px;
+            opacity: 0;
+            transition: 0.2s;
+        }
+
+        .folder-item:hover .folder-actions {
+            opacity: 1;
+        }
+
+        /* --- Main Content --- */
+        #main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+            background-image: 
+                radial-gradient(circle at 90% 10%, rgba(56, 189, 248, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 10% 90%, rgba(251, 191, 36, 0.05) 0%, transparent 40%);
+        }
+
+        #header-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 40px 50px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        h2 { 
+            font-size: 32px; 
+            margin: 0; 
+            font-weight: 800;
+            background: linear-gradient(90deg, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 10px;
+            padding: 0 50px;
+            margin-top: 20px;
+        }
+
+        .filter-tab {
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid transparent;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .filter-tab:hover {
+            background: rgba(255,255,255,0.08);
+            color: var(--text-main);
+        }
+
+        .filter-tab.active {
+            background: rgba(56, 189, 248, 0.15);
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        #content-wrapper {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px 50px 50px;
+        }
+
+        /* Stats cards */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
+            backdrop-filter: blur(5px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--accent-color);
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--accent-color);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-trend {
+            font-size: 11px;
+            color: var(--success-color);
+            margin-top: 5px;
+        }
+
+        .empty-state {
+            text-align: center;
+            margin-top: 100px;
+            color: var(--text-muted);
+            font-size: 18px;
+            border: 2px dashed rgba(255,255,255,0.1);
+            padding: 60px 40px;
+            border-radius: 20px;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        /* --- Grille des Matières --- */
+        #subjects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 25px;
+        }
+
+        .subject-card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            cursor: pointer;
+        }
+
+        .subject-card.dragging {
+            opacity: 0.5;
+            cursor: move;
+        }
+
+        .subject-card:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+
+        .subject-title-section {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .subject-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .priority-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .priority-high { background: var(--danger-color); }
+        .priority-medium { background: var(--warning-color); }
+        .priority-low { background: var(--success-color); }
+
+        .subject-description {
+            color: var(--text-muted);
+            font-size: 13px;
+            margin-top: 5px;
+            line-height: 1.4;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .subject-meta {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            color: var(--text-muted);
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .progress-section {
+            margin: 15px 0;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-color), var(--accent-secondary));
+            border-radius: 10px;
+            transition: width 0.3s;
+        }
+
+        .tags-container {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+            margin: 10px 0;
+        }
+
+        .tag {
+            background: rgba(56, 189, 248, 0.15);
+            color: var(--accent-color);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .tag:hover {
+            background: rgba(56, 189, 248, 0.25);
+        }
+
+        .file-list {
+            margin-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 15px;
+            font-size: 14px;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            color: var(--text-muted);
+            border-radius: 8px;
+            margin-bottom: 5px;
+            transition: 0.2s;
+            background: rgba(255,255,255,0.02);
+        }
+
+        .file-item:hover {
+            color: var(--accent-color);
+            background: rgba(56, 189, 248, 0.05);
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .file-icon {
+            font-size: 20px;
+        }
+
+        .file-details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .file-name {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-weight: 500;
+        }
+
+        .file-meta {
+            font-size: 11px;
+            color: var(--text-muted);
+            opacity: 0.7;
+            margin-top: 2px;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        /* Notes section */
+        .notes-section {
+            background: rgba(251, 191, 36, 0.05);
+            border-left: 3px solid var(--accent-secondary);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 13px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .notes-section:hover {
+            background: rgba(251, 191, 36, 0.08);
+        }
+
+        .notes-section.has-notes {
+            color: var(--text-main);
+        }
+
+        /* Drag and Drop Zone */
+        .drop-zone {
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            margin-top: 15px;
+            transition: 0.3s;
+            display: none;
+        }
+
+        .drop-zone.active {
+            display: block;
+        }
+
+        .drop-zone.drag-over {
+            border-color: var(--accent-color);
+            background: rgba(56, 189, 248, 0.05);
+        }
+
+        /* Boutons */
+        .btn-small {
+            background-color: rgba(255,255,255,0.1);
+            border: none;
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+        
+        .btn-small:hover { 
+            background-color: var(--accent-color); 
+            color: #0f172a; 
+        }
+
+        .btn-icon {
+            background: rgba(56, 189, 248, 0.1);
+            border: none;
+            color: var(--accent-color);
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 10px;
+            border-radius: 8px;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+        
+        .btn-icon:hover { 
+            background-color: var(--accent-color); 
+            color: #0f172a; 
+        }
+        
+        .delete-btn { 
+            color: #ef4444; 
+            background: rgba(239, 68, 68, 0.1); 
+            padding: 6px 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 18px;
+            line-height: 1;
+            transition: 0.2s;
+        }
+        
+        .delete-btn:hover { 
+            background: rgba(239, 68, 68, 0.2); 
+            transform: scale(1.1);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--sidebar-bg);
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--accent-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-body label {
+            display: block;
+            color: var(--text-muted);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            margin-top: 15px;
+            font-weight: 600;
+        }
+
+        .modal-body input,
+        .modal-body textarea,
+        .modal-body select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 5px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: rgba(255,255,255,0.05);
+            color: var(--text-main);
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .modal-body input:focus,
+        .modal-body textarea:focus,
+        .modal-body select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
+        }
+
+        .modal-body textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 25px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #0ea5e9, #38bdf8);
+            color: #0f172a;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: 0.3s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(56, 189, 248, 0.5);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-main);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        /* Color picker */
+        .color-picker {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: 0.2s;
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+
+        .color-option.selected {
+            border-color: white;
+            box-shadow: 0 0 15px rgba(255,255,255,0.5);
+        }
+
+        /* Emoji Picker */
+        .emoji-picker {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 8px;
+            margin: 15px 0;
+        }
+
+        .emoji-option {
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: 0.2s;
+            text-align: center;
+        }
+
+        .emoji-option:hover {
+            background: rgba(255,255,255,0.1);
+            transform: scale(1.2);
+        }
+
+        .emoji-option.selected {
+            background: rgba(56, 189, 248, 0.2);
+        }
+
+        /* Input File Caché */
+        input[type="file"] { display: none; }
+
+        /* Scrollbar moderne */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
+        
+        .campus-badge {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.2);
+            font-weight: 700;
+            text-transform: uppercase;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Notification toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--card-bg);
+            padding: 15px 20px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: none;
+            align-items: center;
+            gap: 10px;
+            z-index: 2000;
+            animation: slideInRight 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .toast.show {
+            display: flex;
+        }
+
+        .toast.success { border-left: 4px solid var(--success-color); }
+        .toast.error { border-left: 4px solid var(--danger-color); }
+        .toast.info { border-left: 4px solid var(--accent-color); }
+
+        /* Responsive */
+        @media (max-width: 968px) {
+            #sidebar {
+                width: 280px;
+            }
+
+            #subjects-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+
+            #sidebar {
+                width: 100%;
+                height: auto;
+                max-height: 40vh;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            #header-area,
+            #content-wrapper {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+
+            #subjects-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-tabs {
+                padding: 0 20px;
+                overflow-x: auto;
+            }
+        }
+
+        /* Utility buttons */
+        .utility-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .btn-utility {
+            flex: 1;
+            padding: 10px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: 0.2s;
+        }
+
+        .btn-utility:hover {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-main);
+            border-color: var(--accent-color);
+        }
+
+        /* Calendar integration */
+        .deadline-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger-color);
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .deadline-badge.soon {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning-color);
+        }
+
+        .deadline-badge.ok {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success-color);
+        }
+
+        /* Quick actions floating button */
+        .quick-actions {
+            position: fixed;
+            bottom: 30px;
+            left: 320px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .quick-action-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-secondary));
+            border: none;
+            color: #0f172a;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quick-action-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(56, 189, 248, 0.5);
+        }
+
+        @media (max-width: 768px) {
+            .quick-actions {
+                left: 20px;
+            }
+        }
+
+    </style>
+</head>
+<body data-theme="default">
+
+    <div id="sidebar">
+        <div class="logo-area">
+            <div class="logo-circle"></div>
+            <h1>AMU <span>LUMINY</span></h1>
+            <div class="theme-selector">
+                <button class="theme-btn" onclick="toggleThemeDropdown()">🎨</button>
+                <div class="theme-dropdown" id="theme-dropdown">
+                    <div class="theme-option active" onclick="changeTheme('default')">
+                        <div class="theme-color-preview" style="background: #38bdf8;"></div>
+                        <span>Classique</span>
+                    </div>
+                    <div class="theme-option" onclick="changeTheme('ocean')">
+                        <div class="theme-color-preview" style="background: #06b6d4;"></div>
+                        <span>Océan</span>
+                    </div>
+                    <div class="theme-option" onclick="changeTheme('sunset')">
+                        <div class="theme-color-preview" style="background: #f59e0b;"></div>
+                        <span>Coucher de soleil</span>
+                    </div>
+                    <div class="theme-option" onclick="changeTheme('forest')">
+                        <div class="theme-color-preview" style="background: #10b981;"></div>
+                        <span>Forêt</span>
+                    </div>
+                    <div class="theme-option" onclick="changeTheme('purple')">
+                        <div class="theme-color-preview" style="background: #a855f7;"></div>
+                        <span>Violet</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar-stats">
+            <div class="sidebar-stat">
+                <div class="sidebar-stat-value" id="sidebar-total-folders">0</div>
+                <div class="sidebar-stat-label">Dossiers</div>
+            </div>
+            <div class="sidebar-stat">
+                <div class="sidebar-stat-value" id="sidebar-total-subjects">0</div>
+                <div class="sidebar-stat-label">Matières</div>
+            </div>
+            <div class="sidebar-stat">
+                <div class="sidebar-stat-value" id="sidebar-total-files">0</div>
+                <div class="sidebar-stat-label">Documents</div>
+            </div>
+            <div class="sidebar-stat">
+                <div class="sidebar-stat-value" id="sidebar-avg-progress">0%</div>
+                <div class="sidebar-stat-label">Progression</div>
+            </div>
+        </div>
+        
+        <div class="search-box">
+            <input type="text" id="search-input" placeholder="Rechercher...">
+        </div>
+        
+        <button class="btn-add" onclick="openFolderModal()">
+            <span>+</span> Nouveau Dossier
+        </button>
+        
+        <div class="section-header">
+            <span>Mes Années</span>
+            <div class="view-toggle">
+                <button class="view-btn active" onclick="setFolderView('list')">☰</button>
+                <button class="view-btn" onclick="setFolderView('grid')">▦</button>
+            </div>
+        </div>
+        
+        <div id="folder-list"></div>
+
+        <div class="utility-buttons">
+            <button class="btn-utility" onclick="exportData()" title="Exporter les données">📤</button>
+            <button class="btn-utility" onclick="document.getElementById('import-file').click()" title="Importer les données">📥</button>
+            <button class="btn-utility" onclick="showStats()" title="Statistiques">📊</button>
+        </div>
+    </div>
+
+    <div id="main">
+        <div id="header-area">
+            <h2 id="current-folder-title">Bienvenue sur le Campus</h2>
+            <div class="header-actions">
+                <button id="sort-btn" class="btn-small" onclick="toggleSortMenu()" style="display:none;">
+                    🔽 Trier
+                </button>
+                <button id="add-subject-btn" class="btn-add" style="margin:0; display:none;" onclick="openSubjectModal()">
+                    <span>+</span> Ajouter Matière
+                </button>
+            </div>
+        </div>
+
+        <div class="filter-tabs" id="filter-tabs" style="display: none;">
+            <div class="filter-tab active" onclick="filterSubjects('all')">Toutes</div>
+            <div class="filter-tab" onclick="filterSubjects('high')">🔴 Priorité haute</div>
+            <div class="filter-tab" onclick="filterSubjects('medium')">🟡 Priorité moyenne</div>
+            <div class="filter-tab" onclick="filterSubjects('low')">🟢 Priorité basse</div>
+            <div class="filter-tab" onclick="filterSubjects('incomplete')">📝 En cours</div>
+            <div class="filter-tab" onclick="filterSubjects('complete')">✅ Terminées</div>
+        </div>
+
+        <div id="content-wrapper">
+            <div id="stats-section" style="display: none;">
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-subjects">0</div>
+                        <div class="stat-label">Matières</div>
+                        <div class="stat-trend">+2 ce mois</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-files">0</div>
+                        <div class="stat-label">Documents</div>
+                        <div class="stat-trend">+5 cette semaine</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-size">0 MB</div>
+                        <div class="stat-label">Stockage</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-progress">0%</div>
+                        <div class="stat-label">Progression moyenne</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="subjects-grid">
+                <div class="empty-state">
+                    <div class="empty-state-icon">🌊</div>
+                    <p>Sélectionne une année ou un semestre à gauche pour commencer.</p>
+                    <p style="font-size: 14px; margin-top: 10px;">Crée ton premier dossier et organise tes cours !</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="campus-badge">Aix-Marseille Université • Campus Luminy</div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions" style="display: none;" id="quick-actions">
+        <button class="quick-action-btn" onclick="scrollToTop()" title="Retour en haut">↑</button>
+    </div>
+
+    <!-- Modals -->
+    <div id="folder-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">📁 Nouveau Dossier</div>
+            <div class="modal-body">
+                <label>Nom du dossier *</label>
+                <input type="text" id="folder-name-input" placeholder="ex: L2 - Semestre 3">
+                
+                <label>Emoji</label>
+                <div class="emoji-picker">
+                    <div class="emoji-option selected" data-emoji="📁">📁</div>
+                    <div class="emoji-option" data-emoji="📚">📚</div>
+                    <div class="emoji-option" data-emoji="🎓">🎓</div>
+                    <div class="emoji-option" data-emoji="📖">📖</div>
+                    <div class="emoji-option" data-emoji="✏️">✏️</div>
+                    <div class="emoji-option" data-emoji="🔬">🔬</div>
+                    <div class="emoji-option" data-emoji="💻">💻</div>
+                    <div class="emoji-option" data-emoji="🧮">🧮</div>
+                </div>
+                
+                <label>Description (optionnel)</label>
+                <textarea id="folder-desc-input" placeholder="Description du semestre ou de l'année"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeFolderModal()">Annuler</button>
+                <button class="btn-primary" onclick="createFolder()">Créer</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="subject-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header"><span id="subject-modal-icon">📚</span> <span id="subject-modal-title">Nouvelle Matière</span></div>
+            <div class="modal-body">
+                <label>Nom de la matière *</label>
+                <input type="text" id="subject-name-input" placeholder="ex: Biologie Cellulaire">
+                
+                <label>Description (optionnel)</label>
+                <textarea id="subject-desc-input" placeholder="Description de la matière"></textarea>
+                
+                <label>Couleur</label>
+                <div class="color-picker">
+                    <div class="color-option selected" data-color="#38bdf8" style="background: #38bdf8;"></div>
+                    <div class="color-option" data-color="#10b981" style="background: #10b981;"></div>
+                    <div class="color-option" data-color="#f59e0b" style="background: #f59e0b;"></div>
+                    <div class="color-option" data-color="#ef4444" style="background: #ef4444;"></div>
+                    <div class="color-option" data-color="#8b5cf6" style="background: #8b5cf6;"></div>
+                    <div class="color-option" data-color="#ec4899" style="background: #ec4899;"></div>
+                    <div class="color-option" data-color="#06b6d4" style="background: #06b6d4;"></div>
+                    <div class="color-option" data-color="#14b8a6" style="background: #14b8a6;"></div>
+                </div>
+
+                <label>Priorité</label>
+                <select id="subject-priority-input">
+                    <option value="low">Basse</option>
+                    <option value="medium" selected>Moyenne</option>
+                    <option value="high">Haute</option>
+                </select>
+
+                <label>Date limite (optionnel)</label>
+                <input type="date" id="subject-deadline-input">
+
+                <label>Tags (séparés par des virgules)</label>
+                <input type="text" id="subject-tags-input" placeholder="ex: TD, Cours magistral, Partiel">
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeSubjectModal()">Annuler</button>
+                <button class="btn-primary" onclick="createSubject()">Créer</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="notes-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">📝 Notes pour <span id="notes-subject-name"></span></div>
+            <div class="modal-body">
+                <textarea id="notes-textarea" style="min-height: 200px;" placeholder="Écris tes notes ici..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeNotesModal()">Fermer</button>
+                <button class="btn-primary" onclick="saveNotes()">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast notification -->
+    <div id="toast" class="toast">
+        <span id="toast-icon"></span>
+        <span id="toast-message"></span>
+    </div>
+
+    <input type="file" id="pdf-upload" accept="application/pdf" multiple>
+    <input type="file" id="import-file" accept=".json" style="display: none;">
+
+    <script>
+        // --- Database ---
+        const DB_NAME = "StudyAppDB_Ultimate";
+        const DB_VERSION = 3;
+        let db;
+        let currentFolderId = null;
+        let editingSubjectId = null;
+        let editingNotesSubjectId = null;
+        let selectedColor = "#38bdf8";
+        let selectedEmoji = "📁";
+        let currentTheme = localStorage.getItem('amu-theme') || 'default';
+        let currentFilter = 'all';
+        let currentSort = 'name';
+
+        function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                
+                request.onupgradeneeded = (e) => {
+                    db = e.target.result;
+                    
+                    if (!db.objectStoreNames.contains('folders')) {
+                        db.createObjectStore('folders', { keyPath: 'id', autoIncrement: true });
+                    }
+                    
+                    if (!db.objectStoreNames.contains('subjects')) {
+                        const s = db.createObjectStore('subjects', { keyPath: 'id', autoIncrement: true });
+                        s.createIndex('folderId', 'folderId', { unique: false });
+                    }
+                    
+                    if (!db.objectStoreNames.contains('files')) {
+                        const f = db.createObjectStore('files', { keyPath: 'id', autoIncrement: true });
+                        f.createIndex('subjectId', 'subjectId', { unique: false });
+                    }
+                };
+                
+                request.onsuccess = (e) => {
+                    db = e.target.result;
+                    loadFolders();
+                    updateGlobalStats();
+                    resolve();
+                };
+                
+                request.onerror = (e) => {
+                    showToast("Erreur de base de données", "error");
+                    reject("Erreur DB");
+                };
+            });
+        }
+
+        // --- Theme Management ---
+        function toggleThemeDropdown() {
+            const dropdown = document.getElementById('theme-dropdown');
+            dropdown.classList.toggle('active');
+        }
+
+        function changeTheme(theme) {
+            currentTheme = theme;
+            document.body.setAttribute('data-theme', theme);
+            localStorage.setItem('amu-theme', theme);
+            
+            // Update active state
+            document.querySelectorAll('.theme-option').forEach(opt => {
+                opt.classList.remove('active');
+            });
+            event.target.closest('.theme-option').classList.add('active');
+            
+            toggleThemeDropdown();
+            showToast("Thème changé", "success");
+        }
+
+        // Initialize theme
+        document.body.setAttribute('data-theme', currentTheme);
+
+        // --- Toast Notifications ---
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            const toastIcon = document.getElementById('toast-icon');
+            
+            const icons = {
+                success: '✅',
+                error: '❌',
+                info: 'ℹ️',
+                warning: '⚠️'
+            };
+            
+            toastIcon.textContent = icons[type] || icons.info;
+            toastMessage.textContent = message;
+            toast.className = `toast ${type} show`;
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // --- Folder Management ---
+        function openFolderModal() {
+            document.getElementById('folder-modal').classList.add('active');
+            document.getElementById('folder-name-input').value = '';
+            document.getElementById('folder-desc-input').value = '';
+            document.getElementById('folder-name-input').focus();
+            
+            // Reset emoji selection
+            document.querySelectorAll('.emoji-option').forEach(opt => {
+                opt.classList.remove('selected');
+                if (opt.dataset.emoji === '📁') {
+                    opt.classList.add('selected');
+                    selectedEmoji = '📁';
+                }
+            });
+        }
+
+        function closeFolderModal() {
+            document.getElementById('folder-modal').classList.remove('active');
+        }
+
+        function createFolder() {
+            const name = document.getElementById('folder-name-input').value.trim();
+            const description = document.getElementById('folder-desc-input').value.trim();
+            
+            if (!name) {
+                showToast("Le nom est requis", "error");
+                return;
+            }
+            
+            const tx = db.transaction(['folders'], 'readwrite');
+            tx.objectStore('folders').add({
+                name: name,
+                description: description,
+                emoji: selectedEmoji,
+                createdAt: new Date(),
+                color: selectedColor
+            });
+            
+            tx.oncomplete = () => {
+                loadFolders();
+                updateGlobalStats();
+                closeFolderModal();
+                showToast("Dossier créé avec succès", "success");
+            };
+        }
+
+        function loadFolders() {
+            const tx = db.transaction(['folders'], 'readonly');
+            const req = tx.objectStore('folders').getAll();
+            
+            req.onsuccess = () => {
+                const folders = req.result;
+                const container = document.getElementById('folder-list');
+                container.innerHTML = '';
+                
+                if (folders.length === 0) {
+                    container.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 20px; font-size: 13px;">Aucun dossier</div>';
+                    return;
+                }
+                
+                folders.forEach(folder => {
+                    countSubjectsInFolder(folder.id, (count) => {
+                        calculateFolderProgress(folder.id, (progress) => {
+                            const div = document.createElement('div');
+                            div.className = `folder-item ${currentFolderId === folder.id ? 'active' : ''}`;
+                            div.draggable = true;
+                            div.dataset.folderId = folder.id;
+                            
+                            div.innerHTML = `
+                                <div class="folder-content">
+                                    <span class="folder-emoji">${folder.emoji || '📁'}</span>
+                                    <div class="folder-info">
+                                        <div class="folder-name">
+                                            ${folder.name}
+                                            ${count > 0 ? `<span class="folder-count">${count}</span>` : ''}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="folder-actions">
+                                    <button class="delete-btn" onclick="deleteFolder(${folder.id}, event)" title="Supprimer">×</button>
+                                </div>
+                                ${progress > 0 ? `<div class="folder-progress" style="width: ${progress}%"></div>` : ''}
+                            `;
+                            
+                            div.onclick = (e) => {
+                                if (e.target.tagName !== 'BUTTON') selectFolder(folder);
+                            };
+                            
+                            // Drag events
+                            div.addEventListener('dragstart', handleFolderDragStart);
+                            div.addEventListener('dragover', handleFolderDragOver);
+                            div.addEventListener('drop', handleFolderDrop);
+                            div.addEventListener('dragleave', handleFolderDragLeave);
+                            
+                            container.appendChild(div);
+                        });
+                    });
+                });
+            };
+        }
+
+        function calculateFolderProgress(folderId, callback) {
+            const tx = db.transaction(['subjects'], 'readonly');
+            const req = tx.objectStore('subjects').index('folderId').getAll(folderId);
+            
+            req.onsuccess = () => {
+                const subjects = req.result;
+                if (subjects.length === 0) {
+                    callback(0);
+                    return;
+                }
+                
+                const totalProgress = subjects.reduce((sum, subject) => sum + (subject.progress || 0), 0);
+                const avgProgress = Math.round(totalProgress / subjects.length);
+                callback(avgProgress);
+            };
+        }
+
+        function countSubjectsInFolder(folderId, callback) {
+            const tx = db.transaction(['subjects'], 'readonly');
+            const req = tx.objectStore('subjects').index('folderId').getAll(folderId);
+            req.onsuccess = () => callback(req.result.length);
+        }
+
+        function deleteFolder(id, event) {
+            event.stopPropagation();
+            
+            if (!confirm("Supprimer ce dossier et toutes ses matières ?")) return;
+            
+            const tx = db.transaction(['folders', 'subjects', 'files'], 'readwrite');
+            tx.objectStore('folders').delete(id);
+            
+            // Delete all subjects and files
+            const subjectsReq = tx.objectStore('subjects').index('folderId').getAll(id);
+            subjectsReq.onsuccess = () => {
+                const subjects = subjectsReq.result;
+                subjects.forEach(subject => {
+                    tx.objectStore('subjects').delete(subject.id);
+                    
+                    // Delete files
+                    const filesReq = tx.objectStore('files').index('subjectId').getAll(subject.id);
+                    filesReq.onsuccess = () => {
+                        filesReq.result.forEach(file => {
+                            tx.objectStore('files').delete(file.id);
+                        });
+                    };
+                });
+            };
+            
+            tx.oncomplete = () => {
+                if (currentFolderId === id) {
+                    currentFolderId = null;
+                    document.getElementById('current-folder-title').innerText = "Bienvenue sur le Campus";
+                    document.getElementById('add-subject-btn').style.display = 'none';
+                    document.getElementById('stats-section').style.display = 'none';
+                    document.getElementById('filter-tabs').style.display = 'none';
+                    document.getElementById('sort-btn').style.display = 'none';
+                    document.getElementById('subjects-grid').innerHTML = '<div class="empty-state"><div class="empty-state-icon">🗑️</div><p>Dossier supprimé</p></div>';
+                }
+                loadFolders();
+                updateGlobalStats();
+                showToast("Dossier supprimé", "success");
+            };
+        }
+
+        function selectFolder(folder) {
+            currentFolderId = folder.id;
+            document.getElementById('current-folder-title').innerText = `${folder.emoji || '📂'} ${folder.name}`;
+            document.getElementById('add-subject-btn').style.display = 'flex';
+            document.getElementById('stats-section').style.display = 'block';
+            document.getElementById('filter-tabs').style.display = 'flex';
+            document.getElementById('sort-btn').style.display = 'block';
+            document.getElementById('quick-actions').style.display = 'flex';
+            loadSubjects();
+            loadFolders();
+            updateStats();
+        }
+
+        // --- Subject Management ---
+        function openSubjectModal() {
+            if (!currentFolderId) return;
+            
+            editingSubjectId = null;
+            document.getElementById('subject-modal-title').innerText = 'Nouvelle Matière';
+            document.getElementById('subject-modal-icon').innerText = '📚';
+            document.getElementById('subject-modal').classList.add('active');
+            document.getElementById('subject-name-input').value = '';
+            document.getElementById('subject-desc-input').value = '';
+            document.getElementById('subject-tags-input').value = '';
+            document.getElementById('subject-deadline-input').value = '';
+            document.getElementById('subject-priority-input').value = 'medium';
+            document.getElementById('subject-name-input').focus();
+            
+            // Reset color selection
+            document.querySelectorAll('.color-option').forEach(opt => {
+                opt.classList.remove('selected');
+                if (opt.dataset.color === '#38bdf8') {
+                    opt.classList.add('selected');
+                    selectedColor = '#38bdf8';
+                }
+            });
+        }
+
+        function closeSubjectModal() {
+            document.getElementById('subject-modal').classList.remove('active');
+        }
+
+        function createSubject() {
+            if (!currentFolderId) return;
+            
+            const name = document.getElementById('subject-name-input').value.trim();
+            const description = document.getElementById('subject-desc-input').value.trim();
+            const tags = document.getElementById('subject-tags-input').value.trim();
+            const deadline = document.getElementById('subject-deadline-input').value;
+            const priority = document.getElementById('subject-priority-input').value;
+            
+            if (!name) {
+                showToast("Le nom est requis", "error");
+                return;
+            }
+            
+            const tx = db.transaction(['subjects'], 'readwrite');
+            tx.objectStore('subjects').add({
+                name: name,
+                description: description,
+                folderId: currentFolderId,
+                color: selectedColor,
+                priority: priority,
+                deadline: deadline || null,
+                tags: tags ? tags.split(',').map(t => t.trim()) : [],
+                progress: 0,
+                notes: '',
+                createdAt: new Date()
+            });
+            
+            tx.oncomplete = () => {
+                loadSubjects();
+                closeSubjectModal();
+                showToast("Matière créée avec succès", "success");
+                updateStats();
+                updateGlobalStats();
+            };
+        }
+
+        function deleteSubject(subjectId, event) {
+            event.stopPropagation();
+            
+            if (!confirm("Supprimer cette matière et tous ses fichiers ?")) return;
+            
+            const tx = db.transaction(['subjects', 'files'], 'readwrite');
+            tx.objectStore('subjects').delete(subjectId);
+            
+            // Delete all files
+            const filesReq = tx.objectStore('files').index('subjectId').getAll(subjectId);
+            filesReq.onsuccess = () => {
+                const files = filesReq.result;
+                files.forEach(file => {
+                    tx.objectStore('files').delete(file.id);
+                });
+            };
+            
+            tx.oncomplete = () => {
+                loadSubjects();
+                showToast("Matière supprimée", "success");
+                updateStats();
+                updateGlobalStats();
+            };
+        }
+
+        function updateProgress(subjectId, value) {
+            const tx = db.transaction(['subjects'], 'readwrite');
+            const req = tx.objectStore('subjects').get(subjectId);
+            
+            req.onsuccess = () => {
+                const subject = req.result;
+                subject.progress = parseInt(value);
+                tx.objectStore('subjects').put(subject);
+            };
+            
+            tx.oncomplete = () => {
+                updateStats();
+                loadFolders();
+            };
+        }
+
+        function loadSubjects() {
+            if (!currentFolderId) return;
+            
+            const tx = db.transaction(['subjects'], 'readonly');
+            const req = tx.objectStore('subjects').index('folderId').getAll(currentFolderId);
+            
+            req.onsuccess = () => {
+                let subjects = req.result;
+                
+                // Apply filter
+                subjects = applyFilter(subjects);
+                
+                // Apply sort
+                subjects = applySort(subjects);
+                
+                const grid = document.getElementById('subjects-grid');
+                grid.innerHTML = '';
+                
+                if (subjects.length === 0) {
+                    grid.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📚</div><p>Aucune matière pour ce filtre.</p></div>';
+                    return;
+                }
+                
+                subjects.forEach(subject => {
+                    const card = createSubjectCard(subject);
+                    grid.appendChild(card);
+                    loadFilesForSubject(subject.id);
+                });
+            };
+        }
+
+        function createSubjectCard(subject) {
+            const card = document.createElement('div');
+            card.className = 'subject-card';
+            card.style.borderLeftColor = subject.color || '#38bdf8';
+            card.style.borderLeftWidth = '4px';
+            card.dataset.subjectId = subject.id;
+            card.dataset.priority = subject.priority;
+            card.dataset.progress = subject.progress || 0;
+            
+            const deadlineBadge = getDeadlineBadge(subject.deadline);
+            const priorityClass = `priority-${subject.priority || 'medium'}`;
+            
+            card.innerHTML = `
+                <div class="card-header">
+                    <div class="subject-title-section">
+                        <div class="subject-title">
+                            <span class="priority-indicator ${priorityClass}"></span>
+                            ${subject.name}
+                        </div>
+                        ${subject.description ? `<div class="subject-description">${subject.description}</div>` : ''}
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn-icon" onclick="triggerFileUpload(${subject.id})" title="Ajouter PDF">📎</button>
+                        <button class="btn-icon" onclick="openNotesModal(${subject.id})" title="Notes">📝</button>
+                        <button class="delete-btn" onclick="deleteSubject(${subject.id}, event)" title="Supprimer">×</button>
+                    </div>
+                </div>
+                
+                <div class="subject-meta">
+                    <div class="meta-item">
+                        <span>📄</span>
+                        <span id="file-count-${subject.id}">0 docs</span>
+                    </div>
+                    <div class="meta-item">
+                        <span>📅</span>
+                        <span>${new Date(subject.createdAt).toLocaleDateString('fr-FR')}</span>
+                    </div>
+                    ${deadlineBadge ? `<div class="meta-item">${deadlineBadge}</div>` : ''}
+                </div>
+
+                ${subject.tags && subject.tags.length > 0 ? `
+                    <div class="tags-container">
+                        ${subject.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                    </div>
+                ` : ''}
+
+                <div class="progress-section">
+                    <div class="progress-label">
+                        <span>Progression</span>
+                        <span>${subject.progress || 0}%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${subject.progress || 0}%"></div>
+                    </div>
+                    <input type="range" min="0" max="100" value="${subject.progress || 0}" 
+                           style="width: 100%; margin-top: 10px;" 
+                           oninput="updateProgress(${subject.id}, this.value); this.previousElementSibling.querySelector('.progress-fill').style.width = this.value + '%'; this.previousElementSibling.querySelector('.progress-label span:last-child').textContent = this.value + '%';">
+                </div>
+
+                ${subject.notes ? `
+                    <div class="notes-section has-notes" onclick="openNotesModal(${subject.id})">
+                        💡 Notes disponibles - Cliquer pour voir
+                    </div>
+                ` : `
+                    <div class="notes-section" onclick="openNotesModal(${subject.id})">
+                        + Ajouter des notes
+                    </div>
+                `}
+                
+                <div class="file-list" id="files-subject-${subject.id}"></div>
+            `;
+            
+            return card;
+        }
+
+        function getDeadlineBadge(deadline) {
+            if (!deadline) return null;
+            
+            const deadlineDate = new Date(deadline);
+            const today = new Date();
+            const diffTime = deadlineDate - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (diffDays < 0) {
+                return `<span class="deadline-badge">⏰ Passé</span>`;
+            } else if (diffDays <= 7) {
+                return `<span class="deadline-badge">⏰ ${diffDays}j</span>`;
+            } else if (diffDays <= 30) {
+                return `<span class="deadline-badge soon">⏰ ${diffDays}j</span>`;
+            } else {
+                return `<span class="deadline-badge ok">⏰ ${diffDays}j</span>`;
+            }
+        }
+
+        // --- Notes Management ---
+        function openNotesModal(subjectId) {
+            editingNotesSubjectId = subjectId;
+            
+            const tx = db.transaction(['subjects'], 'readonly');
+            const req = tx.objectStore('subjects').get(subjectId);
+            
+            req.onsuccess = () => {
+                const subject = req.result;
+                document.getElementById('notes-subject-name').textContent = subject.name;
+                document.getElementById('notes-textarea').value = subject.notes || '';
+                document.getElementById('notes-modal').classList.add('active');
+                document.getElementById('notes-textarea').focus();
+            };
+        }
+
+        function closeNotesModal() {
+            document.getElementById('notes-modal').classList.remove('active');
+        }
+
+        function saveNotes() {
+            if (!editingNotesSubjectId) return;
+            
+            const notes = document.getElementById('notes-textarea').value.trim();
+            
+            const tx = db.transaction(['subjects'], 'readwrite');
+            const req = tx.objectStore('subjects').get(editingNotesSubjectId);
+            
+            req.onsuccess = () => {
+                const subject = req.result;
+                subject.notes = notes;
+                tx.objectStore('subjects').put(subject);
+            };
+            
+            tx.oncomplete = () => {
+                closeNotesModal();
+                loadSubjects();
+                showToast("Notes enregistrées", "success");
+            };
+        }
+
+        // --- File Management ---
+        let activeSubjectIdForUpload = null;
+        const fileInput = document.getElementById('pdf-upload');
+
+        function triggerFileUpload(subjectId) {
+            activeSubjectIdForUpload = subjectId;
+            fileInput.click();
+        }
+
+        fileInput.addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            
+            if (files.length > 0 && activeSubjectIdForUpload) {
+                let processed = 0;
+                files.forEach(file => {
+                    saveFile(activeSubjectIdForUpload, file, () => {
+                        processed++;
+                        if (processed === files.length) {
+                            showToast(`${files.length} fichier(s) ajouté(s)`, "success");
+                        }
+                    });
+                });
+                fileInput.value = '';
+            }
+        });
+
+        function saveFile(subjectId, file, callback) {
+            const reader = new FileReader();
+            
+            reader.onload = (e) => {
+                const blob = new Blob([e.target.result], { type: 'application/pdf' });
+                const tx = db.transaction(['files'], 'readwrite');
+                
+                tx.objectStore('files').add({
+                    name: file.name,
+                    subjectId: subjectId,
+                    data: blob,
+                    size: file.size,
+                    uploadedAt: new Date()
+                });
+                
+                tx.oncomplete = () => {
+                    loadFilesForSubject(subjectId);
+                    updateStats();
+                    updateGlobalStats();
+                    if (callback) callback();
+                };
+            };
+            
+            reader.readAsArrayBuffer(file);
+        }
+
+        function loadFilesForSubject(subjectId) {
+            const tx = db.transaction(['files'], 'readonly');
+            const req = tx.objectStore('files').index('subjectId').getAll(subjectId);
+            
+            req.onsuccess = () => {
+                const files = req.result;
+                const container = document.getElementById(`files-subject-${subjectId}`);
+                const countEl = document.getElementById(`file-count-${subjectId}`);
+                
+                if (countEl) {
+                    countEl.textContent = `${files.length} doc${files.length > 1 ? 's' : ''}`;
+                }
+                
+                if (!container) return;
+                
+                container.innerHTML = '';
+                
+                if (files.length === 0) {
+                    container.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--text-muted); font-size: 13px;">Pas de documents</div>';
+                    return;
+                }
+                
+                files.forEach(file => {
+                    const row = document.createElement('div');
+                    row.className = 'file-item';
+                    
+                    const displayName = file.name.length > 28 ? file.name.substring(0, 25) + '...' : file.name;
+                    const fileSize = (file.size / 1024).toFixed(1) + ' KB';
+                    const uploadDate = new Date(file.uploadedAt).toLocaleDateString('fr-FR');
+                    
+                    row.innerHTML = `
+                        <div class="file-info">
+                            <span class="file-icon">📄</span>
+                            <div class="file-details">
+                                <div class="file-name">${displayName}</div>
+                                <div class="file-meta">${fileSize} • ${uploadDate}</div>
+                            </div>
+                        </div>
+                        <div class="file-actions">
+                            <button class="btn-small" onclick="openPdf(${file.id})">Lire</button>
+                            <button class="delete-btn" onclick="deleteFile(${file.id}, ${subjectId}, event)" style="font-size: 14px;">×</button>
+                        </div>
+                    `;
+                    
+                    container.appendChild(row);
+                });
+            };
+        }
+
+        function openPdf(fileId) {
+            const tx = db.transaction(['files'], 'readonly');
+            const req = tx.objectStore('files').get(fileId);
+            
+            req.onsuccess = () => {
+                const file = req.result;
+                if (file && file.data) {
+                    const url = URL.createObjectURL(file.data);
+                    window.open(url, '_blank');
+                }
+            };
+        }
+
+        function deleteFile(fileId, subjectId, event) {
+            event.stopPropagation();
+            
+            if (!confirm("Supprimer ce fichier ?")) return;
+            
+            const tx = db.transaction(['files'], 'readwrite');
+            tx.objectStore('files').delete(fileId);
+            
+            tx.oncomplete = () => {
+                loadFilesForSubject(subjectId);
+                showToast("Fichier supprimé", "success");
+                updateStats();
+                updateGlobalStats();
+            };
+        }
+
+        // --- Stats ---
+        function updateStats() {
+            if (!currentFolderId) return;
+            
+            const tx = db.transaction(['subjects', 'files'], 'readonly');
+            
+            const subjectsReq = tx.objectStore('subjects').index('folderId').getAll(currentFolderId);
+            subjectsReq.onsuccess = () => {
+                const subjects = subjectsReq.result;
+                document.getElementById('stat-subjects').textContent = subjects.length;
+                
+                // Calculate average progress
+                if (subjects.length > 0) {
+                    const totalProgress = subjects.reduce((sum, s) => sum + (s.progress || 0), 0);
+                    const avgProgress = Math.round(totalProgress / subjects.length);
+                    document.getElementById('stat-progress').textContent = avgProgress + '%';
+                } else {
+                    document.getElementById('stat-progress').textContent = '0%';
+                }
+                
+                let totalFiles = 0;
+                let totalSize = 0;
+                
+                const promises = subjects.map(subject => {
+                    return new Promise((resolve) => {
+                        const filesTx = db.transaction(['files'], 'readonly');
+                        const filesReq = filesTx.objectStore('files').index('subjectId').getAll(subject.id);
+                        filesReq.onsuccess = () => {
+                            const files = filesReq.result;
+                            totalFiles += files.length;
+                            files.forEach(file => totalSize += file.size || 0);
+                            resolve();
+                        };
+                    });
+                });
+                
+                Promise.all(promises).then(() => {
+                    document.getElementById('stat-files').textContent = totalFiles;
+                    document.getElementById('stat-size').textContent = (totalSize / (1024 * 1024)).toFixed(2) + ' MB';
+                });
+            };
+        }
+
+        function updateGlobalStats() {
+            const tx = db.transaction(['folders', 'subjects', 'files'], 'readonly');
+            
+            // Count folders
+            const foldersReq = tx.objectStore('folders').getAll();
+            foldersReq.onsuccess = () => {
+                document.getElementById('sidebar-total-folders').textContent = foldersReq.result.length;
+            };
+            
+            // Count subjects
+            const subjectsReq = tx.objectStore('subjects').getAll();
+            subjectsReq.onsuccess = () => {
+                const subjects = subjectsReq.result;
+                document.getElementById('sidebar-total-subjects').textContent = subjects.length;
+                
+                // Calculate average progress
+                if (subjects.length > 0) {
+                    const totalProgress = subjects.reduce((sum, s) => sum + (s.progress || 0), 0);
+                    const avgProgress = Math.round(totalProgress / subjects.length);
+                    document.getElementById('sidebar-avg-progress').textContent = avgProgress + '%';
+                } else {
+                    document.getElementById('sidebar-avg-progress').textContent = '0%';
+                }
+            };
+            
+            // Count files
+            const filesReq = tx.objectStore('files').getAll();
+            filesReq.onsuccess = () => {
+                document.getElementById('sidebar-total-files').textContent = filesReq.result.length;
+            };
+        }
+
+        // --- Filtering & Sorting ---
+        function filterSubjects(filter) {
+            currentFilter = filter;
+            
+            // Update active tab
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            loadSubjects();
+        }
+
+        function applyFilter(subjects) {
+            if (currentFilter === 'all') return subjects;
+            
+            if (currentFilter === 'high' || currentFilter === 'medium' || currentFilter === 'low') {
+                return subjects.filter(s => s.priority === currentFilter);
+            }
+            
+            if (currentFilter === 'incomplete') {
+                return subjects.filter(s => (s.progress || 0) < 100);
+            }
+            
+            if (currentFilter === 'complete') {
+                return subjects.filter(s => (s.progress || 0) === 100);
+            }
+            
+            return subjects;
+        }
+
+        function applySort(subjects) {
+            return subjects.sort((a, b) => {
+                if (currentSort === 'name') {
+                    return a.name.localeCompare(b.name);
+                }
+                if (currentSort === 'date') {
+                    return new Date(b.createdAt) - new Date(a.createdAt);
+                }
+                if (currentSort === 'progress') {
+                    return (b.progress || 0) - (a.progress || 0);
+                }
+                if (currentSort === 'priority') {
+                    const priorityOrder = { high: 3, medium: 2, low: 1 };
+                    return (priorityOrder[b.priority] || 0) - (priorityOrder[a.priority] || 0);
+                }
+                return 0;
+            });
+        }
+
+        function toggleSortMenu() {
+            const options = ['Nom', 'Date', 'Progression', 'Priorité'];
+            const values = ['name', 'date', 'progress', 'priority'];
+            
+            const choice = prompt(`Trier par:\n1. Nom\n2. Date\n3. Progression\n4. Priorité\n\nEntrez le numéro (1-4):`);
+            
+            if (choice && choice >= 1 && choice <= 4) {
+                currentSort = values[choice - 1];
+                loadSubjects();
+                showToast(`Trié par ${options[choice - 1]}`, "success");
+            }
+        }
+
+        // --- Color & Emoji Picker ---
+        document.querySelectorAll('.color-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.color-option').forEach(opt => opt.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedColor = this.dataset.color;
+            });
+        });
+
+        document.querySelectorAll('.emoji-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.emoji-option').forEach(opt => opt.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedEmoji = this.dataset.emoji;
+            });
+        });
+
+        // --- Search ---
+        document.getElementById('search-input').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const folderItems = document.querySelectorAll('.folder-item');
+            
+            folderItems.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                item.style.display = text.includes(searchTerm) ? 'flex' : 'none';
+            });
+        });
+
+        // --- Export/Import ---
+        function exportData() {
+            const exportData = {
+                version: 2,
+                exportDate: new Date().toISOString(),
+                folders: [],
+                subjects: [],
+                files: []
+            };
+            
+            const tx = db.transaction(['folders', 'subjects', 'files'], 'readonly');
+            
+            const foldersReq = tx.objectStore('folders').getAll();
+            foldersReq.onsuccess = () => {
+                exportData.folders = foldersReq.result;
+                
+                const subjectsReq = tx.objectStore('subjects').getAll();
+                subjectsReq.onsuccess = () => {
+                    exportData.subjects = subjectsReq.result;
+                    
+                    const filesReq = tx.objectStore('files').getAll();
+                    filesReq.onsuccess = () => {
+                        exportData.files = filesReq.result.map(file => ({
+                            id: file.id,
+                            name: file.name,
+                            subjectId: file.subjectId,
+                            size: file.size,
+                            uploadedAt: file.uploadedAt
+                        }));
+                        
+                        const dataStr = JSON.stringify(exportData, null, 2);
+                        const blob = new Blob([dataStr], { type: 'application/json' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `amu-study-export-${new Date().toISOString().split('T')[0]}.json`;
+                        a.click();
+                        
+                        showToast("Données exportées", "success");
+                    };
+                };
+            };
+        }
+
+        document.getElementById('import-file').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (!data.folders || !data.subjects) {
+                        showToast("Format de fichier invalide", "error");
+                        return;
+                    }
+                    
+                    if (!confirm("Importer ces données ?")) return;
+                    
+                    const tx = db.transaction(['folders', 'subjects'], 'readwrite');
+                    
+                    data.folders.forEach(folder => {
+                        delete folder.id;
+                        tx.objectStore('folders').add(folder);
+                    });
+                    
+                    data.subjects.forEach(subject => {
+                        delete subject.id;
+                        tx.objectStore('subjects').add(subject);
+                    });
+                    
+                    tx.oncomplete = () => {
+                        loadFolders();
+                        updateGlobalStats();
+                        showToast("Données importées", "success");
+                    };
+                    
+                } catch (err) {
+                    showToast("Erreur lors de l'import", "error");
+                }
+            };
+            reader.readAsText(file);
+            this.value = '';
+        });
+
+        // --- Statistics Modal ---
+        function showStats() {
+            alert("Fonctionnalité de statistiques à venir !");
+        }
+
+        // --- Drag and Drop ---
+        let draggedSubjectId = null;
+        let draggedFolderId = null;
+
+        function handleFolderDragStart(e) {
+            draggedFolderId = parseInt(e.target.dataset.folderId);
+            e.target.classList.add('dragging');
+        }
+
+        function handleFolderDragOver(e) {
+            e.preventDefault();
+            if (!e.target.classList.contains('folder-item')) return;
+            e.target.classList.add('drag-over');
+        }
+
+        function handleFolderDragLeave(e) {
+            e.target.classList.remove('drag-over');
+        }
+
+        function handleFolderDrop(e) {
+            e.preventDefault();
+            e.target.classList.remove('drag-over');
+            
+            const targetFolderId = parseInt(e.target.dataset.folderId);
+            
+            if (draggedSubjectId && targetFolderId && draggedSubjectId !== targetFolderId) {
+                // Move subject to this folder
+                const tx = db.transaction(['subjects'], 'readwrite');
+                const req = tx.objectStore('subjects').get(draggedSubjectId);
+                
+                req.onsuccess = () => {
+                    const subject = req.result;
+                    subject.folderId = targetFolderId;
+                    tx.objectStore('subjects').put(subject);
+                };
+                
+                tx.oncomplete = () => {
+                    loadSubjects();
+                    loadFolders();
+                    showToast("Matière déplacée", "success");
+                };
+            }
+            
+            document.querySelectorAll('.dragging').forEach(el => el.classList.remove('dragging'));
+        }
+
+        // --- Utility Functions ---
+        function scrollToTop() {
+            document.getElementById('content-wrapper').scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function setFolderView(view) {
+            document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            // View switching can be implemented here
+        }
+
+        // --- Keyboard shortcuts ---
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                document.getElementById('search-input').focus();
+            }
+            
+            if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+                e.preventDefault();
+                if (currentFolderId) {
+                    openSubjectModal();
+                } else {
+                    openFolderModal();
+                }
+            }
+            
+            if (e.key === 'Escape') {
+                closeFolderModal();
+                closeSubjectModal();
+                closeNotesModal();
+                document.getElementById('theme-dropdown').classList.remove('active');
+            }
+        });
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.theme-selector')) {
+                document.getElementById('theme-dropdown').classList.remove('active');
+            }
+        });
+
+        // --- Initialize ---
+        initDB();
+    </script>
+</body>
+</html>
