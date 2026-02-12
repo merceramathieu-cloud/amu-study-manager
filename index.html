@@ -196,6 +196,49 @@
 }
 
 /* ═══════════════════════════════════════════
+   LIGHT MODE OVERRIDES
+   Applied when body has data-lightmode="true"
+   These override bg/surface/text vars only,
+   keeping the accent color of the current theme.
+═══════════════════════════════════════════ */
+[data-lightmode="true"] {
+  --bg:      #f4f6fb;
+  --bg2:     #eaecf4;
+  --bg3:     #dde1ef;
+  --surface: rgba(255,255,255,0.92);
+  --surface2: rgba(240,242,252,0.85);
+  --border:  rgba(80,100,180,0.15);
+  --border2: rgba(80,100,180,0.07);
+  --text:    #1a1e36;
+  --text2:   #5a6080;
+  --text3:   #9aa0c0;
+  --glow:    rgba(80,100,200,0.12);
+}
+
+/* Light mode specifics */
+[data-lightmode="true"] body::before { opacity: 0.15; }
+[data-lightmode="true"] .auth-card { box-shadow: 0 20px 60px rgba(0,0,0,0.12), 0 0 0 1px var(--border); }
+[data-lightmode="true"] .subject-card { box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+[data-lightmode="true"] .week-grid { box-shadow: 0 2px 20px rgba(0,0,0,0.06); }
+[data-lightmode="true"] #sidebar { box-shadow: 4px 0 20px rgba(0,0,0,0.08); }
+
+.light-toggle-btn {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  width: 32px; height: 32px;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+.light-toggle-btn:hover {
+  border-color: var(--accent);
+  transform: rotate(20deg) scale(1.1);
+}
+
+/* ═══════════════════════════════════════════
    BASE
 ═══════════════════════════════════════════ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1044,191 +1087,302 @@ body::before {
   gap: 28px;
 }
 
-.week-header {
+/* ═══════════════════════════════════════════
+   AGENDA — Emploi du temps
+═══════════════════════════════════════════ */
+
+/* Toolbar */
+.agenda-toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 12px;
+  flex-shrink: 0;
 }
-
-.week-nav-btn {
-  width: 36px; height: 36px;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  color: var(--text2);
-  cursor: pointer;
-  font-size: 18px;
-  transition: var(--transition);
-  display: flex; align-items: center; justify-content: center;
-}
-
-.week-nav-btn:hover { border-color: var(--accent); color: var(--accent); }
-
-.week-label {
+.agenda-title-row { display: flex; flex-direction: column; gap: 4px; }
+.agenda-main-title {
   font-family: var(--font-display);
-  font-size: 20px;
-  font-weight: 700;
+  font-size: 24px; font-weight: 800; letter-spacing: -0.5px;
+  color: var(--text);
 }
+.agenda-subtitle { font-size: 12px; color: var(--text3); font-weight: 500; }
 
-.week-grid {
-  display: grid;
-  grid-template-columns: 60px repeat(7, 1fr);
-  gap: 0;
-  background: var(--surface2);
+/* ── Timetable container ── */
+.timetable-wrap {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   overflow: hidden;
+  flex-shrink: 0;
 }
 
-.week-grid-header {
-  display: contents;
-}
-
-.week-day-head {
-  padding: 14px 8px;
-  text-align: center;
-  border-bottom: 1px solid var(--border2);
+/* Header row: time gutter + 7 day columns */
+.tt-header {
+  display: grid;
+  grid-template-columns: 52px repeat(7, 1fr);
   background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
-.week-day-head.today-col .wdh-name { color: var(--accent); }
-.week-day-head.today-col .wdh-num {
-  background: var(--accent);
-  color: var(--bg);
-  border-radius: 50%;
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 2px;
-  font-weight: 700;
-}
-
-.wdh-name { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text3); letter-spacing: 0.8px; }
-.wdh-num { font-family: var(--font-display); font-size: 18px; font-weight: 700; margin-top: 4px; }
-
-.time-col-head {
-  background: var(--bg3);
-  border-bottom: 1px solid var(--border2);
+.tt-header-gutter {
   border-right: 1px solid var(--border2);
 }
 
-.time-slot-row { display: contents; }
-
-.time-label {
-  text-align: right;
-  padding: 0 10px;
-  font-size: 11px;
-  color: var(--text3);
-  font-weight: 600;
-  height: 54px;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  border-right: 1px solid var(--border2);
-}
-
-.day-cell {
-  border-right: 1px solid var(--border2);
-  border-bottom: 1px solid var(--border2);
-  height: 54px;
-  position: relative;
-  transition: var(--transition);
-  cursor: pointer;
-}
-
-.day-cell:last-child { border-right: none; }
-.day-cell:hover { background: var(--glow); }
-
-.agenda-event {
-  position: absolute;
-  inset: 3px 4px;
-  border-radius: 6px;
-  padding: 3px 7px;
-  font-size: 11px;
-  font-weight: 600;
-  overflow: hidden;
-  z-index: 2;
-  line-height: 1.3;
-  cursor: pointer;
-  transition: var(--transition);
-}
-
-.agenda-event:hover { filter: brightness(1.15); transform: scaleY(1.02); }
-
-.event-type-CM   { background: rgba(91,138,245,0.3); border-left: 3px solid #5b8af5; color: #a0c0ff; }
-.event-type-TD   { background: rgba(74,200,100,0.25); border-left: 3px solid #4ac864; color: #90e8a0; }
-.event-type-Partiel { background: rgba(248,113,113,0.25); border-left: 3px solid #f87171; color: #ffa0a0; }
-.event-type-Other { background: rgba(244,192,90,0.2); border-left: 3px solid #f4c05a; color: #f0d090; }
-
-/* Upcoming events */
-.upcoming-list { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
-
-.upcoming-event {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 14px 18px;
-  background: var(--surface2);
-  border: 1px solid var(--border2);
-  border-radius: var(--radius);
-  transition: var(--transition);
-}
-
-.upcoming-event:hover { border-color: var(--border); }
-
-.upcoming-date-box {
+.tt-header-day {
+  padding: 12px 6px;
   text-align: center;
-  min-width: 44px;
-}
-
-.upd-day { font-family: var(--font-display); font-size: 22px; font-weight: 800; color: var(--accent); line-height: 1; }
-.upd-month { font-size: 11px; color: var(--text3); text-transform: uppercase; font-weight: 600; }
-
-.upcoming-info { flex: 1; }
-.upcoming-title { font-weight: 600; font-size: 14px; margin-bottom: 2px; }
-.upcoming-sub { font-size: 12px; color: var(--text2); }
-
-.upcoming-type-badge {
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.upcoming-del {
-  background: none;
-  border: none;
-  color: var(--text3);
+  border-right: 1px solid var(--border2);
   cursor: pointer;
-  padding: 4px 6px;
+  transition: var(--transition);
+}
+.tt-header-day:last-child { border-right: none; }
+.tt-header-day:hover { background: var(--glow); }
+
+.tt-day-name {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text3);
+}
+.tt-day-add {
   font-size: 16px;
-  border-radius: 4px;
+  margin-top: 4px;
+  opacity: 0;
   transition: var(--transition);
 }
-.upcoming-del:hover { color: var(--danger); background: rgba(248,113,113,0.1); }
+.tt-header-day:hover .tt-day-add { opacity: 1; }
 
-/* Add event btn */
-.add-event-btn {
+/* Body: scrollable */
+.tt-body {
+  display: grid;
+  grid-template-columns: 52px repeat(7, 1fr);
+  position: relative;
+  overflow-y: auto;
+  max-height: 520px;
+}
+
+/* Time gutter labels */
+.tt-time-col {
   display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border2);
+}
+
+.tt-hour-label {
+  height: 60px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 4px 8px 0 0;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text3);
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+/* Day columns */
+.tt-day-col {
+  position: relative;
+  border-right: 1px solid var(--border2);
+  cursor: pointer;
+}
+.tt-day-col:last-child { border-right: none; }
+
+/* Hour lines inside day column */
+.tt-hour-line {
+  position: absolute;
+  left: 0; right: 0;
+  height: 60px;
+  border-bottom: 1px solid var(--border2);
+  box-sizing: border-box;
+  transition: background var(--transition);
+}
+.tt-hour-line:hover { background: var(--glow); }
+
+/* Half-hour dotted line */
+.tt-half-line {
+  position: absolute;
+  left: 4px; right: 4px;
+  height: 0;
+  border-top: 1px dashed var(--border2);
+  top: 30px;
+  pointer-events: none;
+}
+
+/* ── Event blocks ── */
+.tt-event {
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  border-radius: 8px;
+  padding: 5px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.3;
+  overflow: hidden;
+  cursor: pointer;
+  z-index: 5;
+  transition: filter var(--transition), transform var(--transition), box-shadow var(--transition);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-height: 22px;
+  box-sizing: border-box;
+}
+.tt-event:hover {
+  filter: brightness(1.15);
+  transform: translateX(1px) scaleX(0.98);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  z-index: 10;
+}
+
+.tt-event-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tt-event-meta  { font-size: 10px; opacity: 0.75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Type colours — solid fills for readability */
+.ev-CM      { background: rgba(91,138,245,0.85);  color: #fff; border-left: 3px solid #3a6ae8; }
+.ev-TD      { background: rgba(74,200,100,0.85);   color: #fff; border-left: 3px solid #28a855; }
+.ev-Partiel { background: rgba(248,113,113,0.9);   color: #fff; border-left: 3px solid #e03c3c; }
+.ev-Other   { background: rgba(244,192,90,0.85);   color: #1a1000; border-left: 3px solid #d4a020; }
+
+/* Delete X on hover */
+.tt-event-del {
+  position: absolute;
+  top: 3px; right: 4px;
+  font-size: 13px;
+  line-height: 1;
+  opacity: 0;
+  background: rgba(0,0,0,0.35);
+  border-radius: 50%;
+  width: 16px; height: 16px;
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity var(--transition);
+  cursor: pointer;
+  color: #fff;
+  flex-shrink: 0;
+}
+.tt-event:hover .tt-event-del { opacity: 1; }
+
+/* ── Event list below ── */
+.ev-list-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.ev-day-col {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ev-day-header {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text3);
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border2);
+  text-align: center;
+}
+
+.ev-pill {
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  cursor: pointer;
+  transition: var(--transition);
+  border: none;
+  text-align: left;
+}
+.ev-pill:hover { filter: brightness(0.85); transform: translateY(-1px); }
+.ev-pill-time { font-size: 10px; opacity: 0.75; }
+.ev-pill-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ev-pill-empty { font-size: 11px; color: var(--text3); text-align: center; padding: 8px 0; }
+
+/* Add event button */
+.add-event-btn {
+  display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 18px;
-  background: var(--surface2);
-  border: 1.5px dashed var(--border);
-  border-radius: var(--radius);
-  color: var(--text2);
+  padding: 11px 20px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--bg);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
   cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
   transition: var(--transition);
-  width: 100%;
-  justify-content: center;
+}
+.add-event-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px var(--glow); }
+
+/* Color picker for events */
+.ev-color-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.ev-color-swatch {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 3px solid transparent;
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+.ev-color-swatch:hover { transform: scale(1.15); }
+.ev-color-swatch.sel { border-color: #fff; box-shadow: 0 0 10px rgba(255,255,255,0.4); }
+
+/* Current time line */
+.tt-now-line {
+  position: absolute;
+  left: 0; right: 0;
+  height: 2px;
+  background: var(--danger);
+  z-index: 20;
+  pointer-events: none;
+}
+.tt-now-dot {
+  position: absolute;
+  left: -4px;
+  top: -4px;
+  width: 10px; height: 10px;
+  background: var(--danger);
+  border-radius: 50%;
 }
 
-.add-event-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--glow); }
+/* Today column highlight */
+.tt-day-col.today-col { background: rgba(var(--accent-raw, 91,138,245), 0.03); }
+.tt-header-day.today-col .tt-day-name { color: var(--accent); }
+
+/* Responsive */
+@media (max-width: 860px) {
+  .tt-header, .tt-body { grid-template-columns: 40px repeat(7,1fr); }
+  .ev-list-grid { grid-template-columns: repeat(4, 1fr); }
+  .tt-event-meta { display: none; }
+}
+@media (max-width: 600px) {
+  .ev-list-grid { grid-template-columns: repeat(2, 1fr); }
+  .tt-body { max-height: 380px; }
+}
+
 
 /* ═══════════════════════════════════════════
    MODAL
@@ -1652,6 +1806,256 @@ body::before {
 }
 
 input[type="file"] { display: none; }
+
+/* ── ENT link in user card ── */
+.user-ent-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+  padding: 2px 8px;
+  background: var(--glow);
+  border-radius: 20px;
+  border: 1px solid var(--accent);
+  opacity: 0.85;
+  transition: var(--transition);
+  white-space: nowrap;
+  margin-top: 3px;
+}
+.user-ent-link:hover { opacity: 1; transform: translateY(-1px); box-shadow: 0 3px 10px var(--glow); }
+
+/* Nav badge (devoirs count) */
+.nav-badge {
+  margin-left: auto;
+  background: var(--danger);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  min-width: 18px; height: 18px;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+}
+
+/* ── Page header row (Notes / Devoirs) ── */
+.page-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.page-title {
+  font-family: var(--font-display);
+  font-size: 24px; font-weight: 800; letter-spacing: -0.5px;
+}
+.page-subtitle { font-size: 12px; color: var(--text3); margin-top: 4px; }
+
+/* ══════════════════════════════
+   NOTES PAGE
+══════════════════════════════ */
+.notes-filter-bar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.notes-search {
+  flex: 1;
+  min-width: 200px;
+  padding: 10px 14px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 13px;
+  outline: none;
+  transition: var(--transition);
+}
+.notes-search:focus { border-color: var(--accent); }
+.notes-cats { display: flex; gap: 6px; flex-wrap: wrap; }
+.notes-cat-chip {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px; font-weight: 600;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  color: var(--text2);
+  cursor: pointer;
+  transition: var(--transition);
+}
+.notes-cat-chip:hover, .notes-cat-chip.active {
+  background: var(--glow);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.notes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.note-card {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  cursor: pointer;
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+.note-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--note-color, var(--accent));
+}
+.note-card:hover { border-color: var(--border); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
+
+.note-card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.note-card-title { font-family: var(--font-display); font-size: 15px; font-weight: 700; line-height: 1.3; }
+.note-card-del {
+  background: none; border: none; color: var(--text3);
+  cursor: pointer; font-size: 16px; padding: 2px 4px;
+  border-radius: 4px; transition: var(--transition); flex-shrink: 0;
+  opacity: 0;
+}
+.note-card:hover .note-card-del { opacity: 1; }
+.note-card-del:hover { color: var(--danger); }
+
+.note-card-cat {
+  display: inline-block;
+  font-size: 11px; font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: var(--glow);
+  color: var(--accent);
+  align-self: flex-start;
+}
+.note-card-body {
+  font-size: 13px; color: var(--text2);
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  white-space: pre-wrap;
+}
+.note-card-date { font-size: 11px; color: var(--text3); margin-top: auto; }
+.notes-empty { text-align: center; color: var(--text3); padding: 60px 20px; font-size: 14px; }
+
+/* Note color picker uses same ev-color-row + ev-color-swatch classes */
+
+/* ══════════════════════════════
+   DEVOIRS PAGE
+══════════════════════════════ */
+.devoirs-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  background: var(--surface2);
+  border-radius: var(--radius-sm);
+  padding: 4px;
+  width: fit-content;
+}
+.dv-tab {
+  padding: 7px 18px;
+  border-radius: 6px;
+  font-size: 13px; font-weight: 600;
+  border: none; cursor: pointer;
+  background: transparent;
+  color: var(--text2);
+  transition: var(--transition);
+}
+.dv-tab.active { background: var(--bg3); color: var(--text); box-shadow: 0 1px 6px rgba(0,0,0,0.2); }
+
+.devoirs-list { display: flex; flex-direction: column; gap: 10px; }
+
+.devoir-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+.devoir-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  background: var(--dv-color, var(--accent));
+}
+.devoir-card:hover { border-color: var(--border); box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+.devoir-card.done { opacity: 0.5; }
+.devoir-card.done .devoir-title { text-decoration: line-through; }
+
+.dv-check {
+  width: 22px; height: 22px; min-width: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: none;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px;
+  transition: var(--transition);
+}
+.dv-check:hover { border-color: var(--success); background: rgba(74,222,128,0.15); }
+.dv-check.checked { background: var(--success); border-color: var(--success); color: #fff; }
+
+.devoir-info { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.devoir-title { font-weight: 700; font-size: 14px; }
+.devoir-meta { font-size: 12px; color: var(--text2); display: flex; gap: 10px; flex-wrap: wrap; }
+
+.dv-deadline-badge {
+  font-size: 12px; font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.dv-deadline-badge.overdue  { background: rgba(248,113,113,0.18); color: var(--danger); }
+.dv-deadline-badge.urgent   { background: rgba(251,191,36,0.18); color: var(--warning); }
+.dv-deadline-badge.ok       { background: rgba(74,222,128,0.15); color: var(--success); }
+.dv-deadline-badge.today    { background: rgba(248,113,113,0.25); color: var(--danger); animation: pulse 1.5s infinite; }
+
+.dv-type-badge {
+  font-size: 11px; font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 20px;
+  background: var(--surface2);
+  color: var(--text2);
+  border: 1px solid var(--border2);
+}
+
+.dv-del-btn {
+  background: none; border: none; color: var(--text3);
+  cursor: pointer; font-size: 18px; padding: 4px;
+  transition: var(--transition); opacity: 0;
+}
+.devoir-card:hover .dv-del-btn { opacity: 1; }
+.dv-del-btn:hover { color: var(--danger); }
+
+.devoirs-empty { text-align: center; color: var(--text3); padding: 60px 20px; font-size: 14px; }
+
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
 </style>
 </head>
 <body data-theme="midnight">
@@ -1709,12 +2113,15 @@ input[type="file"] { display: none; }
       <div class="logo-row">
         <div class="logo-dot"></div>
         <div class="logo-text">AMU <span>STUDY</span></div>
+        <button class="light-toggle-btn" id="light-toggle-btn" onclick="toggleLightMode()" title="Mode clair / sombre">🌙</button>
       </div>
-      <div class="user-card" onclick="showUserMenu()">
+      <div class="user-card">
         <div class="user-avatar" id="sidebar-avatar">🎓</div>
         <div class="user-info">
           <div class="user-name" id="sidebar-username">—</div>
-          <div class="user-sub">Campus Luminy</div>
+          <a class="user-ent-link" href="https://ent.univ-amu.fr/" target="_blank" rel="noopener" title="Ouvrir l'ENT AMU">
+            🎓 ENT AMU ↗
+          </a>
         </div>
         <button class="logout-btn" onclick="logout(event)" title="Déconnexion">⏻</button>
       </div>
@@ -1726,6 +2133,13 @@ input[type="file"] { display: none; }
       </button>
       <button class="nav-pill" data-page="agenda" onclick="navTo('agenda',this)">
         <span class="nav-icon">📅</span> Agenda
+      </button>
+      <button class="nav-pill" data-page="notes" onclick="navTo('notes',this)">
+        <span class="nav-icon">📝</span> Notes
+      </button>
+      <button class="nav-pill" data-page="devoirs" onclick="navTo('devoirs',this)">
+        <span class="nav-icon">✅</span> Devoirs
+        <span class="nav-badge" id="devoirs-badge" style="display:none">0</span>
       </button>
     </div>
 
@@ -1773,17 +2187,62 @@ input[type="file"] { display: none; }
 
       <!-- PAGE: AGENDA -->
       <div id="page-agenda" class="page">
-        <div class="week-header">
-          <button class="week-nav-btn" onclick="changeWeek(-1)">‹</button>
-          <div class="week-label" id="week-label">Semaine du ...</div>
-          <button class="week-nav-btn" onclick="changeWeek(1)">›</button>
+
+        <div class="agenda-toolbar">
+          <div class="agenda-title-row">
+            <span class="agenda-main-title">🗓️ Emploi du temps</span>
+            <span class="agenda-subtitle">Semaine type · cliquer sur un créneau pour ajouter</span>
+          </div>
+          <button class="add-event-btn" onclick="openAddEventModal()">＋ Ajouter un cours</button>
         </div>
 
-        <div class="week-grid" id="week-grid"></div>
+        <!-- Timetable -->
+        <div class="timetable-wrap">
+          <div class="tt-header" id="tt-header"></div>
+          <div class="tt-body"  id="tt-body"></div>
+        </div>
 
-        <div class="section-heading">📌 Évènements à venir</div>
-        <button class="add-event-btn" onclick="openModal('event-modal')">+ Ajouter un cours / évènement</button>
-        <div class="upcoming-list" id="upcoming-list"></div>
+        <!-- Event list per day -->
+        <div class="section-heading" style="margin-top:28px">📋 Récapitulatif</div>
+        <div class="ev-list-grid" id="ev-list-grid"></div>
+
+      </div>
+
+      <!-- PAGE: NOTES -->
+      <div id="page-notes" class="page">
+        <div class="page-header-row">
+          <div>
+            <div class="page-title">📝 Notes</div>
+            <div class="page-subtitle">Toutes tes notes en un seul endroit</div>
+          </div>
+          <button class="add-event-btn" onclick="openNoteModal()">＋ Nouvelle note</button>
+        </div>
+
+        <div class="notes-filter-bar">
+          <input class="notes-search" id="notes-search" placeholder="🔍 Rechercher une note..." oninput="renderNotes()">
+          <div class="notes-cats" id="notes-cats"></div>
+        </div>
+
+        <div id="notes-grid" class="notes-grid"></div>
+      </div>
+
+      <!-- PAGE: DEVOIRS -->
+      <div id="page-devoirs" class="page">
+        <div class="page-header-row">
+          <div>
+            <div class="page-title">✅ Devoirs à faire</div>
+            <div class="page-subtitle">Ne rate plus aucune deadline</div>
+          </div>
+          <button class="add-event-btn" onclick="openDevoirModal()">＋ Ajouter un devoir</button>
+        </div>
+
+        <div class="devoirs-tabs">
+          <button class="dv-tab active" onclick="switchDevoirsTab('todo',this)">À faire</button>
+          <button class="dv-tab" onclick="switchDevoirsTab('done',this)">Terminés</button>
+          <button class="dv-tab" onclick="switchDevoirsTab('all',this)">Tous</button>
+        </div>
+
+        <div id="devoirs-list" class="devoirs-list"></div>
       </div>
 
     </div>
@@ -1880,63 +2339,153 @@ input[type="file"] { display: none; }
 <!-- Event Modal -->
 <div class="modal-overlay" id="event-modal">
   <div class="modal-box">
-    <div class="modal-title">📅 Ajouter un cours</div>
+    <div class="modal-title" id="ev-modal-title">➕ Nouveau cours</div>
+
     <div class="form-field">
-      <label class="form-label">Titre *</label>
-      <input class="form-input" id="ev-title" placeholder="ex: Maths — Algèbre">
+      <label class="form-label">Intitulé *</label>
+      <input class="form-input" id="ev-title" placeholder="ex: Biologie Cellulaire">
     </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-field">
+        <label class="form-label">Type</label>
+        <select class="form-select" id="ev-type">
+          <option value="CM">🎤 CM</option>
+          <option value="TD">✏️ TD</option>
+          <option value="Partiel">📝 Partiel</option>
+          <option value="Other">📌 Autre</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Jour *</label>
+        <select class="form-select" id="ev-day">
+          <option value="0">Lundi</option>
+          <option value="1">Mardi</option>
+          <option value="2">Mercredi</option>
+          <option value="3">Jeudi</option>
+          <option value="4">Vendredi</option>
+          <option value="5">Samedi</option>
+          <option value="6">Dimanche</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-field">
+        <label class="form-label">Heure début *</label>
+        <input class="form-input" id="ev-time" type="time" value="08:00">
+      </div>
+      <div class="form-field">
+        <label class="form-label">Durée</label>
+        <select class="form-select" id="ev-duration">
+          <option value="0.5">30 min</option>
+          <option value="1">1h</option>
+          <option value="1.5">1h30</option>
+          <option value="2" selected>2h</option>
+          <option value="2.5">2h30</option>
+          <option value="3">3h</option>
+          <option value="4">4h</option>
+        </select>
+      </div>
+    </div>
+
     <div class="form-field">
-      <label class="form-label">Type</label>
-      <select class="form-select" id="ev-type">
-        <option value="CM">🎤 Cours Magistral (CM)</option>
-        <option value="TD">✏️ Travaux Dirigés (TD)</option>
-        <option value="Partiel">📝 Partiel / Examen</option>
-        <option value="Other">📌 Autre</option>
-      </select>
+      <label class="form-label">Salle / Lieu</label>
+      <input class="form-input" id="ev-room" placeholder="ex: Amphi Darwin, Salle 203">
     </div>
+
     <div class="form-field">
-      <label class="form-label">Jour *</label>
-      <select class="form-select" id="ev-day">
-        <option value="0">Lundi</option>
-        <option value="1">Mardi</option>
-        <option value="2">Mercredi</option>
-        <option value="3">Jeudi</option>
-        <option value="4">Vendredi</option>
-        <option value="5">Samedi</option>
-        <option value="6">Dimanche</option>
-      </select>
+      <label class="form-label">Enseignant (optionnel)</label>
+      <input class="form-input" id="ev-teacher" placeholder="ex: Prof. Martin">
     </div>
+
     <div class="form-field">
-      <label class="form-label">Heure *</label>
-      <input class="form-input" id="ev-time" type="time" value="08:00">
+      <label class="form-label">Couleur personnalisée</label>
+      <div class="ev-color-row" id="ev-color-row"></div>
     </div>
-    <div class="form-field">
-      <label class="form-label">Durée (heures)</label>
-      <select class="form-select" id="ev-duration">
-        <option value="1">1h</option>
-        <option value="1.5">1h30</option>
-        <option value="2" selected>2h</option>
-        <option value="3">3h</option>
-      </select>
-    </div>
-    <div class="form-field">
-      <label class="form-label">Salle (optionnel)</label>
-      <input class="form-input" id="ev-room" placeholder="ex: Amphi A, Salle 203">
-    </div>
-    <div class="form-field">
-      <label class="form-label">Date précise (optionnel)</label>
-      <input class="form-input" id="ev-date" type="date">
-    </div>
-    <div class="form-field">
-      <label class="form-label">Répétition</label>
-      <select class="form-select" id="ev-repeat">
-        <option value="none">Aucune</option>
-        <option value="weekly" selected>Toutes les semaines</option>
-      </select>
-    </div>
+
     <div class="modal-footer">
       <button class="btn-cancel" onclick="closeModal('event-modal')">Annuler</button>
-      <button class="btn-confirm" onclick="createEvent()">Ajouter</button>
+      <button class="btn-confirm" id="ev-submit-btn" onclick="createEvent()">Ajouter</button>
+    </div>
+  </div>
+</div>
+
+<!-- Note Modal -->
+<div class="modal-overlay" id="note-modal">
+  <div class="modal-box" style="width:580px">
+    <div class="modal-title" id="note-modal-title">📝 Nouvelle note</div>
+    <div class="form-field">
+      <label class="form-label">Titre *</label>
+      <input class="form-input" id="note-title" placeholder="ex: Cours de Bio — Mitose">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-field">
+        <label class="form-label">Matière / Catégorie</label>
+        <input class="form-input" id="note-cat" placeholder="ex: Biologie, Maths...">
+      </div>
+      <div class="form-field">
+        <label class="form-label">Couleur</label>
+        <div class="ev-color-row" id="note-color-row"></div>
+      </div>
+    </div>
+    <div class="form-field">
+      <label class="form-label">Contenu *</label>
+      <textarea class="form-textarea" id="note-content" style="min-height:160px" placeholder="Écris tes notes ici..."></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('note-modal')">Annuler</button>
+      <button class="btn-confirm" id="note-submit-btn" onclick="saveNote()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Devoir Modal -->
+<div class="modal-overlay" id="devoir-modal">
+  <div class="modal-box">
+    <div class="modal-title" id="devoir-modal-title">📋 Nouveau devoir</div>
+    <div class="form-field">
+      <label class="form-label">Intitulé *</label>
+      <input class="form-input" id="dv-title" placeholder="ex: DM Analyse — Série 4">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-field">
+        <label class="form-label">Matière</label>
+        <input class="form-input" id="dv-subject" placeholder="ex: Maths, Physique...">
+      </div>
+      <div class="form-field">
+        <label class="form-label">Type</label>
+        <select class="form-select" id="dv-type">
+          <option value="DM">📄 Devoir maison</option>
+          <option value="DS">📝 Devoir sur table</option>
+          <option value="Projet">🗂️ Projet</option>
+          <option value="Exposé">🎤 Exposé</option>
+          <option value="Lecture">📖 Lecture</option>
+          <option value="Autre">📌 Autre</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-field">
+        <label class="form-label">Date limite *</label>
+        <input class="form-input" id="dv-deadline" type="date">
+      </div>
+      <div class="form-field">
+        <label class="form-label">Priorité</label>
+        <select class="form-select" id="dv-priority">
+          <option value="low">🟢 Basse</option>
+          <option value="medium" selected>🟡 Moyenne</option>
+          <option value="high">🔴 Haute</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-field">
+      <label class="form-label">Description (optionnel)</label>
+      <textarea class="form-textarea" id="dv-desc" placeholder="Instructions, pages à lire..."></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('devoir-modal')">Annuler</button>
+      <button class="btn-confirm" id="dv-submit-btn" onclick="saveDevoir()">Ajouter</button>
     </div>
   </div>
 </div>
@@ -1950,7 +2499,7 @@ input[type="file"] { display: none; }
 // CONSTANTS
 // ═══════════════════════════════════════════════════════
 const DB_NAME = "AMU_HUB_DB";
-const DB_VER = 1;
+const DB_VER = 2; // bumped to add notes + devoirs stores
 
 const THEMES = [
   { id:"midnight", name:"Midnight",  bg:"#090c14", c1:"#5b8af5", c2:"#a78bfa", c3:"#0f1422" },
@@ -1983,11 +2532,17 @@ const SUBJECT_TABS = [
 // ═══════════════════════════════════════════════════════
 let db, currentUser = null, currentFolderId = null;
 let editingNotesId = null, uploadTargetId = null, uploadTabKey = null;
-let currentWeekOffset = 0;
 let selectedColor = COLORS[0];
 let selectedFolderEmoji = "📁";
 let selectedAvatar = "🎓";
 let currentFilter = "all";
+// Notes state
+let selectedNoteColor = null;
+let editingNoteId = null;
+let currentNotesCat = 'all';
+// Devoirs state
+let editingDevoirId = null;
+let currentDevoirsTab = 'todo';
 
 // ═══════════════════════════════════════════════════════
 // DB INIT
@@ -1997,16 +2552,18 @@ async function initDB() {
     const r = indexedDB.open(DB_NAME, DB_VER);
     r.onupgradeneeded = e => {
       const d = e.target.result;
-      ['users','folders','subjects','files','events'].forEach(store => {
+      ['users','folders','subjects','files','events','notes','devoirs'].forEach(store => {
         if (!d.objectStoreNames.contains(store)) {
           const s = d.createObjectStore(store, { keyPath:'id', autoIncrement:true });
-          if (store === 'folders') s.createIndex('userId','userId',{unique:false});
+          if (store === 'folders')  s.createIndex('userId','userId',{unique:false});
           if (store === 'subjects') s.createIndex('folderId','folderId',{unique:false});
           if (store === 'files') {
             s.createIndex('subjectId','subjectId',{unique:false});
             s.createIndex('tabKey','tabKey',{unique:false});
           }
-          if (store === 'events') s.createIndex('userId','userId',{unique:false});
+          if (store === 'events')  s.createIndex('userId','userId',{unique:false});
+          if (store === 'notes')   s.createIndex('userId','userId',{unique:false});
+          if (store === 'devoirs') s.createIndex('userId','userId',{unique:false});
         }
       });
     };
@@ -2016,45 +2573,84 @@ async function initDB() {
 }
 
 function dbGet(store, id) {
-  return new Promise(res => {
-    const tx = db.transaction(store,'readonly');
-    tx.objectStore(store).get(id).onsuccess = e => res(e.target.result);
+  return new Promise((res, rej) => {
+    try {
+      const tx = db.transaction(store, 'readonly');
+      const req = tx.objectStore(store).get(id);
+      req.onsuccess = e => res(e.target.result);
+      req.onerror   = e => rej(e.target.error);
+    } catch(e) { rej(e); }
   });
 }
 
 function dbGetAll(store) {
-  return new Promise(res => {
-    const tx = db.transaction(store,'readonly');
-    tx.objectStore(store).getAll().onsuccess = e => res(e.target.result);
+  return new Promise((res, rej) => {
+    try {
+      const tx = db.transaction(store, 'readonly');
+      const req = tx.objectStore(store).getAll();
+      req.onsuccess = e => res(e.target.result);
+      req.onerror   = e => rej(e.target.error);
+    } catch(e) { rej(e); }
   });
 }
 
 function dbGetByIndex(store, idx, val) {
-  return new Promise(res => {
-    const tx = db.transaction(store,'readonly');
-    tx.objectStore(store).index(idx).getAll(val).onsuccess = e => res(e.target.result);
+  // Use getAll + JS filter to avoid silent type-mismatch in IDB index queries
+  // (e.g. storing userId as number 1 but querying with number 1 can still fail
+  //  in some browsers if the key path was indexed as a different type)
+  return new Promise((res, rej) => {
+    try {
+      const tx = db.transaction(store, 'readonly');
+      const req = tx.objectStore(store).getAll();
+      req.onsuccess = e => {
+        const all = e.target.result || [];
+        // Find the field name from the index name (they match in our schema)
+        const filtered = all.filter(obj => String(obj[idx]) === String(val));
+        res(filtered);
+      };
+      req.onerror = e => rej(e.target.error);
+    } catch(e) { rej(e); }
   });
 }
 
 function dbAdd(store, obj) {
-  return new Promise(res => {
-    const tx = db.transaction(store,'readwrite');
-    const req = tx.objectStore(store).add(obj);
-    req.onsuccess = e => res(e.target.result);
+  return new Promise((res, rej) => {
+    try {
+      const tx = db.transaction(store, 'readwrite');
+      const req = tx.objectStore(store).add(obj);
+      let newId;
+      req.onsuccess = e => { newId = e.target.result; };
+      req.onerror   = e => rej(e.target.error);
+      // Resolve ONLY when transaction is fully committed
+      tx.oncomplete = () => res(newId);
+      tx.onerror    = e => rej(e.target.error);
+      tx.onabort    = e => rej(e.target.error);
+    } catch(e) { rej(e); }
   });
 }
 
 function dbPut(store, obj) {
-  return new Promise(res => {
-    const tx = db.transaction(store,'readwrite');
-    tx.objectStore(store).put(obj).onsuccess = e => res(e.target.result);
+  return new Promise((res, rej) => {
+    try {
+      const tx = db.transaction(store, 'readwrite');
+      const req = tx.objectStore(store).put(obj);
+      req.onerror = e => rej(e.target.error);
+      tx.oncomplete = () => res();
+      tx.onerror    = e => rej(e.target.error);
+      tx.onabort    = e => rej(e.target.error);
+    } catch(e) { rej(e); }
   });
 }
 
 function dbDelete(store, id) {
-  return new Promise(res => {
-    const tx = db.transaction(store,'readwrite');
-    tx.objectStore(store).delete(id).onsuccess = () => res();
+  return new Promise((res, rej) => {
+    try {
+      const tx = db.transaction(store, 'readwrite');
+      tx.objectStore(store).delete(id);
+      tx.oncomplete = () => res();
+      tx.onerror    = e => rej(e.target.error);
+      tx.onabort    = e => rej(e.target.error);
+    } catch(e) { rej(e); }
   });
 }
 
@@ -2127,20 +2723,24 @@ async function handleRegister() {
   loginSuccess({ id, name, username, avatar: selectedAvatar, theme: 'midnight' });
 }
 
-function loginSuccess(user) {
+async function loginSuccess(user) {
   currentUser = user;
+  console.log('[AMU] Logged in as:', user.name, 'id:', user.id);
   document.getElementById('auth-screen').style.display = 'none';
   document.getElementById('app').classList.add('visible');
   document.getElementById('sidebar-username').textContent = user.name;
   document.getElementById('sidebar-avatar').textContent = user.avatar || '🎓';
 
   applyTheme(user.theme || 'midnight');
-  loadFolders();
-  updateGlobalStats();
-  renderAgenda();
   buildThemeGrid();
   buildColorPicker();
   buildFolderEmojiGrid();
+  buildEvColorPicker();
+  buildNoteColorPicker();
+  await loadFolders();
+  updateGlobalStats();
+  await renderAgenda();
+  await renderDevoirs(); // update badge silently
   toast('Bienvenue ' + user.name + ' 👋', 'success');
 }
 
@@ -2160,19 +2760,26 @@ function logout(e) {
 // ═══════════════════════════════════════════════════════
 function navTo(page, btn) {
   document.querySelectorAll('.nav-pill').forEach(p => p.classList.remove('active'));
-  btn.classList.add('active');
+  if (btn) btn.classList.add('active');
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-' + page).classList.add('active');
 
+  document.getElementById('stat-chips').style.display = 'none';
+  document.getElementById('add-subject-btn').style.display = 'none';
+
   if (page === 'agenda') {
     document.getElementById('main-title').textContent = '📅 Agenda';
-    document.getElementById('stat-chips').style.display = 'none';
-    document.getElementById('add-subject-btn').style.display = 'none';
     renderAgenda();
   } else if (page === 'courses') {
     document.getElementById('main-title').textContent = currentFolderId ? document.getElementById('main-title').textContent : 'Mes Cours';
     document.getElementById('stat-chips').style.display = currentFolderId ? 'flex' : 'none';
     document.getElementById('add-subject-btn').style.display = currentFolderId ? 'flex' : 'none';
+  } else if (page === 'notes') {
+    document.getElementById('main-title').textContent = '📝 Notes';
+    renderNotes();
+  } else if (page === 'devoirs') {
+    document.getElementById('main-title').textContent = '✅ Devoirs';
+    renderDevoirs();
   }
 }
 
@@ -2182,6 +2789,24 @@ function navTo(page, btn) {
 function applyTheme(id) {
   document.body.setAttribute('data-theme', id);
   localStorage.setItem('amu-theme', id);
+}
+
+// Light / Dark mode
+let isLightMode = localStorage.getItem('amu-lightmode') === 'true';
+
+function toggleLightMode() {
+  isLightMode = !isLightMode;
+  applyLightMode();
+  localStorage.setItem('amu-lightmode', isLightMode);
+}
+
+function applyLightMode() {
+  document.body.setAttribute('data-lightmode', isLightMode ? 'true' : 'false');
+  const btn = document.getElementById('light-toggle-btn');
+  if (btn) btn.textContent = isLightMode ? '☀️' : '🌙';
+  // Also update the auth screen background
+  const authScreen = document.getElementById('auth-screen');
+  if (authScreen) authScreen.style.background = isLightMode ? 'var(--bg)' : '';
 }
 
 function openThemePanel() {
@@ -2614,160 +3239,615 @@ async function updateGlobalStats() { /* can be extended */ }
 // ═══════════════════════════════════════════════════════
 // AGENDA
 // ═══════════════════════════════════════════════════════
-const HOURS = [8,9,10,11,12,13,14,15,16,17,18,19];
+// AGENDA — Emploi du temps (grille temps réel)
+// ═══════════════════════════════════════════════════════
 
-function getWeekDates(offset=0) {
-  const now = new Date();
-  const day = now.getDay(); // 0=Sunday
-  const monday = new Date(now);
-  monday.setDate(now.getDate() - (day===0?6:day-1) + offset*7);
-  return Array.from({length:7},(_,i)=>{ const d=new Date(monday); d.setDate(monday.getDate()+i); return d; });
+const TT_START = 7;   // première heure affichée
+const TT_END   = 21;  // dernière heure affichée
+const TT_CELL  = 60;  // px par heure
+
+// Couleurs disponibles pour les événements
+const EV_COLORS = [
+  null,          // null = auto selon le type
+  '#5b8af5','#4ac864','#f87171','#f4c05a',
+  '#c880ff','#fa6450','#20c9ac','#f064a0',
+  '#38bdf8','#ff9a6c','#ffd060','#a0c080',
+];
+let selectedEvColor = null; // null = auto
+
+function buildEvColorPicker() {
+  const row = document.getElementById('ev-color-row');
+  if (!row) return;
+  row.innerHTML = '';
+  EV_COLORS.forEach(c => {
+    const s = document.createElement('div');
+    s.className = 'ev-color-swatch' + (c === selectedEvColor ? ' sel' : '');
+    s.style.background = c || 'var(--bg3)';
+    s.style.border = c ? '3px solid transparent' : '2px dashed var(--border)';
+    if (!c) s.textContent = '↺';
+    s.style.display = 'flex';
+    s.style.alignItems = 'center';
+    s.style.justifyContent = 'center';
+    s.style.fontSize = '14px';
+    s.style.color = 'var(--text2)';
+    s.onclick = () => {
+      selectedEvColor = c;
+      buildEvColorPicker();
+    };
+    row.appendChild(s);
+  });
+}
+
+// Get event color (custom or type default)
+function evBgColor(ev) {
+  if (ev.color) return ev.color;
+  const map = { CM:'#5b8af5', TD:'#4ac864', Partiel:'#f87171', Other:'#f4c05a' };
+  return map[ev.type] || '#5b8af5';
+}
+
+function evTextColor(bg) {
+  // Simple luminance check
+  const r = parseInt(bg.slice(1,3),16), g = parseInt(bg.slice(3,5),16), b = parseInt(bg.slice(5,7),16);
+  return (0.299*r + 0.587*g + 0.114*b) > 140 ? '#1a1a1a' : '#ffffff';
+}
+
+// Convert "HH:MM" to minutes from TT_START
+function timeToOffset(timeStr) {
+  if (!timeStr) return 0;
+  const [h, m] = timeStr.split(':').map(Number);
+  return ((h - TT_START) * 60 + (m || 0));
 }
 
 async function renderAgenda() {
   if (!currentUser) return;
-  const dates = getWeekDates(currentWeekOffset);
-  const today = new Date();
 
-  // Update label
-  const first = dates[0], last = dates[6];
-  document.getElementById('week-label').textContent =
-    `${first.getDate()} ${MONTHS_FULL[first.getMonth()]} — ${last.getDate()} ${MONTHS_FULL[last.getMonth()]} ${last.getFullYear()}`;
+  // Fetch & filter events
+  let allEv = [];
+  try { allEv = await dbGetAll('events'); } catch(e) { console.error(e); }
+  const uid = String(currentUser.id);
+  const events = allEv.filter(ev => String(ev.userId) === uid);
+  console.log('[AMU] agenda: loaded', events.length, 'events for user', uid);
 
-  const events = await dbGetByIndex('events','userId',currentUser.id);
+  // ── Build header ──────────────────────────────────────
+  const header = document.getElementById('tt-header');
+  header.innerHTML = '';
 
-  // Build grid
-  const grid = document.getElementById('week-grid');
-  grid.innerHTML='';
+  // Today's weekday (Mon=0)
+  const todayIdx = (() => { const d = new Date().getDay(); return d === 0 ? 6 : d - 1; })();
 
-  // Header row
-  const cornerHead = document.createElement('div');
-  cornerHead.className = 'time-col-head';
-  grid.appendChild(cornerHead);
+  // Gutter corner
+  const corner = document.createElement('div');
+  corner.className = 'tt-header-gutter';
+  header.appendChild(corner);
 
-  dates.forEach((d,i) => {
-    const isToday = d.toDateString()===today.toDateString();
-    const head = document.createElement('div');
-    head.className = 'week-day-head' + (isToday?' today-col':'');
-    head.innerHTML = `<div class="wdh-name">${DAYS_FR[i]}</div><div class="wdh-num">${d.getDate()}</div>`;
-    grid.appendChild(head);
+  DAYS_FR.forEach((name, i) => {
+    const col = document.createElement('div');
+    col.className = 'tt-header-day' + (i === todayIdx ? ' today-col' : '');
+    col.innerHTML = `<div class="tt-day-name">${name}</div><div class="tt-day-add">＋</div>`;
+    col.onclick = () => {
+      document.getElementById('ev-day').value = i;
+      openAddEventModal(i);
+    };
+    header.appendChild(col);
   });
 
-  // Time rows
-  HOURS.forEach(hour => {
-    const timeLabel = document.createElement('div');
-    timeLabel.className = 'time-label';
-    timeLabel.textContent = `${hour}:00`;
-    grid.appendChild(timeLabel);
+  // ── Build body ────────────────────────────────────────
+  const body = document.getElementById('tt-body');
+  body.innerHTML = '';
 
-    dates.forEach((d,dayIdx) => {
-      const cell = document.createElement('div');
-      cell.className = 'day-cell';
-      cell.title = `${DAYS_FR[dayIdx]} ${d.getDate()} ${MONTHS_FULL[d.getMonth()]} — ${hour}h`;
+  const totalHours = TT_END - TT_START;
+  const totalPx    = totalHours * TT_CELL;
 
-      // Find events for this slot
-      const slotEvents = events.filter(ev => {
-        if (ev.repeat === 'weekly') return ev.day == dayIdx && parseInt(ev.time?.split(':')[0]) === hour;
-        if (ev.date) {
-          const evDate = new Date(ev.date);
-          return evDate.toDateString()===d.toDateString() && parseInt(ev.time?.split(':')[0]) === hour;
-        }
-        return false;
-      });
+  // Time gutter column
+  const timeCol = document.createElement('div');
+  timeCol.className = 'tt-time-col';
+  for (let h = TT_START; h <= TT_END; h++) {
+    const lbl = document.createElement('div');
+    lbl.className = 'tt-hour-label';
+    lbl.textContent = h < 10 ? `0${h}:00` : `${h}:00`;
+    timeCol.appendChild(lbl);
+  }
+  body.appendChild(timeCol);
 
-      slotEvents.forEach(ev => {
-        const evDiv = document.createElement('div');
-        evDiv.className = `agenda-event event-type-${ev.type}`;
-        evDiv.textContent = ev.title + (ev.room ? ` · ${ev.room}` : '');
-        evDiv.title = `${ev.type} — ${ev.title}${ev.room?' | '+ev.room:''}`;
-        cell.appendChild(evDiv);
-      });
+  // One column per day
+  DAYS_FR.forEach((_, dayIdx) => {
+    const col = document.createElement('div');
+    col.className = 'tt-day-col' + (dayIdx === todayIdx ? ' today-col' : '');
+    col.style.height = totalPx + 'px';
 
-      cell.onclick = (e) => {
-        if (!slotEvents.length) {
-          // Pre-fill modal
-          document.getElementById('ev-day').value = dayIdx;
-          document.getElementById('ev-time').value = `${String(hour).padStart(2,'0')}:00`;
-          document.getElementById('ev-date').value = d.toISOString().split('T')[0];
-          openModal('event-modal');
-        }
+    // Hour lines + click handlers
+    for (let h = TT_START; h < TT_END; h++) {
+      const line = document.createElement('div');
+      line.className = 'tt-hour-line';
+      line.style.top = ((h - TT_START) * TT_CELL) + 'px';
+
+      // Half-hour dashed line
+      const half = document.createElement('div');
+      half.className = 'tt-half-line';
+      line.appendChild(half);
+
+      const capturedH = h;
+      line.onclick = (e) => {
+        if (e.target.closest('.tt-event')) return;
+        const rect = col.getBoundingClientRect();
+        const clickY = e.clientY - rect.top;
+        const minutesFromTop = Math.round(clickY / (TT_CELL / 60) / 30) * 30;
+        const absMinutes = TT_START * 60 + minutesFromTop;
+        const hh = Math.floor(absMinutes / 60);
+        const mm = absMinutes % 60;
+        const timeStr = `${String(Math.min(hh, TT_END - 1)).padStart(2,'0')}:${String(mm).padStart(2,'0')}`;
+        openAddEventModal(dayIdx, timeStr);
       };
+      col.appendChild(line);
+    }
 
-      grid.appendChild(cell);
+    // Place events
+    const dayEvents = events.filter(ev => parseInt(ev.day, 10) === dayIdx);
+    dayEvents.forEach(ev => {
+      const offsetMin = timeToOffset(ev.time);
+      const durationMin = (parseFloat(ev.duration) || 1) * 60;
+
+      // Clamp to visible range
+      if (offsetMin < 0 || offsetMin >= totalHours * 60) return;
+
+      const top  = (offsetMin / 60) * TT_CELL;
+      const height = Math.max((durationMin / 60) * TT_CELL - 4, 22);
+
+      const bg   = evBgColor(ev);
+      const fg   = evTextColor(bg);
+
+      const evEl = document.createElement('div');
+      evEl.className = 'tt-event';
+      evEl.style.cssText = `top:${top + 2}px; height:${height}px; background:${bg}; color:${fg}; border-left:3px solid ${fg === '#ffffff' ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.2)'};`;
+
+      const meta = [ev.time];
+      if (ev.duration) meta.push(`${ev.duration}h`);
+      if (ev.room) meta.push(ev.room);
+      if (ev.teacher) meta.push(ev.teacher);
+
+      evEl.innerHTML = `
+        <div class="tt-event-title">${ev.title}</div>
+        <div class="tt-event-meta">${meta.join(' · ')}</div>
+        <div class="tt-event-del" onclick="deleteEvent(${ev.id},event)">×</div>`;
+
+      col.appendChild(evEl);
     });
+
+    body.appendChild(col);
   });
 
-  // Upcoming list
-  renderUpcoming(events);
-}
-
-function renderUpcoming(events) {
-  const list = document.getElementById('upcoming-list');
-  list.innerHTML = '';
-  const now = new Date();
-
-  const upcoming = events
-    .filter(ev => ev.date && new Date(ev.date) >= now)
-    .sort((a,b)=>new Date(a.date)-new Date(b.date))
-    .slice(0,8);
-
-  if (!upcoming.length) {
-    list.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px">Aucun événement à venir</div>';
-    return;
+  // Current time line (only if today is in view)
+  if (todayIdx >= 0 && todayIdx < 7) {
+    const now = new Date();
+    const nowMin = now.getHours() * 60 + now.getMinutes();
+    const startMin = TT_START * 60;
+    const endMin   = TT_END   * 60;
+    if (nowMin >= startMin && nowMin <= endMin) {
+      const pct = (nowMin - startMin) / ((endMin - startMin));
+      const topPx = pct * totalPx;
+      // Find the today column (index todayIdx + 1 because first child is timeCol)
+      const cols = body.children;
+      if (cols[todayIdx + 1]) {
+        const line = document.createElement('div');
+        line.className = 'tt-now-line';
+        line.style.top = topPx + 'px';
+        line.innerHTML = '<div class="tt-now-dot"></div>';
+        cols[todayIdx + 1].appendChild(line);
+      }
+    }
   }
 
-  const typeColors = { CM:'var(--accent)', TD:'var(--success)', Partiel:'var(--danger)', Other:'var(--gold)' };
+  // Scroll to 8h by default
+  body.scrollTop = (8 - TT_START) * TT_CELL;
 
-  upcoming.forEach(ev => {
-    const d = new Date(ev.date);
-    const row = document.createElement('div');
-    row.className = 'upcoming-event';
-    row.innerHTML = `
-      <div class="upcoming-date-box">
-        <div class="upd-day">${d.getDate()}</div>
-        <div class="upd-month">${MONTHS_FR[d.getMonth()]}</div>
-      </div>
-      <div class="upcoming-info">
-        <div class="upcoming-title">${ev.title}</div>
-        <div class="upcoming-sub">${ev.time||''}${ev.room?' · '+ev.room:''}</div>
-      </div>
-      <span class="upcoming-type-badge" style="background:${typeColors[ev.type]||'var(--accent)'}22;color:${typeColors[ev.type]||'var(--accent)'}">${ev.type}</span>
-      <button class="upcoming-del" onclick="deleteEvent(${ev.id},event)">×</button>`;
-    list.appendChild(row);
+  // ── Build list grid ───────────────────────────────────
+  renderEvListGrid(events);
+}
+
+function renderEvListGrid(events) {
+  const grid = document.getElementById('ev-list-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+
+  DAYS_FR.forEach((dayName, dayIdx) => {
+    const col = document.createElement('div');
+    col.className = 'ev-day-col';
+    col.innerHTML = `<div class="ev-day-header">${dayName.slice(0,3)}</div>`;
+
+    const dayEvs = events
+      .filter(ev => parseInt(ev.day,10) === dayIdx)
+      .sort((a,b) => (a.time||'').localeCompare(b.time||''));
+
+    if (!dayEvs.length) {
+      col.innerHTML += `<div class="ev-pill-empty">—</div>`;
+    } else {
+      dayEvs.forEach(ev => {
+        const bg = evBgColor(ev);
+        const fg = evTextColor(bg);
+        const pill = document.createElement('div');
+        pill.className = 'ev-pill';
+        pill.style.cssText = `background:${bg};color:${fg}`;
+        pill.innerHTML = `
+          <span class="ev-pill-time">${ev.time || ''}${ev.duration ? ` · ${ev.duration}h` : ''}</span>
+          <span class="ev-pill-title">${ev.title}</span>`;
+        pill.title = `${ev.type}${ev.room ? ' · ' + ev.room : ''}${ev.teacher ? ' · ' + ev.teacher : ''}`;
+        pill.onclick = () => {
+          if (confirm(`Supprimer "${ev.title}" ?`)) {
+            dbDelete('events', ev.id).then(() => renderAgenda());
+          }
+        };
+        col.appendChild(pill);
+      });
+    }
+    grid.appendChild(col);
   });
 }
 
-function changeWeek(delta) {
-  currentWeekOffset += delta;
-  renderAgenda();
+function openAddEventModal(dayIdx = 0, timeStr = '08:00') {
+  document.getElementById('ev-title').value = '';
+  document.getElementById('ev-type').value = 'CM';
+  document.getElementById('ev-day').value = String(dayIdx);
+  document.getElementById('ev-time').value = timeStr;
+  document.getElementById('ev-duration').value = '2';
+  document.getElementById('ev-room').value = '';
+  document.getElementById('ev-teacher').value = '';
+  document.getElementById('ev-modal-title').textContent = '➕ Nouveau cours';
+  document.getElementById('ev-submit-btn').textContent = 'Ajouter';
+  selectedEvColor = null;
+  buildEvColorPicker();
+  openModal('event-modal');
 }
 
 async function createEvent() {
   const title = document.getElementById('ev-title').value.trim();
-  if (!title) { toast('Titre requis','error'); return; }
-  await dbAdd('events',{
+  const time  = document.getElementById('ev-time').value;
+
+  if (!title) { toast('Titre requis', 'error'); return; }
+  if (!time)  { toast('Heure requise', 'error'); return; }
+
+  const evObj = {
     title,
-    type: document.getElementById('ev-type').value,
-    day: parseInt(document.getElementById('ev-day').value),
-    time: document.getElementById('ev-time').value,
+    type:     document.getElementById('ev-type').value,
+    day:      parseInt(document.getElementById('ev-day').value, 10),
+    time,
     duration: parseFloat(document.getElementById('ev-duration').value),
-    room: document.getElementById('ev-room').value.trim(),
-    date: document.getElementById('ev-date').value || null,
-    repeat: document.getElementById('ev-repeat').value,
-    userId: currentUser.id,
+    room:     document.getElementById('ev-room').value.trim(),
+    teacher:  document.getElementById('ev-teacher').value.trim(),
+    color:    selectedEvColor || null,
+    userId:   currentUser.id,
     createdAt: new Date()
-  });
-  closeModal('event-modal');
-  renderAgenda();
-  toast('Cours ajouté','success');
+  };
+
+  try {
+    const newId = await dbAdd('events', evObj);
+    console.log('[AMU] event saved id:', newId);
+    closeModal('event-modal');
+    await renderAgenda();
+    toast(`"${title}" ajouté ✓`, 'success');
+  } catch(err) {
+    console.error('[AMU] createEvent:', err);
+    toast('Erreur : ' + (err?.message || err), 'error');
+  }
 }
 
 async function deleteEvent(id, e) {
+  if (e) e.stopPropagation();
+  if (!confirm('Supprimer ce cours ?')) return;
+  await dbDelete('events', id);
+  await renderAgenda();
+  toast('Cours supprimé', 'info');
+}
+
+// ═══════════════════════════════════════════════════════
+// NOTES
+// ═══════════════════════════════════════════════════════
+const NOTE_COLORS = ['#5b8af5','#4ac864','#f87171','#f4c05a','#c880ff','#fa6450','#20c9ac','#f064a0','#ffd060','#38bdf8'];
+
+function buildNoteColorPicker() {
+  const row = document.getElementById('note-color-row');
+  if (!row) return;
+  row.innerHTML = '';
+  [null, ...NOTE_COLORS].forEach(c => {
+    const s = document.createElement('div');
+    s.className = 'ev-color-swatch' + (c === selectedNoteColor ? ' sel' : '');
+    s.style.cssText = `background:${c||'var(--bg3)'};border:${c?'3px solid transparent':'2px dashed var(--border)'};display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--text2)`;
+    if (!c) s.textContent = '↺';
+    s.onclick = () => { selectedNoteColor = c; buildNoteColorPicker(); };
+    row.appendChild(s);
+  });
+}
+
+function openNoteModal(noteId = null) {
+  editingNoteId = noteId;
+  selectedNoteColor = null;
+  if (noteId) {
+    dbGet('notes', noteId).then(n => {
+      if (!n) return;
+      document.getElementById('note-title').value   = n.title || '';
+      document.getElementById('note-cat').value     = n.cat   || '';
+      document.getElementById('note-content').value = n.content || '';
+      selectedNoteColor = n.color || null;
+      document.getElementById('note-modal-title').textContent = '✏️ Modifier la note';
+      document.getElementById('note-submit-btn').textContent  = 'Enregistrer';
+      buildNoteColorPicker();
+      openModal('note-modal');
+    });
+  } else {
+    document.getElementById('note-title').value   = '';
+    document.getElementById('note-cat').value     = '';
+    document.getElementById('note-content').value = '';
+    document.getElementById('note-modal-title').textContent = '📝 Nouvelle note';
+    document.getElementById('note-submit-btn').textContent  = 'Enregistrer';
+    buildNoteColorPicker();
+    openModal('note-modal');
+  }
+}
+
+async function saveNote() {
+  const title   = document.getElementById('note-title').value.trim();
+  const content = document.getElementById('note-content').value.trim();
+  if (!title)   { toast('Titre requis', 'error'); return; }
+  if (!content) { toast('Contenu requis', 'error'); return; }
+
+  const obj = {
+    title,
+    cat:     document.getElementById('note-cat').value.trim(),
+    content,
+    color:   selectedNoteColor || null,
+    userId:  currentUser.id,
+    updatedAt: new Date()
+  };
+
+  try {
+    if (editingNoteId) {
+      const existing = await dbGet('notes', editingNoteId);
+      await dbPut('notes', { ...existing, ...obj, id: editingNoteId });
+      toast('Note mise à jour ✓', 'success');
+    } else {
+      obj.createdAt = new Date();
+      await dbAdd('notes', obj);
+      toast('Note ajoutée ✓', 'success');
+    }
+    closeModal('note-modal');
+    renderNotes();
+  } catch(err) {
+    toast('Erreur : ' + (err?.message||err), 'error');
+  }
+}
+
+async function deleteNote(id, e) {
   e.stopPropagation();
-  if (!confirm('Supprimer cet événement ?')) return;
-  await dbDelete('events',id);
-  renderAgenda();
-  toast('Événement supprimé','info');
+  if (!confirm('Supprimer cette note ?')) return;
+  await dbDelete('notes', id);
+  renderNotes();
+  toast('Note supprimée', 'info');
+}
+
+async function renderNotes() {
+  const grid = document.getElementById('notes-grid');
+  const catsEl = document.getElementById('notes-cats');
+  if (!grid || !currentUser) return;
+
+  const all = await dbGetAll('notes');
+  const uid = String(currentUser.id);
+  let notes = all.filter(n => String(n.userId) === uid)
+                  .sort((a,b) => new Date(b.updatedAt||b.createdAt) - new Date(a.updatedAt||a.createdAt));
+
+  // Build category chips
+  const cats = [...new Set(notes.map(n => n.cat).filter(Boolean))];
+  catsEl.innerHTML = `<div class="notes-cat-chip${currentNotesCat==='all'?' active':''}" onclick="setNotesCat('all',this)">Toutes</div>` +
+    cats.map(c => `<div class="notes-cat-chip${currentNotesCat===c?' active':''}" onclick="setNotesCat('${c}',this)">${c}</div>`).join('');
+
+  // Filter by cat
+  if (currentNotesCat !== 'all') notes = notes.filter(n => n.cat === currentNotesCat);
+
+  // Filter by search
+  const q = (document.getElementById('notes-search')?.value || '').toLowerCase();
+  if (q) notes = notes.filter(n => n.title.toLowerCase().includes(q) || n.content.toLowerCase().includes(q));
+
+  if (!notes.length) {
+    grid.innerHTML = `<div class="notes-empty">📭 Aucune note${q?' pour "'+q+'"':''}<br><span style="font-size:12px;opacity:0.6">Clique sur "Nouvelle note" pour commencer</span></div>`;
+    return;
+  }
+
+  grid.innerHTML = '';
+  notes.forEach(n => {
+    const color = n.color || 'var(--accent)';
+    const card = document.createElement('div');
+    card.className = 'note-card';
+    card.style.setProperty('--note-color', color);
+    const d = new Date(n.updatedAt || n.createdAt);
+    const dateStr = `${d.getDate()} ${MONTHS_FR[d.getMonth()]} ${d.getFullYear()}`;
+    card.innerHTML = `
+      <div class="note-card-header">
+        <div class="note-card-title">${n.title}</div>
+        <button class="note-card-del" onclick="deleteNote(${n.id},event)" title="Supprimer">✕</button>
+      </div>
+      ${n.cat ? `<span class="note-card-cat">${n.cat}</span>` : ''}
+      <div class="note-card-body">${escHtml(n.content)}</div>
+      <div class="note-card-date">Modifié le ${dateStr}</div>`;
+    card.onclick = (e) => { if (!e.target.closest('.note-card-del')) openNoteModal(n.id); };
+    grid.appendChild(card);
+  });
+}
+
+function setNotesCat(cat, el) {
+  currentNotesCat = cat;
+  renderNotes();
+}
+
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+}
+
+// ═══════════════════════════════════════════════════════
+// DEVOIRS
+// ═══════════════════════════════════════════════════════
+const DV_PRIORITY_COLOR = { high:'#f87171', medium:'#f4c05a', low:'#4ac864' };
+
+function openDevoirModal(devoirId = null) {
+  editingDevoirId = devoirId;
+  if (devoirId) {
+    dbGet('devoirs', devoirId).then(dv => {
+      if (!dv) return;
+      document.getElementById('dv-title').value    = dv.title || '';
+      document.getElementById('dv-subject').value  = dv.subject || '';
+      document.getElementById('dv-type').value     = dv.type || 'DM';
+      document.getElementById('dv-deadline').value = dv.deadline || '';
+      document.getElementById('dv-priority').value = dv.priority || 'medium';
+      document.getElementById('dv-desc').value     = dv.desc || '';
+      document.getElementById('devoir-modal-title').textContent = '✏️ Modifier le devoir';
+      document.getElementById('dv-submit-btn').textContent = 'Enregistrer';
+      openModal('devoir-modal');
+    });
+  } else {
+    document.getElementById('dv-title').value    = '';
+    document.getElementById('dv-subject').value  = '';
+    document.getElementById('dv-type').value     = 'DM';
+    document.getElementById('dv-deadline').value = '';
+    document.getElementById('dv-priority').value = 'medium';
+    document.getElementById('dv-desc').value     = '';
+    document.getElementById('devoir-modal-title').textContent = '📋 Nouveau devoir';
+    document.getElementById('dv-submit-btn').textContent = 'Ajouter';
+    openModal('devoir-modal');
+  }
+}
+
+async function saveDevoir() {
+  const title    = document.getElementById('dv-title').value.trim();
+  const deadline = document.getElementById('dv-deadline').value;
+  if (!title)    { toast('Intitulé requis', 'error'); return; }
+  if (!deadline) { toast('Date limite requise', 'error'); return; }
+
+  const obj = {
+    title,
+    subject:  document.getElementById('dv-subject').value.trim(),
+    type:     document.getElementById('dv-type').value,
+    deadline,
+    priority: document.getElementById('dv-priority').value,
+    desc:     document.getElementById('dv-desc').value.trim(),
+    done:     false,
+    userId:   currentUser.id,
+    updatedAt: new Date()
+  };
+
+  try {
+    if (editingDevoirId) {
+      const existing = await dbGet('devoirs', editingDevoirId);
+      await dbPut('devoirs', { ...existing, ...obj, id: editingDevoirId, done: existing.done });
+      toast('Devoir mis à jour ✓', 'success');
+    } else {
+      obj.createdAt = new Date();
+      await dbAdd('devoirs', obj);
+      toast('Devoir ajouté ✓', 'success');
+    }
+    closeModal('devoir-modal');
+    renderDevoirs();
+  } catch(err) {
+    toast('Erreur : ' + (err?.message||err), 'error');
+  }
+}
+
+async function toggleDevoir(id) {
+  const dv = await dbGet('devoirs', id);
+  if (!dv) return;
+  await dbPut('devoirs', { ...dv, done: !dv.done, updatedAt: new Date() });
+  renderDevoirs();
+}
+
+async function deleteDevoir(id, e) {
+  e.stopPropagation();
+  if (!confirm('Supprimer ce devoir ?')) return;
+  await dbDelete('devoirs', id);
+  renderDevoirs();
+  toast('Devoir supprimé', 'info');
+}
+
+function switchDevoirsTab(tab, el) {
+  currentDevoirsTab = tab;
+  document.querySelectorAll('.dv-tab').forEach(t => t.classList.remove('active'));
+  if (el) el.classList.add('active');
+  renderDevoirs();
+}
+
+function deadlineBadge(dateStr, done) {
+  if (!dateStr || done) return '';
+  const now  = new Date(); now.setHours(0,0,0,0);
+  const [y,m,d] = dateStr.split('-').map(Number);
+  const due  = new Date(y, m-1, d);
+  const diff = Math.round((due - now) / 86400000);
+  if (diff < 0)  return `<span class="dv-deadline-badge overdue">⚠️ ${Math.abs(diff)}j de retard</span>`;
+  if (diff === 0) return `<span class="dv-deadline-badge today">⏰ Aujourd'hui !</span>`;
+  if (diff <= 3) return `<span class="dv-deadline-badge urgent">🔥 Dans ${diff}j</span>`;
+  if (diff <= 7) return `<span class="dv-deadline-badge urgent">📅 Dans ${diff}j</span>`;
+  return `<span class="dv-deadline-badge ok">📅 ${d}/${m}</span>`;
+}
+
+async function renderDevoirs() {
+  const list = document.getElementById('devoirs-list');
+  if (!list || !currentUser) return;
+
+  const all = await dbGetAll('devoirs');
+  const uid = String(currentUser.id);
+  let devoirs = all.filter(dv => String(dv.userId) === uid);
+
+  // Filter by tab
+  if (currentDevoirsTab === 'todo')  devoirs = devoirs.filter(dv => !dv.done);
+  if (currentDevoirsTab === 'done')  devoirs = devoirs.filter(dv => dv.done);
+
+  // Sort: todo by deadline asc, done by updatedAt desc
+  if (currentDevoirsTab !== 'done') {
+    devoirs.sort((a,b) => {
+      const pa = { high:0, medium:1, low:2 }[a.priority] ?? 1;
+      const pb = { high:0, medium:1, low:2 }[b.priority] ?? 1;
+      if (pa !== pb) return pa - pb;
+      return (a.deadline||'').localeCompare(b.deadline||'');
+    });
+  } else {
+    devoirs.sort((a,b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+  }
+
+  // Update badge
+  const todoCount = all.filter(dv => String(dv.userId) === uid && !dv.done).length;
+  const badge = document.getElementById('devoirs-badge');
+  if (badge) {
+    badge.textContent = todoCount;
+    badge.style.display = todoCount > 0 ? 'inline-flex' : 'none';
+  }
+
+  if (!devoirs.length) {
+    const msg = currentDevoirsTab === 'done' ? '🎉 Aucun devoir terminé' :
+                currentDevoirsTab === 'todo' ? '✨ Aucun devoir en attente !' : '📭 Aucun devoir';
+    list.innerHTML = `<div class="devoirs-empty">${msg}</div>`;
+    return;
+  }
+
+  list.innerHTML = '';
+  devoirs.forEach(dv => {
+    const pColor = DV_PRIORITY_COLOR[dv.priority] || '#5b8af5';
+    const card = document.createElement('div');
+    card.className = 'devoir-card' + (dv.done ? ' done' : '');
+    card.style.setProperty('--dv-color', pColor);
+
+    const [y,m,d] = (dv.deadline||'').split('-').map(Number);
+    const dateLabel = dv.deadline ? `${d}/${m}/${y}` : '';
+
+    card.innerHTML = `
+      <div class="dv-check${dv.done?' checked':''}" onclick="toggleDevoir(${dv.id})" title="${dv.done?'Marquer comme à faire':'Marquer comme fait'}">${dv.done?'✓':''}</div>
+      <div class="devoir-info">
+        <div class="devoir-title">${dv.title}</div>
+        <div class="devoir-meta">
+          ${dv.subject ? `<span>📚 ${dv.subject}</span>` : ''}
+          ${dv.type ? `<span class="dv-type-badge">${dv.type}</span>` : ''}
+          ${dv.desc ? `<span>· ${dv.desc.slice(0,60)}${dv.desc.length>60?'…':''}</span>` : ''}
+        </div>
+      </div>
+      ${deadlineBadge(dv.deadline, dv.done)}
+      <button class="dv-del-btn" onclick="deleteDevoir(${dv.id},event)" title="Supprimer">✕</button>`;
+
+    card.ondblclick = () => openDevoirModal(dv.id);
+    list.appendChild(card);
+  });
 }
 
 // ═══════════════════════════════════════════════════════
@@ -2867,6 +3947,7 @@ document.addEventListener('keydown', e => {
 (async () => {
   const saved = localStorage.getItem('amu-theme') || 'midnight';
   document.body.setAttribute('data-theme', saved);
+  applyLightMode(); // apply saved light/dark mode
   await initDB();
   buildColorPicker();
   buildFolderEmojiGrid();
