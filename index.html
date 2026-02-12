@@ -105,6 +105,267 @@
             transition: all 0.3s ease;
         }
         
+        /* OPTIMISATIONS RESPONSIVE */
+        
+        /* Mobile First - par défaut */
+        @media (max-width: 768px) {
+            /* Navigation mobile */
+            nav .flex.space-x-6 {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+            }
+            
+            nav .flex.space-x-6::-webkit-scrollbar {
+                display: none;
+            }
+            
+            .nav-item {
+                white-space: nowrap;
+                font-size: 0.75rem;
+                padding: 0.5rem 0.75rem;
+            }
+            
+            .nav-item i {
+                display: none;
+            }
+            
+            /* Stats cards en colonne sur mobile */
+            .stat-card {
+                font-size: 0.9rem;
+            }
+            
+            .stat-card .text-4xl {
+                font-size: 2rem !important;
+            }
+            
+            /* Grilles responsive */
+            .grid.grid-cols-2,
+            .grid.grid-cols-3,
+            .grid.grid-cols-4 {
+                grid-template-columns: 1fr !important;
+            }
+            
+            .grid.md\:grid-cols-2,
+            .grid.md\:grid-cols-3,
+            .grid.md\:grid-cols-4 {
+                grid-template-columns: 1fr !important;
+            }
+            
+            /* Formulaires mobile */
+            .flex.gap-4 {
+                flex-direction: column !important;
+            }
+            
+            /* Planning mobile - scroll horizontal */
+            .schedule-grid {
+                font-size: 0.7rem;
+                grid-template-columns: 60px repeat(5, minmax(100px, 1fr)) !important;
+            }
+            
+            .schedule-header {
+                padding: 8px 4px;
+                font-size: 0.7rem;
+            }
+            
+            .schedule-cell {
+                min-height: 60px;
+                padding: 4px;
+                font-size: 0.65rem;
+            }
+            
+            /* Scroll horizontal pour l'agenda */
+            .overflow-x-auto {
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            /* Modals mobile */
+            .modal-content {
+                width: 95%;
+                max-height: 90vh;
+                padding: 20px;
+            }
+            
+            /* Boutons mobile */
+            .floating-action {
+                bottom: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+            }
+            
+            /* Cartes cours mobile */
+            .course-card {
+                margin-bottom: 1rem;
+            }
+            
+            /* Notifications mobile */
+            .notification {
+                right: 10px;
+                left: 10px;
+                top: 70px;
+            }
+            
+            /* Cache certains badges sur mobile */
+            .badge:not(:first-child):not(:nth-child(2)) {
+                display: none;
+            }
+            
+            /* Textes plus petits sur mobile */
+            h2, h3 {
+                font-size: 1.25rem !important;
+            }
+            
+            h4 {
+                font-size: 1rem !important;
+            }
+            
+            /* Espacement réduit */
+            .space-y-6 > * + * {
+                margin-top: 1rem !important;
+            }
+            
+            .gap-4 {
+                gap: 0.5rem !important;
+            }
+            
+            /* Padding réduit sur mobile */
+            .p-6 {
+                padding: 1rem !important;
+            }
+            
+            .p-5 {
+                padding: 0.875rem !important;
+            }
+            
+            /* Input file sur mobile */
+            input[type="file"] {
+                font-size: 0.75rem;
+            }
+        }
+        
+        /* Tablette - optimisations intermédiaires */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .schedule-grid {
+                grid-template-columns: 70px repeat(5, 1fr) !important;
+            }
+            
+            .grid.md\:grid-cols-2 {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+            
+            .grid.md\:grid-cols-3 {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+            
+            .grid.md\:grid-cols-4 {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+            
+            .stat-card .text-4xl {
+                font-size: 2.5rem !important;
+            }
+            
+            /* Navigation tablette */
+            .nav-item {
+                font-size: 0.85rem;
+            }
+            
+            /* Modals tablette */
+            .modal-content {
+                max-width: 80%;
+            }
+        }
+        
+        /* Desktop - optimisations larges écrans */
+        @media (min-width: 1025px) {
+            /* Agenda plus large sur desktop */
+            .schedule-grid {
+                min-width: 1000px;
+            }
+            
+            /* Grilles optimales */
+            .grid.md\:grid-cols-2 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .grid.md\:grid-cols-3 {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .grid.md\:grid-cols-4 {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            /* Hover effects seulement sur desktop */
+            .card:hover {
+                transform: translateY(-5px);
+            }
+            
+            /* Scroll plus fluide */
+            .overflow-y-auto {
+                scrollbar-width: thin;
+                scrollbar-color: var(--primary) var(--border);
+            }
+            
+            .overflow-y-auto::-webkit-scrollbar {
+                width: 8px;
+            }
+            
+            .overflow-y-auto::-webkit-scrollbar-track {
+                background: var(--border);
+            }
+            
+            .overflow-y-auto::-webkit-scrollbar-thumb {
+                background: var(--primary);
+                border-radius: 4px;
+            }
+        }
+        
+        /* Très grands écrans */
+        @media (min-width: 1440px) {
+            .max-w-7xl {
+                max-width: 90rem;
+            }
+        }
+        
+        /* Mode paysage mobile */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .modal-content {
+                max-height: 95vh;
+                overflow-y: auto;
+            }
+            
+            .stat-card {
+                padding: 15px;
+            }
+        }
+        
+        /* Touch improvements pour mobile/tablette */
+        @media (hover: none) and (pointer: coarse) {
+            /* Boutons plus grands pour le touch */
+            button, .nav-item, .filter-btn {
+                min-height: 44px;
+                min-width: 44px;
+            }
+            
+            /* Désactiver les hover effects sur tactile */
+            .card:hover {
+                transform: none;
+            }
+            
+            .schedule-cell:hover {
+                background: var(--bg-card);
+            }
+            
+            /* Meilleure zone de tap */
+            input[type="checkbox"] {
+                width: 20px;
+                height: 20px;
+            }
+        }
+        
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
         
@@ -127,6 +388,28 @@
             border-bottom: 3px solid var(--primary); 
             color: var(--primary);
             font-weight: 600;
+        }
+
+        .nav-item-mobile {
+            transition: all 0.2s;
+        }
+
+        .nav-item-mobile.active {
+            background: var(--primary) !important;
+            color: white !important;
+            font-weight: 600;
+        }
+
+        .nav-item-mobile:hover {
+            background: var(--border) !important;
+        }
+
+        [data-theme="dark"] .nav-item-mobile:hover {
+            background: #374151 !important;
+        }
+
+        [data-theme="dark"] .nav-item-mobile.active {
+            background: var(--primary) !important;
         }
         
         .card {
@@ -306,6 +589,19 @@
         .floating-action:hover {
             transform: scale(1.1) rotate(90deg);
         }
+
+        @media (max-width: 768px) {
+            .floating-action {
+                bottom: 20px;
+                right: 20px;
+                width: 56px;
+                height: 56px;
+            }
+
+            .floating-action:active {
+                transform: scale(0.95);
+            }
+        }
         
         .confetti {
             position: fixed;
@@ -345,12 +641,13 @@
             <div class="flex justify-between h-16">
                 <div class="flex items-center space-x-4">
                     <span class="text-2xl font-bold gradient-text">
-                        <i class="fas fa-graduation-cap"></i> MyStudySpace
+                        <i class="fas fa-graduation-cap"></i> <span class="hidden sm:inline">MyStudySpace</span>
                     </span>
-                    <span class="badge" style="background: var(--primary); color: white;">ULTIMATE</span>
+                    <span class="badge hidden md:inline" style="background: var(--primary); color: white;">ULTIMATE</span>
                 </div>
                 
-                <div class="flex space-x-6 items-center">
+                <!-- Navigation Desktop -->
+                <div class="hidden lg:flex space-x-6 items-center">
                     <button onclick="showTab('dashboard')" class="nav-item active px-3 py-2 text-sm font-medium hover:text-blue-600">
                         <i class="fas fa-home mr-1"></i> Dashboard
                     </button>
@@ -371,6 +668,40 @@
                     </button>
                     <button onclick="openSettings()" class="px-3 py-2 text-sm font-medium hover:text-blue-600">
                         <i class="fas fa-cog"></i>
+                    </button>
+                </div>
+
+                <!-- Navigation Mobile -->
+                <div class="flex lg:hidden items-center space-x-2">
+                    <button onclick="openSettings()" class="px-3 py-2 text-sm font-medium hover:text-blue-600">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                    <button onclick="toggleMobileMenu()" class="px-3 py-2 text-sm font-medium hover:text-blue-600" id="mobileMenuBtn">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Menu Mobile Déroulant -->
+            <div id="mobileMenu" class="lg:hidden hidden border-t pt-2 pb-3" style="border-color: var(--border);">
+                <div class="flex flex-col space-y-1">
+                    <button onclick="showTab('dashboard'); closeMobileMenu()" class="nav-item-mobile active px-3 py-3 text-sm font-medium text-left hover:bg-gray-50 rounded">
+                        <i class="fas fa-home mr-2 w-5"></i> Dashboard
+                    </button>
+                    <button onclick="showTab('courses'); closeMobileMenu()" class="nav-item-mobile px-3 py-3 text-sm font-medium text-left hover:bg-gray-50 rounded">
+                        <i class="fas fa-book mr-2 w-5"></i> Cours
+                    </button>
+                    <button onclick="showTab('schedule'); closeMobileMenu()" class="nav-item-mobile px-3 py-3 text-sm font-medium text-left hover:bg-gray-50 rounded">
+                        <i class="fas fa-calendar mr-2 w-5"></i> Planning
+                    </button>
+                    <button onclick="showTab('grades'); closeMobileMenu()" class="nav-item-mobile px-3 py-3 text-sm font-medium text-left hover:bg-gray-50 rounded">
+                        <i class="fas fa-chart-line mr-2 w-5"></i> Notes
+                    </button>
+                    <button onclick="showTab('stats'); closeMobileMenu()" class="nav-item-mobile px-3 py-3 text-sm font-medium text-left hover:bg-gray-50 rounded">
+                        <i class="fas fa-chart-bar mr-2 w-5"></i> Stats
+                    </button>
+                    <button onclick="showTab('tasks'); closeMobileMenu()" class="nav-item-mobile px-3 py-3 text-sm font-medium text-left hover:bg-gray-50 rounded">
+                        <i class="fas fa-tasks mr-2 w-5"></i> Tâches
                     </button>
                 </div>
             </div>
@@ -437,22 +768,22 @@
             <!-- Quick Actions -->
             <div class="card rounded-lg p-6 shadow-lg">
                 <h3 class="text-xl font-bold mb-4">⚡ Actions rapides</h3>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <button onclick="quickAddCourse()" class="p-4 rounded-lg border-2 border-dashed hover:border-solid transition" style="border-color: var(--primary);">
-                        <i class="fas fa-plus-circle text-3xl mb-2" style="color: var(--primary);"></i>
-                        <p class="text-sm font-medium">Nouveau cours</p>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+                    <button onclick="quickAddCourse()" class="p-3 md:p-4 rounded-lg border-2 border-dashed hover:border-solid transition" style="border-color: var(--primary);">
+                        <i class="fas fa-plus-circle text-2xl md:text-3xl mb-2" style="color: var(--primary);"></i>
+                        <p class="text-xs md:text-sm font-medium">Nouveau cours</p>
                     </button>
-                    <button onclick="quickAddGrade()" class="p-4 rounded-lg border-2 border-dashed hover:border-solid transition" style="border-color: var(--secondary);">
-                        <i class="fas fa-star text-3xl mb-2" style="color: var(--secondary);"></i>
-                        <p class="text-sm font-medium">Ajouter note</p>
+                    <button onclick="quickAddGrade()" class="p-3 md:p-4 rounded-lg border-2 border-dashed hover:border-solid transition" style="border-color: var(--secondary);">
+                        <i class="fas fa-star text-2xl md:text-3xl mb-2" style="color: var(--secondary);"></i>
+                        <p class="text-xs md:text-sm font-medium">Ajouter note</p>
                     </button>
-                    <button onclick="quickAddTask()" class="p-4 rounded-lg border-2 border-dashed hover:border-solid transition" style="border-color: var(--accent);">
-                        <i class="fas fa-clipboard-list text-3xl mb-2" style="color: var(--accent);"></i>
-                        <p class="text-sm font-medium">Nouvelle tâche</p>
+                    <button onclick="quickAddTask()" class="p-3 md:p-4 rounded-lg border-2 border-dashed hover:border-solid transition" style="border-color: var(--accent);">
+                        <i class="fas fa-clipboard-list text-2xl md:text-3xl mb-2" style="color: var(--accent);"></i>
+                        <p class="text-xs md:text-sm font-medium">Nouvelle tâche</p>
                     </button>
-                    <button onclick="exportData()" class="p-4 rounded-lg border-2 border-dashed hover:border-solid transition" style="border-color: #22c55e;">
-                        <i class="fas fa-download text-3xl mb-2" style="color: #22c55e;"></i>
-                        <p class="text-sm font-medium">Exporter données</p>
+                    <button onclick="exportData()" class="p-3 md:p-4 rounded-lg border-2 border-dashed hover:border-solid transition" style="border-color: #22c55e;">
+                        <i class="fas fa-download text-2xl md:text-3xl mb-2" style="color: #22c55e;"></i>
+                        <p class="text-xs md:text-sm font-medium">Exporter données</p>
                     </button>
                 </div>
             </div>
@@ -491,25 +822,35 @@
         <div id="schedule" class="tab-content">
             <div class="card shadow-lg rounded-lg p-6">
                 <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-2xl font-bold gradient-text">📅 Mon Agenda Hebdomadaire</h3>
-                    <div class="flex gap-2">
-                        <button onclick="previousWeek()" class="px-4 py-2 rounded-lg border hover:bg-gray-100">
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
-                        <button onclick="currentWeek()" class="px-4 py-2 rounded-lg border hover:bg-blue-50" style="color: var(--primary);">
-                            Aujourd'hui
-                        </button>
-                        <button onclick="nextWeek()" class="px-4 py-2 rounded-lg border hover:bg-gray-100">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
-                        <button onclick="openScheduleSettings()" class="px-4 py-2 rounded-lg border hover:bg-purple-50">
+                    <h3 class="text-2xl font-bold gradient-text hidden md:block">📅 Mon Agenda Hebdomadaire</h3>
+                    <h3 class="text-xl font-bold gradient-text md:hidden">📅 Agenda</h3>
+                    <div class="flex gap-2 flex-wrap">
+                        <div class="flex gap-1">
+                            <button onclick="previousWeek()" class="px-3 py-2 rounded-lg border hover:bg-gray-100" title="Semaine précédente">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button onclick="currentWeek()" class="px-3 py-2 rounded-lg border hover:bg-blue-50 text-sm md:text-base" style="color: var(--primary);">
+                                <span class="hidden md:inline">Aujourd'hui</span>
+                                <i class="fas fa-home md:hidden"></i>
+                            </button>
+                            <button onclick="nextWeek()" class="px-3 py-2 rounded-lg border hover:bg-gray-100" title="Semaine suivante">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                        <button onclick="openScheduleSettings()" class="px-3 py-2 rounded-lg border hover:bg-purple-50 hidden md:block">
                             <i class="fas fa-palette mr-2"></i> Personnaliser
                         </button>
-                        <button onclick="clearSchedule()" class="px-4 py-2 rounded-lg border hover:bg-red-50 text-red-600">
+                        <button onclick="openScheduleSettings()" class="px-3 py-2 rounded-lg border hover:bg-purple-50 md:hidden" title="Personnaliser">
+                            <i class="fas fa-palette"></i>
+                        </button>
+                        <button onclick="clearSchedule()" class="px-3 py-2 rounded-lg border hover:bg-red-50 text-red-600 hidden md:block">
                             <i class="fas fa-trash"></i>
                         </button>
-                        <button onclick="exportSchedule()" class="px-4 py-2 rounded-lg" style="background: var(--primary); color: white;">
+                        <button onclick="exportSchedule()" class="px-3 py-2 rounded-lg hidden md:block" style="background: var(--primary); color: white;">
                             <i class="fas fa-download mr-2"></i> Exporter
+                        </button>
+                        <button onclick="exportSchedule()" class="px-3 py-2 rounded-lg md:hidden" style="background: var(--primary); color: white;" title="Exporter">
+                            <i class="fas fa-download"></i>
                         </button>
                     </div>
                 </div>
@@ -517,12 +858,14 @@
                 <div class="mb-4 p-4 rounded-lg" style="background: var(--border);">
                     <p class="font-bold text-lg mb-2" id="weekDisplay">Semaine du ...</p>
                     <p class="text-sm opacity-70">
-                        💡 <strong>Astuce :</strong> Clique sur une case pour ajouter/modifier un cours. 
-                        Double-clique pour supprimer. Utilise le menu de personnalisation pour changer les couleurs !
+                        💡 <strong>Astuce :</strong> 
+                        <span class="hidden md:inline">Clique sur une case pour ajouter/modifier un cours. Double-clique pour supprimer.</span>
+                        <span class="md:hidden">Appuie sur + pour ajouter un cours. Appui long pour supprimer.</span>
+                        <span class="md:hidden block mt-1">👉 Fais défiler horizontalement pour voir tous les jours</span>
                     </p>
                 </div>
                 
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto pb-4" style="-webkit-overflow-scrolling: touch;">
                     <div class="schedule-grid" id="scheduleGrid" style="min-width: 900px;"></div>
                 </div>
             </div>
@@ -923,12 +1266,59 @@
         function showTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item-mobile').forEach(el => el.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
-            event.target.classList.add('active');
+            
+            // Marquer l'item actif dans la nav desktop
+            const navButtons = document.querySelectorAll('.nav-item');
+            navButtons.forEach(btn => {
+                if(btn.textContent.toLowerCase().includes(tabId === 'dashboard' ? 'dashboard' : 
+                   tabId === 'courses' ? 'cours' : 
+                   tabId === 'schedule' ? 'planning' : 
+                   tabId === 'grades' ? 'notes' :
+                   tabId === 'stats' ? 'stats' : 'tâches')) {
+                    btn.classList.add('active');
+                }
+            });
+
+            // Marquer l'item actif dans la nav mobile
+            const mobileButtons = document.querySelectorAll('.nav-item-mobile');
+            mobileButtons.forEach(btn => {
+                if(btn.textContent.toLowerCase().includes(tabId === 'dashboard' ? 'dashboard' : 
+                   tabId === 'courses' ? 'cours' : 
+                   tabId === 'schedule' ? 'planning' : 
+                   tabId === 'grades' ? 'notes' :
+                   tabId === 'stats' ? 'stats' : 'tâches')) {
+                    btn.classList.add('active');
+                }
+            });
             
             if (tabId === 'stats') renderCharts();
             if (tabId === 'dashboard') updateDashboard();
             if (tabId === 'tasks') renderTasks();
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            const icon = document.querySelector('#mobileMenuBtn i');
+            
+            if(menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-times');
+            } else {
+                menu.classList.add('hidden');
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            }
+        }
+
+        function closeMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            const icon = document.querySelector('#mobileMenuBtn i');
+            menu.classList.add('hidden');
+            icon.classList.remove('fa-times');
+            icon.classList.add('fa-bars');
         }
 
         // ===== MODALS =====
@@ -1466,7 +1856,28 @@
                     addBtn.onclick = () => openAddScheduleEvent(d - 1, hours[h]);
                     cell.appendChild(addBtn);
 
-                    // Double-clic pour supprimer
+                    // Double-clic pour supprimer (desktop) ou long press (mobile)
+                    let pressTimer;
+                    cell.addEventListener('touchstart', (e) => {
+                        if(events.length > 0) {
+                            pressTimer = setTimeout(() => {
+                                if(confirm('Supprimer ce cours ?')) {
+                                    db.scheduleEvents.delete(events[0].id);
+                                    initSchedule();
+                                    showNotification('🗑️ Cours supprimé');
+                                }
+                            }, 800);
+                        }
+                    });
+
+                    cell.addEventListener('touchend', () => {
+                        clearTimeout(pressTimer);
+                    });
+
+                    cell.addEventListener('touchmove', () => {
+                        clearTimeout(pressTimer);
+                    });
+
                     cell.ondblclick = async () => {
                         if(events.length > 0) {
                             if(confirm('Supprimer ce cours ?')) {
