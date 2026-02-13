@@ -963,14 +963,55 @@
             
             <!-- Greeting personnalisé -->
             <div class="card rounded-lg p-6 shadow-lg">
-                <div class="flex justify-between items-start flex-wrap gap-2">
+                <div class="flex justify-between items-start flex-wrap gap-4">
                     <div>
                         <h2 class="text-3xl font-bold mb-1" id="greeting">👋 Salut champion !</h2>
                         <p class="text-sm opacity-60" id="motivational-quote">La réussite commence par un effort quotidien.</p>
                     </div>
-                    <div class="text-right flex-shrink-0">
-                        <div id="live-clock" class="font-mono font-bold text-2xl" style="color:var(--primary); letter-spacing:.05em;">--:--:--</div>
-                        <div class="text-xs opacity-50" id="dash-date"></div>
+                    <div class="flex gap-4 flex-wrap">
+                        <!-- Horloge -->
+                        <div class="text-right flex-shrink-0">
+                            <div id="live-clock" class="font-mono font-bold text-2xl" style="color:var(--primary); letter-spacing:.05em;">--:--:--</div>
+                            <div class="text-xs opacity-50" id="dash-date"></div>
+                        </div>
+                        <!-- Compteur prochain cours -->
+                        <div id="next-class-mini-widget" class="text-right flex-shrink-0" style="display: none;">
+                            <div class="text-xs opacity-60 mb-1">Prochain cours</div>
+                            <div id="next-class-mini-countdown" class="font-mono font-bold text-xl" style="color:var(--secondary); letter-spacing:.05em;">--:--</div>
+                            <div class="text-xs opacity-50" id="next-class-mini-name">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Widget Prochain Cours -->
+            <div id="next-class-widget" class="card rounded-lg p-6 shadow-lg" style="background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; display: none;">
+                <div class="flex items-center justify-between flex-wrap gap-4">
+                    <div class="flex items-center gap-4">
+                        <div class="w-16 h-16 rounded-full bg-white bg-opacity-20 flex items-center justify-center text-3xl">
+                            📚
+                        </div>
+                        <div>
+                            <p class="text-sm opacity-90 mb-1">Prochain cours</p>
+                            <h3 class="text-2xl font-bold mb-1" id="next-class-name">-</h3>
+                            <p class="text-sm opacity-80" id="next-class-location">-</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-sm opacity-90 mb-1">Dans</div>
+                        <div id="next-class-countdown" class="font-mono font-bold text-3xl">--:--</div>
+                        <div class="text-xs opacity-80 mt-1" id="next-class-time">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Message quand pas de cours -->
+            <div id="no-next-class" class="card rounded-lg p-6 shadow-lg" style="background: linear-gradient(135deg, #10b981, #059669); color: white; display: none;">
+                <div class="flex items-center gap-4">
+                    <div class="text-5xl">🎉</div>
+                    <div>
+                        <h3 class="text-xl font-bold mb-1">Aucun cours prévu aujourd'hui !</h3>
+                        <p class="text-sm opacity-90">Profitez de votre journée libre ou révisez à votre rythme 📖</p>
                     </div>
                 </div>
             </div>
@@ -2059,7 +2100,8 @@
                    tabId === 'courses' ? 'cours' : 
                    tabId === 'schedule' ? 'planning' : 
                    tabId === 'grades' ? 'notes' :
-                   tabId === 'stats' ? 'stats' : 'tâches')) {
+                   tabId === 'stats' ? 'stats' : 
+                   tabId === 'achievements' ? 'succès' : 'tâches')) {
                     btn.classList.add('active');
                 }
             });
@@ -2071,7 +2113,8 @@
                    tabId === 'courses' ? 'cours' : 
                    tabId === 'schedule' ? 'planning' : 
                    tabId === 'grades' ? 'notes' :
-                   tabId === 'stats' ? 'stats' : 'tâches')) {
+                   tabId === 'stats' ? 'stats' : 
+                   tabId === 'achievements' ? 'succès' : 'tâches')) {
                     btn.classList.add('active');
                 }
             });
@@ -3719,11 +3762,143 @@
         }
 
         // ===== DASHBOARD =====
+        // ===== PROCHAIN COURS =====
+        let nextClassInterval = null;
+
+        async function updateNextClass() {
+            const now = new Date();
+            const currentDay = now.getDay(); // 0 = dimanche, 1 = lundi, etc.
+            const currentTime = now.getHours() * 60 + now.getMinutes();
+            
+            // Récupérer tous les cours de la semaine actuelle
+            const weekStart = getMonday(now);
+            const events = await db.scheduleEvents.where('weekStart').equals(weekStart.toISOString().split('T')[0]).toArray();
+            
+            if (events.length === 0) {
+                showNoNextClass();
+                return;
+            }
+            
+            // Convertir les jours en numéros (Lundi=1, Mardi=2, etc.)
+            const dayMap = { 'Lundi': 1, 'Mardi': 2, 'Mercredi': 3, 'Jeudi': 4, 'Vendredi': 5, 'Samedi': 6, 'Dimanche': 0 };
+            
+            // Trouver le prochain cours
+            let nextClass = null;
+            let minTimeDiff = Infinity;
+            
+            for (const event of events) {
+                const eventDay = dayMap[event.day];
+                const [hours, minutes] = event.startTime.split(':').map(Number);
+                const eventTime = hours * 60 + minutes;
+                
+                // Calculer la différence de temps en minutes
+                let timeDiff;
+                if (eventDay === currentDay) {
+                    // Même jour
+                    timeDiff = eventTime - currentTime;
+                } else if (eventDay > currentDay) {
+                    // Jour suivant dans la semaine
+                    timeDiff = (eventDay - currentDay) * 24 * 60 + eventTime - currentTime;
+                } else {
+                    // Prochain jour (début de semaine prochaine)
+                    timeDiff = (7 - currentDay + eventDay) * 24 * 60 + eventTime - currentTime;
+                }
+                
+                // Garder seulement les cours futurs et trouver le plus proche
+                if (timeDiff > 0 && timeDiff < minTimeDiff) {
+                    minTimeDiff = timeDiff;
+                    nextClass = { ...event, timeDiff };
+                }
+            }
+            
+            if (nextClass) {
+                displayNextClass(nextClass);
+            } else {
+                showNoNextClass();
+            }
+        }
+
+        async function displayNextClass(classData) {
+            const widget = document.getElementById('next-class-widget');
+            const noClassWidget = document.getElementById('no-next-class');
+            const miniWidget = document.getElementById('next-class-mini-widget');
+            
+            widget.style.display = 'block';
+            noClassWidget.style.display = 'none';
+            miniWidget.style.display = 'block';
+            
+            // Récupérer les infos du cours
+            const course = await db.courses.get(classData.courseId);
+            const courseName = course ? course.name : 'Cours';
+            
+            document.getElementById('next-class-name').textContent = courseName;
+            document.getElementById('next-class-location').textContent = classData.location || 'Salle non spécifiée';
+            document.getElementById('next-class-time').textContent = `${classData.day} • ${classData.startTime} - ${classData.endTime}`;
+            
+            // Mettre à jour le mini-widget
+            document.getElementById('next-class-mini-name').textContent = courseName.length > 15 ? courseName.substring(0, 15) + '...' : courseName;
+            
+            // Démarrer le compte à rebours
+            if (nextClassInterval) clearInterval(nextClassInterval);
+            
+            updateCountdown(classData.timeDiff, courseName);
+            nextClassInterval = setInterval(() => {
+                classData.timeDiff--;
+                if (classData.timeDiff <= 0) {
+                    clearInterval(nextClassInterval);
+                    updateNextClass(); // Rafraîchir pour trouver le prochain cours
+                } else {
+                    updateCountdown(classData.timeDiff, courseName);
+                }
+            }, 60000); // Mise à jour chaque minute
+        }
+
+        function updateCountdown(minutes, courseName = '') {
+            const hours = Math.floor(minutes / 60);
+            const mins = minutes % 60;
+            const days = Math.floor(hours / 24);
+            
+            let countdownText;
+            let miniCountdownText;
+            
+            if (days > 0) {
+                const remainingHours = hours % 24;
+                countdownText = `${days}j ${remainingHours}h`;
+                miniCountdownText = `${days}j ${remainingHours}h`;
+            } else if (hours > 0) {
+                countdownText = `${hours}h ${mins.toString().padStart(2, '0')}min`;
+                miniCountdownText = `${hours}h ${mins.toString().padStart(2, '0')}`;
+            } else {
+                countdownText = `${mins} min`;
+                miniCountdownText = `${mins} min`;
+            }
+            
+            document.getElementById('next-class-countdown').textContent = countdownText;
+            document.getElementById('next-class-mini-countdown').textContent = miniCountdownText;
+        }
+
+        function showNoNextClass() {
+            const widget = document.getElementById('next-class-widget');
+            const noClassWidget = document.getElementById('no-next-class');
+            const miniWidget = document.getElementById('next-class-mini-widget');
+            
+            widget.style.display = 'none';
+            noClassWidget.style.display = 'block';
+            miniWidget.style.display = 'none';
+            
+            if (nextClassInterval) {
+                clearInterval(nextClassInterval);
+                nextClassInterval = null;
+            }
+        }
+
+        // ===== DASHBOARD =====
         async function updateDashboard() {
             await updateTodaySchedule();
             await updateStreak();
             await updateWeekSummary();
             updateSemesterProgress();
+            updateNextClass(); // Mise à jour du widget prochain cours
         }
 
         async function updateStreak() {
