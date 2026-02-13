@@ -122,7 +122,262 @@
             background: #434c5e; color: #eceff4; border-color: #4c566a;
         }
 
-        /* ═══════════════════════════════════════════════
+        /* ══════════════════════════════════════════════════
+           THÈMES SUPER-HÉROS
+        ══════════════════════════════════════════════════ */
+        
+        /* ── Spider-Man 🕷️ ─────────── */
+        [data-theme="spiderman"] {
+            --primary: #e23636; --primary-light: #ff5252;
+            --secondary: #0d47a1; --accent: #ffffff;
+            --bg-main: #1a1a1a; --bg-card: #2d2d2d;
+            --bg-nav: rgba(226,54,54,0.95);
+            --text-main: #ffffff; --text-soft: #b0b0b0; --border: #3d3d3d;
+            --shadow-sm: 0 1px 3px rgba(226,54,54,.3);
+            --shadow-md: 0 4px 16px rgba(226,54,54,.4);
+        }
+        [data-theme="spiderman"] input,
+        [data-theme="spiderman"] select,
+        [data-theme="spiderman"] textarea {
+            background: #3d3d3d; color: #ffffff; border-color: #e23636;
+        }
+
+        /* ── Batman 🦇 ─────────── */
+        [data-theme="batman"] {
+            --primary: #ffd700; --primary-light: #ffe44d;
+            --secondary: #1a1a1a; --accent: #ffd700;
+            --bg-main: #0a0a0a; --bg-card: #1a1a1a;
+            --bg-nav: rgba(26,26,26,0.98);
+            --text-main: #ffffff; --text-soft: #888888; --border: #2d2d2d;
+            --shadow-sm: 0 1px 3px rgba(255,215,0,.2);
+            --shadow-md: 0 4px 16px rgba(255,215,0,.3);
+            --shadow-lg: 0 12px 40px rgba(255,215,0,.4);
+        }
+        [data-theme="batman"] input,
+        [data-theme="batman"] select,
+        [data-theme="batman"] textarea {
+            background: #2d2d2d; color: #ffffff; border-color: #ffd700;
+        }
+
+        /* ── Iron Man 🤖 ─────────── */
+        [data-theme="ironman"] {
+            --primary: #dc143c; --primary-light: #ff1744;
+            --secondary: #ffd700; --accent: #c0c0c0;
+            --bg-main: #1a0000; --bg-card: #2d0a0a;
+            --bg-nav: rgba(220,20,60,0.95);
+            --text-main: #ffffff; --text-soft: #ffb3b3; --border: #4d1a1a;
+            --shadow-sm: 0 1px 3px rgba(220,20,60,.3);
+            --shadow-md: 0 4px 16px rgba(220,20,60,.4);
+        }
+        [data-theme="ironman"] input,
+        [data-theme="ironman"] select,
+        [data-theme="ironman"] textarea {
+            background: #4d1a1a; color: #ffffff; border-color: #dc143c;
+        }
+
+        /* ── Hulk 💪 ─────────── */
+        [data-theme="hulk"] {
+            --primary: #00ff00; --primary-light: #4dff4d;
+            --secondary: #9933ff; --accent: #ffffff;
+            --bg-main: #0a1a0a; --bg-card: #1a2d1a;
+            --bg-nav: rgba(0,255,0,0.15);
+            --text-main: #00ff00; --text-soft: #66ff66; --border: #2d4d2d;
+            --shadow-sm: 0 1px 3px rgba(0,255,0,.3);
+            --shadow-md: 0 4px 16px rgba(0,255,0,.4);
+        }
+        [data-theme="hulk"] input,
+        [data-theme="hulk"] select,
+        [data-theme="hulk"] textarea {
+            background: #2d4d2d; color: #00ff00; border-color: #00ff00;
+        }
+
+        /* ── Captain America 🛡️ ─────────── */
+        [data-theme="captain"] {
+            --primary: #0d47a1; --primary-light: #1976d2;
+            --secondary: #c62828; --accent: #ffffff;
+            --bg-main: #e3f2fd; --bg-card: #ffffff;
+            --bg-nav: rgba(13,71,161,0.9);
+            --text-main: #0d47a1; --text-soft: #1976d2; --border: #90caf9;
+        }
+
+        /* ══════════════════════════════════════════════════
+           THÈMES MÉTALLIQUES
+        ══════════════════════════════════════════════════ */
+        
+        /* ── Chrome 🔘 ─────────── */
+        [data-theme="chrome"] {
+            --primary: #c0c0c0; --primary-light: #e0e0e0;
+            --secondary: #808080; --accent: #ffffff;
+            --bg-main: #1a1a1a; --bg-card: #2d2d2d;
+            --bg-nav: rgba(192,192,192,0.15);
+            --text-main: #ffffff; --text-soft: #c0c0c0; --border: #404040;
+            --shadow-sm: 0 1px 3px rgba(192,192,192,.2);
+            --shadow-md: 0 4px 16px rgba(192,192,192,.3);
+        }
+        [data-theme="chrome"] input,
+        [data-theme="chrome"] select,
+        [data-theme="chrome"] textarea {
+            background: #404040; color: #ffffff; border-color: #808080;
+        }
+
+        /* ── Or 🥇 ─────────── */
+        [data-theme="gold"] {
+            --primary: #ffd700; --primary-light: #ffed4e;
+            --secondary: #ff8c00; --accent: #ffffff;
+            --bg-main: #1a1506; --bg-card: #2d2410;
+            --bg-nav: rgba(255,215,0,0.15);
+            --text-main: #ffd700; --text-soft: #ffed4e; --border: #4d3810;
+            --shadow-sm: 0 1px 3px rgba(255,215,0,.3);
+            --shadow-md: 0 4px 16px rgba(255,215,0,.4);
+        }
+        [data-theme="gold"] input,
+        [data-theme="gold"] select,
+        [data-theme="gold"] textarea {
+            background: #4d3810; color: #ffd700; border-color: #ffd700;
+        }
+
+        /* ── Cuivre 🟠 ─────────── */
+        [data-theme="copper"] {
+            --primary: #b87333; --primary-light: #d4935b;
+            --secondary: #8b4513; --accent: #cd853f;
+            --bg-main: #1a0f08; --bg-card: #2d1810;
+            --bg-nav: rgba(184,115,51,0.15);
+            --text-main: #d4935b; --text-soft: #b87333; --border: #4d2810;
+            --shadow-sm: 0 1px 3px rgba(184,115,51,.3);
+            --shadow-md: 0 4px 16px rgba(184,115,51,.4);
+        }
+        [data-theme="copper"] input,
+        [data-theme="copper"] select,
+        [data-theme="copper"] textarea {
+            background: #4d2810; color: #d4935b; border-color: #b87333;
+        }
+
+        /* ── Acier 🔩 ─────────── */
+        [data-theme="steel"] {
+            --primary: #b0c4de; --primary-light: #d3e0f0;
+            --secondary: #708090; --accent: #f0f8ff;
+            --bg-main: #0f1419; --bg-card: #1a2128;
+            --bg-nav: rgba(176,196,222,0.12);
+            --text-main: #e0e8f0; --text-soft: #b0c4de; --border: #2d3a47;
+            --shadow-sm: 0 1px 3px rgba(176,196,222,.2);
+            --shadow-md: 0 4px 16px rgba(176,196,222,.3);
+        }
+        [data-theme="steel"] input,
+        [data-theme="steel"] select,
+        [data-theme="steel"] textarea {
+            background: #2d3a47; color: #e0e8f0; border-color: #708090;
+        }
+
+        /* ══════════════════════════════════════════════════
+           THÈMES SPÉCIAUX
+        ══════════════════════════════════════════════════ */
+        
+        /* ── Matrix 🟢 ─────────── */
+        [data-theme="matrix"] {
+            --primary: #00ff41; --primary-light: #39ff6f;
+            --secondary: #008f11; --accent: #00ff41;
+            --bg-main: #000000; --bg-card: #0a0a0a;
+            --bg-nav: rgba(0,255,65,0.05);
+            --text-main: #00ff41; --text-soft: #008f11; --border: #003b00;
+            --shadow-sm: 0 1px 3px rgba(0,255,65,.3);
+            --shadow-md: 0 4px 16px rgba(0,255,65,.4);
+        }
+        [data-theme="matrix"] input,
+        [data-theme="matrix"] select,
+        [data-theme="matrix"] textarea {
+            background: #0a0a0a; color: #00ff41; border-color: #008f11;
+        }
+
+        /* ── Neon 💡 ─────────── */
+        [data-theme="neon"] {
+            --primary: #ff00ff; --primary-light: #ff4dff;
+            --secondary: #00ffff; --accent: #ffff00;
+            --bg-main: #0a0014; --bg-card: #1a0028;
+            --bg-nav: rgba(255,0,255,0.1);
+            --text-main: #ff00ff; --text-soft: #ff4dff; --border: #330066;
+            --shadow-sm: 0 1px 3px rgba(255,0,255,.4);
+            --shadow-md: 0 4px 16px rgba(255,0,255,.5);
+        }
+        [data-theme="neon"] input,
+        [data-theme="neon"] select,
+        [data-theme="neon"] textarea {
+            background: #1a0028; color: #ff00ff; border-color: #ff00ff;
+        }
+
+        /* ── Cyberpunk 🌆 ─────────── */
+        [data-theme="cyberpunk"] {
+            --primary: #ff0080; --primary-light: #ff4da6;
+            --secondary: #00d4ff; --accent: #ffff00;
+            --bg-main: #0d0221; --bg-card: #1a0440;
+            --bg-nav: rgba(255,0,128,0.15);
+            --text-main: #ff0080; --text-soft: #ff4da6; --border: #2d0850;
+            --shadow-sm: 0 1px 3px rgba(255,0,128,.3);
+            --shadow-md: 0 4px 16px rgba(255,0,128,.4);
+        }
+        [data-theme="cyberpunk"] input,
+        [data-theme="cyberpunk"] select,
+        [data-theme="cyberpunk"] textarea {
+            background: #2d0850; color: #ff0080; border-color: #ff0080;
+        }
+
+        /* ── Retro 📼 ─────────── */
+        [data-theme="retro"] {
+            --primary: #ff6b35; --primary-light: #ff8c5a;
+            --secondary: #f7931e; --accent: #fdc02f;
+            --bg-main: #f4e8c1; --bg-card: #ffffff;
+            --bg-nav: rgba(255,107,53,0.1);
+            --text-main: #2c1810; --text-soft: #8b4513; --border: #e6d5b8;
+        }
+
+        /* ── Galaxy 🌌 ─────────── */
+        [data-theme="galaxy"] {
+            --primary: #9d4edd; --primary-light: #c77dff;
+            --secondary: #7209b7; --accent: #f72585;
+            --bg-main: #10002b; --bg-card: #240046;
+            --bg-nav: rgba(157,78,221,0.15);
+            --text-main: #e0aaff; --text-soft: #c77dff; --border: #3c096c;
+            --shadow-sm: 0 1px 3px rgba(157,78,221,.3);
+            --shadow-md: 0 4px 16px rgba(157,78,221,.4);
+        }
+        [data-theme="galaxy"] input,
+        [data-theme="galaxy"] select,
+        [data-theme="galaxy"] textarea {
+            background: #3c096c; color: #e0aaff; border-color: #9d4edd;
+        }
+
+        /* ── Lava 🌋 ─────────── */
+        [data-theme="lava"] {
+            --primary: #ff4500; --primary-light: #ff6347;
+            --secondary: #dc143c; --accent: #ffa500;
+            --bg-main: #1a0000; --bg-card: #2d0a00;
+            --bg-nav: rgba(255,69,0,0.15);
+            --text-main: #ff4500; --text-soft: #ff6347; --border: #4d1400;
+            --shadow-sm: 0 1px 3px rgba(255,69,0,.3);
+            --shadow-md: 0 4px 16px rgba(255,69,0,.4);
+        }
+        [data-theme="lava"] input,
+        [data-theme="lava"] select,
+        [data-theme="lava"] textarea {
+            background: #4d1400; color: #ff4500; border-color: #ff4500;
+        }
+
+        /* ── Ice 🧊 ─────────── */
+        [data-theme="ice"] {
+            --primary: #00bfff; --primary-light: #4dd2ff;
+            --secondary: #87ceeb; --accent: #b0e0e6;
+            --bg-main: #0a1a2e; --bg-card: #16213e;
+            --bg-nav: rgba(0,191,255,0.12);
+            --text-main: #e6f7ff; --text-soft: #87ceeb; --border: #1f4068;
+            --shadow-sm: 0 1px 3px rgba(0,191,255,.3);
+            --shadow-md: 0 4px 16px rgba(0,191,255,.4);
+        }
+        [data-theme="ice"] input,
+        [data-theme="ice"] select,
+        [data-theme="ice"] textarea {
+            background: #1f4068; color: #e6f7ff; border-color: #00bfff;
+        }
+
+        /* ══════════════════════════════════════════════════
            BASE
         ═══════════════════════════════════════════════ */
         *, *::before, *::after { box-sizing: border-box; }
@@ -1069,8 +1324,8 @@
             </div>
 
             <!-- TAB THÈME -->
-            <div id="tab-theme" class="settings-panel active">
-                <p class="text-xs font-semibold uppercase opacity-50 mb-3">Choisir un thème</p>
+            <div id="tab-theme" class="settings-panel active" style="max-height: 500px; overflow-y: auto;">
+                <p class="text-xs font-semibold uppercase opacity-50 mb-3">🎨 Thèmes Classiques</p>
                 <div class="grid grid-cols-4 gap-3 mb-5">
                     <button onclick="setTheme('light')" class="theme-swatch" id="swatch-light">
                         <div class="h-full w-full" style="background:linear-gradient(135deg,#6366f1,#ec4899);"></div>
@@ -1112,7 +1367,111 @@
                     </button>
                 </div>
 
-                <p class="text-xs font-semibold uppercase opacity-50 mb-3">Couleurs personnalisées</p>
+                <p class="text-xs font-semibold uppercase opacity-50 mb-3">🦸 Thèmes Super-Héros</p>
+                <div class="grid grid-cols-4 gap-3 mb-5">
+                    <button onclick="setTheme('spiderman')" class="theme-swatch" id="swatch-spiderman">
+                        <div class="h-full w-full" style="background:linear-gradient(135deg,#e23636,#0d47a1); position:relative;">
+                            <div style="position:absolute;inset:0;background:rgba(0,0,0,.3);"></div>
+                        </div>
+                        <p class="text-xs font-semibold text-center mt-1" style="color:var(--text-main);">Spider-Man 🕷️</p>
+                    </button>
+                    <button onclick="setTheme('batman')" class="theme-swatch" id="swatch-batman">
+                        <div class="h-full w-full" style="background:linear-gradient(135deg,#ffd700,#1a1a1a); position:relative;">
+                            <div style="position:absolute;inset:0;background:rgba(0,0,0,.7);"></div>
+                        </div>
+                        <p class="text-xs font-semibold text-center mt-1" style="color:var(--text-main);">Batman 🦇</p>
+                    </button>
+                    <button onclick="setTheme('ironman')" class="theme-swatch" id="swatch-ironman">
+                        <div class="h-full w-full" style="background:linear-gradient(135deg,#dc143c,#ffd700); position:relative;">
+                            <div style="position:absolute;inset:0;background:rgba(0,0,0,.4);"></div>
+                        </div>
+                        <p class="text-xs font-semibold text-center mt-1" style="color:var(--text-main);">Iron Man 🤖</p>
+                    </button>
+                    <button onclick="setTheme('hulk')" class="theme-swatch" id="swatch-hulk">
+                        <div class="h-full w-full" style="background:linear-gradient(135deg,#00ff00,#9933ff); position:relative;">
+                            <div style="position:absolute;inset:0;background:rgba(0,0,0,.5);"></div>
+                        </div>
+                        <p class="text-xs font-semibold text-center mt-1" style="color:var(--text-main);">Hulk 💪</p>
+                    </button>
+                    <button onclick="setTheme('captain')" class="theme-swatch" id="swatch-captain">
+                        <div class="h-full w-full" style="background:linear-gradient(135deg,#0d47a1,#c62828);"></div>
+                        <p class="text-xs font-semibold text-center mt-1" style="color:var(--text-main);">Captain 🛡️</p>
+                    </button>
+                </div>
+
+                <p class="text-xs font-semibold uppercase opacity-50 mb-3">⚙️ Thèmes Métalliques</p>
+                <div class="grid grid-cols-4 gap-3 mb-5">
+                    <button onclick="setTheme('chrome')" class="theme-swatch" id="swatch-chrome">
+                        <div class="h-full w-full" style="background:linear-gradient(135deg,#c0c0c0,#808080); position:relative;">
+                            <div style="position:absolute;inset:0;background:rgba(0,0,0,.5);"></div>
+                        </div>
+                        <p class="text-xs font-semibold text-center mt-1" style="color:var(--text-main);">Chrome 🔘</p>
+                    </button>
+                    <button onclick="setTheme('gold')" class="theme-swatch" id="swatch-gold">
+                        <div class="h-full w-full" style="background:linear-gradient(135deg,#ffd700,#ff8c00); position:relative;">
+                            <div style="position:absolute;inset:0;background:rgba(0,0,0,.3);"></div>
+                        </div>
+                        <p class="text-xs font-semibold text-center mt-1" style="color:var(--text-main);">Or 🥇</p>
+                    </button>
+                    <button onclick="setTheme('copper')" class="theme-swatch" id="swatch-copper">
+                        <div class="h-full w-full" style="background:linear-gradient(135deg,#b87333,#8b4513); position:relative;">
+                            <div style="position:absolute;inset:0;background:rgba(0,0,0,.3);"></div>
+                        </div>
+                        <p class="text-xs font-semibold text-center mt-1" style="color:var(--text-main);">Cuivre 🟠</p>
+                    </button>
+                    <button onclick="setTheme('steel')" class="theme-swatch" id="swatch-steel">
+                        <div class="h-full w-full" style="background:linear-gradient(135deg,#b0c4de,#708090); position:relative;">
+                            <div style="position:absolute;inset:0;background:rgba(0,0,0,.4);"></div>
+                        </div>
+                        <p class="text-xs font-semibold text-center mt-1" style="color:var(--text-main);">Acier 🔩</p>
+                    </button>
+                </div>
+
+                <p class="text-xs font-semibold uppercase opacity-50 mb-3">✨ Thèmes Spéciaux</p>
+                <div class="grid grid-cols-4 gap-3 mb-5">
+                    <button onclick="setTheme('matrix')" class="theme-swatch" id="swatch-matrix">
+                        <div class="h-full w-full" style="background:linear-gradient(135deg,#00ff41,#008f11); position:relative;">
+                            <div style="position:absolute;inset:0;background:rgba(0,0,0,.8);"></div>
+                        </div>
+                        <p class="text-xs font-semibold text-center mt-1" style="color:var(--text-main);">Matrix 🟢</p>
+                    </button>
+                    <button onclick="setTheme('neon')" class="theme-swatch" id="swatch-neon">
+                        <div class="h-full w-full" style="background:linear-gradient(135deg,#ff00ff,#00ffff); position:relative;">
+                            <div style="position:absolute;inset:0;background:rgba(0,0,0,.6);"></div>
+                        </div>
+                        <p class="text-xs font-semibold text-center mt-1" style="color:var(--text-main);">Neon 💡</p>
+                    </button>
+                    <button onclick="setTheme('cyberpunk')" class="theme-swatch" id="swatch-cyberpunk">
+                        <div class="h-full w-full" style="background:linear-gradient(135deg,#ff0080,#00d4ff); position:relative;">
+                            <div style="position:absolute;inset:0;background:rgba(0,0,0,.5);"></div>
+                        </div>
+                        <p class="text-xs font-semibold text-center mt-1" style="color:var(--text-main);">Cyberpunk 🌆</p>
+                    </button>
+                    <button onclick="setTheme('retro')" class="theme-swatch" id="swatch-retro">
+                        <div class="h-full w-full" style="background:linear-gradient(135deg,#ff6b35,#fdc02f);"></div>
+                        <p class="text-xs font-semibold text-center mt-1" style="color:var(--text-main);">Retro 📼</p>
+                    </button>
+                    <button onclick="setTheme('galaxy')" class="theme-swatch" id="swatch-galaxy">
+                        <div class="h-full w-full" style="background:linear-gradient(135deg,#9d4edd,#f72585); position:relative;">
+                            <div style="position:absolute;inset:0;background:rgba(0,0,0,.5);"></div>
+                        </div>
+                        <p class="text-xs font-semibold text-center mt-1" style="color:var(--text-main);">Galaxy 🌌</p>
+                    </button>
+                    <button onclick="setTheme('lava')" class="theme-swatch" id="swatch-lava">
+                        <div class="h-full w-full" style="background:linear-gradient(135deg,#ff4500,#dc143c); position:relative;">
+                            <div style="position:absolute;inset:0;background:rgba(0,0,0,.4);"></div>
+                        </div>
+                        <p class="text-xs font-semibold text-center mt-1" style="color:var(--text-main);">Lava 🌋</p>
+                    </button>
+                    <button onclick="setTheme('ice')" class="theme-swatch" id="swatch-ice">
+                        <div class="h-full w-full" style="background:linear-gradient(135deg,#00bfff,#87ceeb); position:relative;">
+                            <div style="position:absolute;inset:0;background:rgba(0,0,0,.4);"></div>
+                        </div>
+                        <p class="text-xs font-semibold text-center mt-1" style="color:var(--text-main);">Ice 🧊</p>
+                    </button>
+                </div>
+
+                <p class="text-xs font-semibold uppercase opacity-50 mb-3">🎨 Couleurs personnalisées</p>
                 <div class="grid grid-cols-2 gap-3">
                     <label class="flex items-center gap-3 p-3 rounded-xl cursor-pointer card">
                         <input type="color" id="customPrimaryColor" value="#6366f1" onchange="applyCustomColor('primary', this.value)" class="w-9 h-9 rounded-lg cursor-pointer border-0 flex-shrink-0">
