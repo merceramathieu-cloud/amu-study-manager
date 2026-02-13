@@ -9,631 +9,551 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     <style>
+        /* ═══════════════════════════════════════════════
+           DESIGN SYSTEM — THÈMES
+        ═══════════════════════════════════════════════ */
         :root {
-            --primary: #3b82f6;
+            --primary: #6366f1;
+            --primary-light: #818cf8;
             --secondary: #8b5cf6;
             --accent: #ec4899;
-            --bg-main: #f3f4f6;
+            --bg-main: #f1f5f9;
             --bg-card: #ffffff;
-            --text-main: #1f2937;
-            --border: #e5e7eb;
+            --bg-nav: rgba(255,255,255,0.85);
+            --text-main: #0f172a;
+            --text-soft: #64748b;
+            --border: #e2e8f0;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+            --shadow-md: 0 4px 16px rgba(0,0,0,.08);
+            --shadow-lg: 0 12px 40px rgba(0,0,0,.12);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
         }
 
+        /* ── Thème sombre ─────────── */
         [data-theme="dark"] {
-            --primary: #60a5fa;
+            --primary: #818cf8;
+            --primary-light: #a5b4fc;
             --secondary: #a78bfa;
             --accent: #f472b6;
-            --bg-main: #111827;
-            --bg-card: #1f2937;
-            --text-main: #f9fafb;
-            --border: #374151;
+            --bg-main: #0b0f1a;
+            --bg-card: #141926;
+            --bg-nav: rgba(14,18,31,0.92);
+            --text-main: #e2e8f0;
+            --text-soft: #94a3b8;
+            --border: #1e2a3a;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,.3);
+            --shadow-md: 0 4px 16px rgba(0,0,0,.4);
+            --shadow-lg: 0 12px 40px rgba(0,0,0,.5);
         }
-
-        /* Fix pour les inputs en mode sombre */
         [data-theme="dark"] input,
         [data-theme="dark"] select,
         [data-theme="dark"] textarea {
-            background: #374151;
-            color: #f9fafb;
+            background: #1e2a3a; color: #e2e8f0; border-color: #1e2a3a;
         }
-
         [data-theme="dark"] input::placeholder,
-        [data-theme="dark"] textarea::placeholder {
-            color: #9ca3af;
-        }
+        [data-theme="dark"] textarea::placeholder { color: #475569; }
+        [data-theme="dark"] option { background: #141926; color: #e2e8f0; }
 
-        [data-theme="dark"] option {
-            background: #374151;
-            color: #f9fafb;
-        }
-
-        [data-theme="dark"] .schedule-cell[contenteditable="true"] {
-            color: #f9fafb;
-        }
-
+        /* ── Thème Océan ────────────  */
         [data-theme="ocean"] {
-            --primary: #06b6d4;
-            --secondary: #0891b2;
-            --accent: #22d3ee;
-            --bg-main: #ecfeff;
-            --bg-card: #ffffff;
-            --text-main: #164e63;
-            --border: #a5f3fc;
+            --primary: #0ea5e9; --primary-light: #38bdf8;
+            --secondary: #06b6d4; --accent: #22d3ee;
+            --bg-main: #f0f9ff; --bg-card: #ffffff;
+            --bg-nav: rgba(255,255,255,0.9);
+            --text-main: #0c4a6e; --text-soft: #0369a1; --border: #bae6fd;
         }
-
+        /* ── Thème Coucher de soleil ─ */
         [data-theme="sunset"] {
-            --primary: #f97316;
-            --secondary: #ea580c;
-            --accent: #fb923c;
-            --bg-main: #fff7ed;
-            --bg-card: #ffffff;
-            --text-main: #7c2d12;
-            --border: #fed7aa;
+            --primary: #f97316; --primary-light: #fb923c;
+            --secondary: #ef4444; --accent: #fbbf24;
+            --bg-main: #fff7ed; --bg-card: #ffffff;
+            --bg-nav: rgba(255,255,255,0.9);
+            --text-main: #431407; --text-soft: #9a3412; --border: #fed7aa;
         }
-
+        /* ── Thème Forêt ─────────── */
         [data-theme="forest"] {
-            --primary: #22c55e;
-            --secondary: #16a34a;
-            --accent: #4ade80;
-            --bg-main: #f0fdf4;
-            --bg-card: #ffffff;
-            --text-main: #14532d;
-            --border: #bbf7d0;
+            --primary: #22c55e; --primary-light: #4ade80;
+            --secondary: #10b981; --accent: #84cc16;
+            --bg-main: #f0fdf4; --bg-card: #ffffff;
+            --bg-nav: rgba(255,255,255,0.9);
+            --text-main: #052e16; --text-soft: #166534; --border: #bbf7d0;
+        }
+        /* ── Thème Minuit ─────────── */
+        [data-theme="midnight"] {
+            --primary: #c084fc; --primary-light: #d8b4fe;
+            --secondary: #e879f9; --accent: #67e8f9;
+            --bg-main: #04020f; --bg-card: #0d0820;
+            --bg-nav: rgba(4,2,15,0.95);
+            --text-main: #f0e6ff; --text-soft: #a78bfa; --border: #1e1040;
+            --shadow-sm: 0 1px 3px rgba(100,0,200,.2);
+            --shadow-md: 0 4px 16px rgba(100,0,200,.3);
+        }
+        [data-theme="midnight"] input,
+        [data-theme="midnight"] select,
+        [data-theme="midnight"] textarea {
+            background: #1e1040; color: #f0e6ff; border-color: #1e1040;
+        }
+        /* ── Thème Rosé ─────────── */
+        [data-theme="rose"] {
+            --primary: #f43f5e; --primary-light: #fb7185;
+            --secondary: #e11d48; --accent: #fb923c;
+            --bg-main: #fff1f2; --bg-card: #ffffff;
+            --bg-nav: rgba(255,255,255,0.9);
+            --text-main: #4c0519; --text-soft: #9f1239; --border: #fecdd3;
+        }
+        /* ── Thème Nord ─────────── */
+        [data-theme="nord"] {
+            --primary: #88c0d0; --primary-light: #8fbcbb;
+            --secondary: #81a1c1; --accent: #a3be8c;
+            --bg-main: #2e3440; --bg-card: #3b4252;
+            --bg-nav: rgba(46,52,64,0.95);
+            --text-main: #eceff4; --text-soft: #d8dee9; --border: #434c5e;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,.3);
+            --shadow-md: 0 4px 16px rgba(0,0,0,.4);
+        }
+        [data-theme="nord"] input,
+        [data-theme="nord"] select,
+        [data-theme="nord"] textarea {
+            background: #434c5e; color: #eceff4; border-color: #4c566a;
         }
 
-        /* Amélioration générale du contraste pour tous les inputs */
+        /* ═══════════════════════════════════════════════
+           BASE
+        ═══════════════════════════════════════════════ */
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+            background: var(--bg-main);
+            color: var(--text-main);
+            transition: background 0.4s ease, color 0.4s ease;
+            -webkit-font-smoothing: antialiased;
+        }
+
         input, select, textarea {
             background: var(--bg-card);
             color: var(--text-main);
+            transition: border-color .2s, box-shadow .2s;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 25%, transparent);
+            border-color: var(--primary) !important;
+        }
+        input::placeholder, textarea::placeholder { color: var(--text-soft); opacity: .7; }
+
+        /* Scrollbars stylisées */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+        /* ═══════════════════════════════════════════════
+           NAVIGATION
+        ═══════════════════════════════════════════════ */
+        nav.card {
+            background: var(--bg-nav) !important;
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid var(--border) !important;
+            border-radius: 0 !important;
+            box-shadow: var(--shadow-sm) !important;
         }
 
-        input::placeholder,
-        textarea::placeholder {
-            color: rgba(0, 0, 0, 0.4);
+        .nav-item {
+            position: relative;
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-soft);
+            transition: color .2s, background .2s;
+            border-bottom: none !important;
+            white-space: nowrap;
         }
-
-        [data-theme="dark"] input::placeholder,
-        [data-theme="dark"] textarea::placeholder {
-            color: #9ca3af;
-        }
-
-        body { 
-            font-family: 'Segoe UI', sans-serif; 
-            background-color: var(--bg-main);
-            color: var(--text-main);
-            transition: all 0.3s ease;
-        }
-        
-        /* OPTIMISATIONS RESPONSIVE */
-        
-        /* Mobile First - par défaut */
-        @media (max-width: 768px) {
-            /* Navigation mobile */
-            nav .flex.space-x-6 {
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-                scrollbar-width: none;
-            }
-            
-            nav .flex.space-x-6::-webkit-scrollbar {
-                display: none;
-            }
-            
-            .nav-item {
-                white-space: nowrap;
-                font-size: 0.75rem;
-                padding: 0.5rem 0.75rem;
-            }
-            
-            .nav-item i {
-                display: none;
-            }
-            
-            /* Stats cards en colonne sur mobile */
-            .stat-card {
-                font-size: 0.9rem;
-            }
-            
-            .stat-card .text-4xl {
-                font-size: 2rem !important;
-            }
-            
-            /* Grilles responsive */
-            .grid.grid-cols-2,
-            .grid.grid-cols-3,
-            .grid.grid-cols-4 {
-                grid-template-columns: 1fr !important;
-            }
-            
-            .grid.md\:grid-cols-2,
-            .grid.md\:grid-cols-3,
-            .grid.md\:grid-cols-4 {
-                grid-template-columns: 1fr !important;
-            }
-            
-            /* Formulaires mobile */
-            .flex.gap-4 {
-                flex-direction: column !important;
-            }
-            
-            /* Planning mobile - scroll horizontal */
-            .schedule-grid {
-                font-size: 0.7rem;
-                grid-template-columns: 60px repeat(5, minmax(100px, 1fr)) !important;
-            }
-            
-            .schedule-header {
-                padding: 8px 4px;
-                font-size: 0.7rem;
-            }
-            
-            .schedule-cell {
-                min-height: 60px;
-                padding: 4px;
-                font-size: 0.65rem;
-            }
-            
-            /* Scroll horizontal pour l'agenda */
-            .overflow-x-auto {
-                overflow-x: auto !important;
-                -webkit-overflow-scrolling: touch;
-            }
-            
-            /* Modals mobile */
-            .modal-content {
-                width: 95%;
-                max-height: 90vh;
-                padding: 20px;
-            }
-            
-            /* Boutons mobile */
-            .floating-action {
-                bottom: 20px;
-                right: 20px;
-                width: 50px;
-                height: 50px;
-            }
-            
-            /* Cartes cours mobile */
-            .course-card {
-                margin-bottom: 1rem;
-            }
-            
-            /* Notifications mobile */
-            .notification {
-                right: 10px;
-                left: 10px;
-                top: 70px;
-            }
-            
-            /* Cache certains badges sur mobile */
-            .badge:not(:first-child):not(:nth-child(2)) {
-                display: none;
-            }
-            
-            /* Textes plus petits sur mobile */
-            h2, h3 {
-                font-size: 1.25rem !important;
-            }
-            
-            h4 {
-                font-size: 1rem !important;
-            }
-            
-            /* Espacement réduit */
-            .space-y-6 > * + * {
-                margin-top: 1rem !important;
-            }
-            
-            .gap-4 {
-                gap: 0.5rem !important;
-            }
-            
-            /* Padding réduit sur mobile */
-            .p-6 {
-                padding: 1rem !important;
-            }
-            
-            .p-5 {
-                padding: 0.875rem !important;
-            }
-            
-            /* Input file sur mobile */
-            input[type="file"] {
-                font-size: 0.75rem;
-            }
-        }
-        
-        /* Tablette - optimisations intermédiaires */
-        @media (min-width: 769px) and (max-width: 1024px) {
-            .schedule-grid {
-                grid-template-columns: 70px repeat(5, 1fr) !important;
-            }
-            
-            .grid.md\:grid-cols-2 {
-                grid-template-columns: repeat(2, 1fr) !important;
-            }
-            
-            .grid.md\:grid-cols-3 {
-                grid-template-columns: repeat(2, 1fr) !important;
-            }
-            
-            .grid.md\:grid-cols-4 {
-                grid-template-columns: repeat(2, 1fr) !important;
-            }
-            
-            .stat-card .text-4xl {
-                font-size: 2.5rem !important;
-            }
-            
-            /* Navigation tablette */
-            .nav-item {
-                font-size: 0.85rem;
-            }
-            
-            /* Modals tablette */
-            .modal-content {
-                max-width: 80%;
-            }
-        }
-        
-        /* Desktop - optimisations larges écrans */
-        @media (min-width: 1025px) {
-            /* Agenda plus large sur desktop */
-            .schedule-grid {
-                min-width: 1000px;
-            }
-            
-            /* Grilles optimales */
-            .grid.md\:grid-cols-2 {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .grid.md\:grid-cols-3 {
-                grid-template-columns: repeat(3, 1fr);
-            }
-            
-            .grid.md\:grid-cols-4 {
-                grid-template-columns: repeat(4, 1fr);
-            }
-            
-            /* Hover effects seulement sur desktop */
-            .card:hover {
-                transform: translateY(-5px);
-            }
-            
-            /* Scroll plus fluide */
-            .overflow-y-auto {
-                scrollbar-width: thin;
-                scrollbar-color: var(--primary) var(--border);
-            }
-            
-            .overflow-y-auto::-webkit-scrollbar {
-                width: 8px;
-            }
-            
-            .overflow-y-auto::-webkit-scrollbar-track {
-                background: var(--border);
-            }
-            
-            .overflow-y-auto::-webkit-scrollbar-thumb {
-                background: var(--primary);
-                border-radius: 4px;
-            }
-        }
-        
-        /* Très grands écrans */
-        @media (min-width: 1440px) {
-            .max-w-7xl {
-                max-width: 90rem;
-            }
-        }
-        
-        /* Mode paysage mobile */
-        @media (max-height: 500px) and (orientation: landscape) {
-            .modal-content {
-                max-height: 95vh;
-                overflow-y: auto;
-            }
-            
-            .stat-card {
-                padding: 15px;
-            }
-        }
-        
-        /* Touch improvements pour mobile/tablette */
-        @media (hover: none) and (pointer: coarse) {
-            /* Boutons plus grands pour le touch */
-            button, .nav-item, .filter-btn {
-                min-height: 44px;
-                min-width: 44px;
-            }
-            
-            /* Désactiver les hover effects sur tactile */
-            .card:hover {
-                transform: none;
-            }
-            
-            .schedule-cell:hover {
-                background: var(--bg-card);
-            }
-            
-            /* Meilleure zone de tap */
-            input[type="checkbox"] {
-                width: 20px;
-                height: 20px;
-            }
-        }
-        
-        .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        @keyframes slideIn {
-            from { transform: translateX(-100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-        
-        .nav-item.active { 
-            border-bottom: 3px solid var(--primary); 
+        .nav-item:hover { color: var(--primary); background: color-mix(in srgb, var(--primary) 8%, transparent); }
+        .nav-item.active {
             color: var(--primary);
-            font-weight: 600;
+            background: color-mix(in srgb, var(--primary) 12%, transparent);
+            border-bottom: none !important;
+        }
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px; left: 20%; right: 20%;
+            height: 2px;
+            background: var(--primary);
+            border-radius: 99px;
         }
 
-        .nav-item-mobile {
-            transition: all 0.2s;
+        /* ── Boutons de la nav (ENT, Mail, Settings) ─── */
+        .nav-pill {
+            display: flex; align-items: center; gap: 6px;
+            padding: 6px 14px;
+            border-radius: var(--radius-md);
+            font-size: 0.82rem; font-weight: 700;
+            transition: all .2s; cursor: pointer;
+            border: none;
         }
+        .nav-pill:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+        .nav-pill:active { transform: translateY(0); }
 
-        .nav-item-mobile.active {
-            background: var(--primary) !important;
-            color: white !important;
-            font-weight: 600;
-        }
-
-        .nav-item-mobile:hover {
-            background: var(--border) !important;
-        }
-
-        [data-theme="dark"] .nav-item-mobile:hover {
-            background: #374151 !important;
-        }
-
-        [data-theme="dark"] .nav-item-mobile.active {
-            background: var(--primary) !important;
-        }
-        
+        /* ═══════════════════════════════════════════════
+           CARDS
+        ═══════════════════════════════════════════════ */
         .card {
             background: var(--bg-card);
             border: 1px solid var(--border);
-            transition: all 0.3s ease;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            transition: transform .3s ease, box-shadow .3s ease;
         }
-        
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-        }
-        
-        .schedule-grid { 
-            display: grid; 
-            background: var(--border);
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            overflow: hidden;
+        @media (hover: hover) {
+            .card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
         }
 
-        .schedule-grid > * {
-            outline: 1px solid var(--border);
-        }
-        
-        .schedule-header { 
-            background: var(--primary); 
+        /* ── Stat cards ─────────────── */
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
-            padding: 12px 8px; 
-            font-weight: bold; 
-            text-align: center; 
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            position: relative; overflow: hidden;
+            box-shadow: var(--shadow-md);
         }
-        
-        .schedule-cell { 
-            background: var(--bg-card); 
-            min-height: 70px; 
-            padding: 8px; 
-            font-size: 0.85rem;
-            transition: all 0.2s;
+        .stat-card::before {
+            content: '';
+            position: absolute; top: -30%; right: -10%;
+            width: 120px; height: 120px;
+            background: rgba(255,255,255,.1);
+            border-radius: 50%;
+        }
+        .stat-card::after {
+            content: '';
+            position: absolute; bottom: -40%; right: 10%;
+            width: 80px; height: 80px;
+            background: rgba(255,255,255,.07);
+            border-radius: 50%;
+        }
+
+        /* ═══════════════════════════════════════════════
+           BOUTONS PRIMAIRES
+        ═══════════════════════════════════════════════ */
+        .btn-primary {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white; font-weight: 700; font-size: 0.875rem;
+            border: none; border-radius: var(--radius-md);
+            cursor: pointer; transition: all .2s;
+            box-shadow: 0 2px 8px color-mix(in srgb, var(--primary) 40%, transparent);
+        }
+        .btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 6px 20px color-mix(in srgb, var(--primary) 40%, transparent); }
+        .btn-primary:active { transform: translateY(0); filter: brightness(0.98); }
+
+        .btn-ghost {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 8px 16px;
+            background: transparent; border: 1.5px solid var(--border);
+            color: var(--text-main); font-weight: 600; font-size: 0.82rem;
+            border-radius: var(--radius-md); cursor: pointer; transition: all .2s;
+        }
+        .btn-ghost:hover { border-color: var(--primary); color: var(--primary); background: color-mix(in srgb, var(--primary) 6%, transparent); }
+
+        .btn-danger {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 8px 16px;
+            background: transparent; border: 1.5px solid #fca5a5;
+            color: #ef4444; font-weight: 600; font-size: 0.82rem;
+            border-radius: var(--radius-md); cursor: pointer; transition: all .2s;
+        }
+        .btn-danger:hover { background: #fef2f2; border-color: #ef4444; }
+
+        /* ═══════════════════════════════════════════════
+           FILTER BUTTONS
+        ═══════════════════════════════════════════════ */
+        .filter-btn {
+            padding: 6px 16px; border-radius: 99px;
+            font-size: 0.8rem; font-weight: 600;
+            border: 1.5px solid var(--border);
+            color: var(--text-soft);
+            background: transparent;
+            cursor: pointer; transition: all .2s;
+        }
+        .filter-btn:hover { border-color: var(--primary); color: var(--primary); }
+        .filter-btn.active {
+            background: var(--primary); color: white;
+            border-color: var(--primary);
+            box-shadow: 0 2px 8px color-mix(in srgb, var(--primary) 40%, transparent);
+        }
+
+        /* ═══════════════════════════════════════════════
+           BADGES
+        ═══════════════════════════════════════════════ */
+        .badge {
+            display: inline-flex; align-items: center;
+            padding: 3px 10px;
+            border-radius: 99px;
+            font-size: 0.72rem; font-weight: 700;
+            letter-spacing: .02em;
+        }
+
+        /* ═══════════════════════════════════════════════
+           PLANNING / SCHEDULE
+        ═══════════════════════════════════════════════ */
+        .schedule-grid {
+            display: grid;
+            background: var(--border);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+        .schedule-grid > * { outline: 1px solid var(--border); }
+
+        .schedule-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 12px 8px;
+            font-weight: 700; font-size: 0.8rem;
+            text-align: center;
+        }
+        .schedule-cell {
+            background: var(--bg-card);
+            min-height: 70px; padding: 8px;
+            font-size: 0.82rem;
+            transition: background .15s;
             position: relative;
         }
-        
-        .schedule-cell:hover {
-            background: rgba(59, 130, 246, 0.05);
-        }
-        
-        .stat-card {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: white;
-            border-radius: 12px;
-            padding: 20px;
-            animation: slideIn 0.5s ease;
-        }
-        
+        .schedule-cell:hover { background: color-mix(in srgb, var(--primary) 4%, var(--bg-card)); }
+
+        /* ═══════════════════════════════════════════════
+           PROGRESS BARS
+        ═══════════════════════════════════════════════ */
         .progress-bar {
-            background: var(--border);
-            border-radius: 10px;
-            overflow: hidden;
-            height: 8px;
+            background: color-mix(in srgb, var(--primary) 15%, transparent);
+            border-radius: 99px; overflow: hidden; height: 7px;
         }
-        
         .progress-fill {
             background: linear-gradient(90deg, var(--primary), var(--accent));
-            height: 100%;
-            transition: width 0.5s ease;
+            height: 100%; transition: width .6s cubic-bezier(.4,0,.2,1);
+            border-radius: 99px;
         }
-        
-        .badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-        
-        .emoji-picker {
-            display: grid;
-            grid-template-columns: repeat(8, 1fr);
-            gap: 8px;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        
-        .emoji-btn {
-            font-size: 1.5rem;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 8px;
-            transition: all 0.2s;
-        }
-        
-        .emoji-btn:hover {
-            background: var(--border);
-            transform: scale(1.2);
-        }
-        
+
+        /* ═══════════════════════════════════════════════
+           MODALS
+        ═══════════════════════════════════════════════ */
         .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
+            display: none; position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.45);
+            backdrop-filter: blur(4px);
             z-index: 1000;
-            align-items: center;
-            justify-content: center;
+            align-items: center; justify-content: center;
+            padding: 16px;
         }
-        
-        .modal.active {
-            display: flex;
-            animation: fadeIn 0.3s ease;
-        }
-        
+        .modal.active { display: flex; animation: fadeIn .25s ease; }
         .modal-content {
             background: var(--bg-card);
-            padding: 30px;
-            border-radius: 16px;
-            max-width: 600px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
+            padding: 28px;
+            border-radius: var(--radius-xl);
+            max-width: 600px; width: 100%;
+            max-height: 88vh; overflow-y: auto;
             color: var(--text-main);
-        }
-        
-        /* Amélioration des checkbox et inputs en mode sombre */
-        [data-theme="dark"] input[type="checkbox"] {
-            filter: brightness(1.2);
-            background: #374151;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border);
         }
 
-        [data-theme="dark"] input[type="time"],
-        [data-theme="dark"] input[type="date"],
-        [data-theme="dark"] input[type="number"],
-        [data-theme="dark"] input[type="text"],
-        [data-theme="dark"] input[type="file"] {
-            background: #374151;
-            color: #f9fafb;
-            border-color: #4b5563;
-        }
-
-        [data-theme="dark"] input[type="color"] {
-            background: #374151;
-            border-color: #4b5563;
-        }
-
-        [data-theme="dark"] .emoji-btn:hover {
-            background: #374151;
-        }
-
-        [data-theme="dark"] details summary {
-            color: var(--text-main);
-        }
-        
+        /* ═══════════════════════════════════════════════
+           GRADIENT TEXT
+        ═══════════════════════════════════════════════ */
         .gradient-text {
             background: linear-gradient(135deg, var(--primary), var(--accent));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-        
+
+        /* ═══════════════════════════════════════════════
+           NOTIFICATIONS
+        ═══════════════════════════════════════════════ */
+        .notification {
+            position: fixed; top: 72px; right: 16px;
+            background: var(--bg-card);
+            padding: 14px 20px;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            border-left: 3px solid var(--primary);
+            z-index: 2000;
+            animation: notifIn .3s cubic-bezier(.34,1.56,.64,1);
+            font-weight: 600; font-size: 0.875rem;
+            max-width: 320px;
+        }
+        @keyframes notifIn {
+            from { opacity: 0; transform: translateX(20px) scale(.95); }
+            to   { opacity: 1; transform: translateX(0) scale(1); }
+        }
+
+        /* ═══════════════════════════════════════════════
+           FLOATING ACTION BUTTON
+        ═══════════════════════════════════════════════ */
         .floating-action {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 60px;
-            height: 60px;
+            position: fixed; bottom: 28px; right: 28px;
+            width: 56px; height: 56px;
             border-radius: 50%;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
             cursor: pointer;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            transition: all 0.3s;
-            z-index: 100;
+            box-shadow: 0 8px 24px color-mix(in srgb, var(--primary) 50%, transparent);
+            transition: all .3s cubic-bezier(.34,1.56,.64,1);
+            z-index: 100; border: none;
         }
-        
-        .floating-action:hover {
-            transform: scale(1.1) rotate(90deg);
+        .floating-action:hover { transform: scale(1.12) rotate(90deg); box-shadow: 0 12px 32px color-mix(in srgb, var(--primary) 60%, transparent); }
+        .floating-action:active { transform: scale(0.95); }
+
+        /* ═══════════════════════════════════════════════
+           EMOJI PICKER
+        ═══════════════════════════════════════════════ */
+        .emoji-picker { display: grid; grid-template-columns: repeat(8,1fr); gap: 6px; max-height: 200px; overflow-y: auto; }
+        .emoji-btn { font-size: 1.4rem; cursor: pointer; padding: 6px; border-radius: var(--radius-sm); transition: all .15s; text-align: center; }
+        .emoji-btn:hover { background: var(--border); transform: scale(1.2); }
+
+        /* ═══════════════════════════════════════════════
+           ANIMATIONS
+        ═══════════════════════════════════════════════ */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn .3s ease; }
+
+        @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes slideIn { from { transform:translateX(-100%); opacity:0; } to { transform:translateX(0); opacity:1; } }
+        @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
+
+        .streak-flame { animation: pulse 1.2s ease infinite; }
+        .confetti { position:fixed; width:9px; height:9px; background:var(--primary); animation:fall 3s linear; border-radius: 2px; }
+        @keyframes fall { to { transform:translateY(100vh) rotate(360deg); opacity:0; } }
+
+        /* ── Animations au chargement des cartes ─── */
+        .course-card { animation: fadeIn .3s ease both; }
+
+        /* ═══════════════════════════════════════════════
+           RESPONSIVE — MOBILE PORTRAIT
+        ═══════════════════════════════════════════════ */
+        @media (max-width: 640px) {
+            body { font-size: 14px; }
+            .modal-content { padding: 20px; border-radius: var(--radius-lg); }
+            .notification { right: 10px; left: 10px; top: 68px; }
+            .floating-action { bottom: 16px; right: 16px; width: 52px; height: 52px; }
+            h2, h3 { font-size: 1.2rem !important; }
+            h4 { font-size: 0.95rem !important; }
+            .stat-card .text-4xl { font-size: 1.9rem !important; }
+            .badge:not(:first-child):not(:nth-child(2)) { display: none; }
+            .space-y-6 > * + * { margin-top: 0.875rem !important; }
+            .p-6 { padding: 1rem !important; }
+            .p-5 { padding: 0.875rem !important; }
+            .schedule-grid { font-size: 0.68rem; grid-template-columns: 52px repeat(5, minmax(90px,1fr)) !important; }
+            .schedule-header { padding: 8px 4px; font-size: 0.68rem; }
+            .schedule-cell { min-height: 60px; padding: 4px; font-size: 0.65rem; }
+            input[type="file"] { font-size: 0.72rem; }
         }
 
-        @media (max-width: 768px) {
-            .floating-action {
-                bottom: 20px;
-                right: 20px;
-                width: 56px;
-                height: 56px;
-            }
+        /* ─ Mobile paysage ─── */
+        @media (max-height: 480px) and (orientation: landscape) {
+            .modal-content { max-height: 96vh; }
+            .stat-card { padding: 12px 16px; }
+            .stat-card .text-4xl { font-size: 1.6rem !important; }
+        }
 
-            .floating-action:active {
-                transform: scale(0.95);
-            }
+        /* ─ Tablette portrait ─── */
+        @media (min-width: 641px) and (max-width: 1024px) {
+            .schedule-grid { grid-template-columns: 64px repeat(5,1fr) !important; }
+            .stat-card .text-4xl { font-size: 2.4rem !important; }
+            .modal-content { max-width: 78%; }
         }
-        
-        .confetti {
-            position: fixed;
-            width: 10px;
-            height: 10px;
-            background: var(--primary);
-            animation: fall 3s linear;
+
+        /* ─ Tablette paysage ─── */
+        @media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+            .grid.md\:grid-cols-4 { grid-template-columns: repeat(4,1fr) !important; }
         }
-        
-        @keyframes fall {
-            to { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+
+        /* ─ Desktop large ─── */
+        @media (min-width: 1280px) {
+            .schedule-grid { min-width: 960px; }
+            .overflow-y-auto { scrollbar-width: thin; scrollbar-color: var(--primary) var(--border); }
         }
-        
-        .notification {
-            position: fixed;
-            top: 80px;
-            right: 20px;
-            background: var(--bg-card);
-            padding: 16px 24px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            border-left: 4px solid var(--primary);
-            z-index: 1000;
-            animation: slideIn 0.3s ease;
+        @media (min-width: 1536px) { .max-w-7xl { max-width: 90rem; } }
+
+        /* ─ Touch devices ─── */
+        @media (hover: none) and (pointer: coarse) {
+            button, .nav-item, .filter-btn, .nav-pill { min-height: 42px; }
+            .card:hover { transform: none; box-shadow: var(--shadow-sm); }
+            .schedule-cell:hover { background: var(--bg-card); }
+            input[type="checkbox"] { width: 20px; height: 20px; }
         }
-        
-        .streak-flame {
-            animation: pulse 1s infinite;
+
+        /* ═══════════════════════════════════════════════
+           SETTINGS PANEL CUSTOM
+        ═══════════════════════════════════════════════ */
+        .theme-swatch {
+            border-radius: var(--radius-md);
+            cursor: pointer; overflow: hidden;
+            border: 2px solid transparent;
+            transition: all .2s;
+            aspect-ratio: 4/3;
         }
+        .theme-swatch:hover { transform: scale(1.04); box-shadow: var(--shadow-md); }
+        .theme-swatch.active { border-color: var(--primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 30%, transparent); }
+
+        /* Settings tabs */
+        .settings-tab-btn {
+            flex: 1; padding: 8px 4px;
+            font-size: 0.75rem; font-weight: 700;
+            border: none; background: transparent;
+            color: var(--text-soft);
+            border-bottom: 2px solid transparent;
+            cursor: pointer; transition: all .2s;
+        }
+        .settings-tab-btn.active { color: var(--primary); border-color: var(--primary); }
+
+        .settings-panel { display: none; }
+        .settings-panel.active { display: block; animation: fadeIn .2s ease; }
+
+        /* ═══════════════════════════════════════════════
+           NAV MOBILE — bottom bar
+        ═══════════════════════════════════════════════ */
+        .nav-item-mobile {
+            transition: all .2s;
+            border-radius: var(--radius-sm);
+        }
+        .nav-item-mobile.active {
+            background: var(--primary) !important;
+            color: white !important; font-weight: 700;
+        }
+        .nav-item-mobile:hover { background: var(--border) !important; }
+        [data-theme="dark"] .nav-item-mobile:hover { background: #1e2a3a !important; }
+
+        /* ─ Quick action cards ─── */
+        .quick-action-card {
+            display: flex; flex-direction: column; align-items: center;
+            padding: 16px 8px; border-radius: var(--radius-md);
+            border: 1.5px dashed var(--border);
+            background: transparent;
+            cursor: pointer; transition: all .2s;
+            color: var(--text-main);
+        }
+        .quick-action-card:hover {
+            border-style: solid;
+            background: color-mix(in srgb, var(--primary) 5%, transparent);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+        .quick-action-card:active { transform: translateY(0); }
     </style>
 </head>
 <body>
@@ -669,28 +589,35 @@
                     <button onclick="showTab('tasks')" class="nav-item px-3 py-2 text-sm font-medium hover:text-blue-600">
                         <i class="fas fa-tasks mr-1"></i> Tâches
                     </button>
-                    <a href="https://ent.univ-amu.fr/" target="_blank" rel="noopener noreferrer" 
-                       class="px-3 py-2 text-sm font-medium flex items-center gap-1 rounded-lg transition-all"
-                       style="background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white;"
-                       title="Accéder à l'ENT AMU">
+                    <a href="https://ent.univ-amu.fr/" target="_blank" rel="noopener noreferrer"
+                       class="nav-pill" style="background:linear-gradient(135deg,var(--primary),var(--secondary)); color:white;"
+                       title="ENT AMU">
                         <i class="fas fa-university"></i>
-                        <span class="hidden xl:inline">ENT AMU</span>
+                        <span class="hidden xl:inline">ENT</span>
                     </a>
-                    <button onclick="openSettings()" class="px-3 py-2 text-sm font-medium hover:text-blue-600">
-                        <i class="fas fa-cog"></i>
+                    <a href="https://outlook.cloud.microsoft/mail/?realm=etu.univ-amu.fr" target="_blank" rel="noopener noreferrer"
+                       class="nav-pill" style="background:linear-gradient(135deg,#0078d4,#106ebe); color:white;"
+                       title="Mails AMU">
+                        <i class="fas fa-envelope"></i>
+                        <span class="hidden xl:inline">Mails</span>
+                    </a>
+                    <button onclick="openSettings()" class="nav-pill btn-ghost" title="Paramètres">
+                        <i class="fas fa-sliders-h"></i>
                     </button>
                 </div>
 
                 <!-- Navigation Mobile -->
-                <div class="flex lg:hidden items-center space-x-2">
+                <div class="flex lg:hidden items-center gap-2">
                     <a href="https://ent.univ-amu.fr/" target="_blank" rel="noopener noreferrer"
-                       class="px-3 py-2 text-sm font-medium rounded-lg flex items-center"
-                       style="background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white;"
-                       title="ENT AMU">
-                        <i class="fas fa-university"></i>
+                       class="nav-pill" style="background:linear-gradient(135deg,var(--primary),var(--secondary)); color:white;" title="ENT">
+                        <i class="fas fa-university text-sm"></i>
                     </a>
-                    <button onclick="openSettings()" class="px-3 py-2 text-sm font-medium hover:text-blue-600">
-                        <i class="fas fa-cog"></i>
+                    <a href="https://outlook.cloud.microsoft/mail/?realm=etu.univ-amu.fr" target="_blank" rel="noopener noreferrer"
+                       class="nav-pill" style="background:linear-gradient(135deg,#0078d4,#106ebe); color:white;" title="Mails">
+                        <i class="fas fa-envelope text-sm"></i>
+                    </a>
+                    <button onclick="openSettings()" class="nav-pill btn-ghost" title="Paramètres">
+                        <i class="fas fa-sliders-h text-sm"></i>
                     </button>
                     <button onclick="toggleMobileMenu()" class="px-3 py-2 text-sm font-medium hover:text-blue-600" id="mobileMenuBtn">
                         <i class="fas fa-bars text-xl"></i>
@@ -725,6 +652,12 @@
                         <i class="fas fa-university mr-2 w-5"></i> ENT AMU
                         <i class="fas fa-external-link-alt ml-auto text-xs opacity-70"></i>
                     </a>
+                    <a href="https://outlook.cloud.microsoft/mail/?realm=etu.univ-amu.fr" target="_blank" rel="noopener noreferrer"
+                       class="nav-item-mobile px-3 py-3 text-sm font-medium text-left rounded flex items-center"
+                       style="background: linear-gradient(135deg, #0078d4, #106ebe); color: white; margin-top: 4px;">
+                        <i class="fas fa-envelope mr-2 w-5"></i> Mails AMU
+                        <i class="fas fa-external-link-alt ml-auto text-xs opacity-70"></i>
+                    </a>
                 </div>
             </div>
         </div>
@@ -737,8 +670,16 @@
             
             <!-- Greeting personnalisé -->
             <div class="card rounded-lg p-6 shadow-lg">
-                <h2 class="text-3xl font-bold mb-2" id="greeting">👋 Salut champion !</h2>
-                <p class="text-sm opacity-70" id="motivational-quote">La réussite commence par un effort quotidien.</p>
+                <div class="flex justify-between items-start flex-wrap gap-2">
+                    <div>
+                        <h2 class="text-3xl font-bold mb-1" id="greeting">👋 Salut champion !</h2>
+                        <p class="text-sm opacity-60" id="motivational-quote">La réussite commence par un effort quotidien.</p>
+                    </div>
+                    <div class="text-right flex-shrink-0">
+                        <div id="live-clock" class="font-mono font-bold text-2xl" style="color:var(--primary); letter-spacing:.05em;">--:--:--</div>
+                        <div class="text-xs opacity-50" id="dash-date"></div>
+                    </div>
+                </div>
             </div>
 
             <!-- Stats rapides -->
@@ -1066,89 +1007,105 @@
 
     <!-- Modal Paramètres -->
     <div id="settingsModal" class="modal">
-        <div class="modal-content">
-            <div class="flex justify-between items-center mb-6">
+        <div class="modal-content" style="max-width:580px;">
+            <div class="flex justify-between items-center mb-5">
                 <h3 class="text-2xl font-bold gradient-text">⚙️ Paramètres</h3>
-                <button onclick="closeSettings()" class="text-2xl">&times;</button>
+                <button onclick="closeSettings()" class="btn-ghost" style="padding:6px 10px; font-size:1.1rem;">&times;</button>
             </div>
 
-            <!-- Thèmes -->
-            <div class="mb-6">
-                <h4 class="font-bold mb-3">🎨 Thème</h4>
-                <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
-                    <button onclick="setTheme('light')" class="p-4 rounded-lg border-2 hover:border-blue-500 transition">
-                        <div class="w-full h-12 rounded bg-gradient-to-r from-blue-500 to-purple-500 mb-2"></div>
-                        <p class="text-xs font-medium">Clair</p>
-                    </button>
-                    <button onclick="setTheme('dark')" class="p-4 rounded-lg border-2 hover:border-blue-500 transition">
-                        <div class="w-full h-12 rounded bg-gradient-to-r from-gray-800 to-gray-900 mb-2"></div>
-                        <p class="text-xs font-medium">Sombre</p>
-                    </button>
-                    <button onclick="setTheme('ocean')" class="p-4 rounded-lg border-2 hover:border-blue-500 transition">
-                        <div class="w-full h-12 rounded bg-gradient-to-r from-cyan-400 to-blue-500 mb-2"></div>
-                        <p class="text-xs font-medium">Océan</p>
-                    </button>
-                    <button onclick="setTheme('sunset')" class="p-4 rounded-lg border-2 hover:border-blue-500 transition">
-                        <div class="w-full h-12 rounded bg-gradient-to-r from-orange-400 to-red-500 mb-2"></div>
-                        <p class="text-xs font-medium">Coucher</p>
-                    </button>
-                    <button onclick="setTheme('forest')" class="p-4 rounded-lg border-2 hover:border-blue-500 transition">
-                        <div class="w-full h-12 rounded bg-gradient-to-r from-green-400 to-emerald-500 mb-2"></div>
-                        <p class="text-xs font-medium">Forêt</p>
-                    </button>
-                </div>
+            <!-- Onglets settings -->
+            <div class="flex border-b mb-5" style="border-color:var(--border);">
+                <button class="settings-tab-btn active" onclick="switchSettingsTab(this,'tab-theme')">🎨 Thème</button>
+                <button class="settings-tab-btn" onclick="switchSettingsTab(this,'tab-profile')">👤 Profil</button>
+                <button class="settings-tab-btn" onclick="switchSettingsTab(this,'tab-display')">🖥️ Affichage</button>
+                <button class="settings-tab-btn" onclick="switchSettingsTab(this,'tab-options')">🎯 Options</button>
+                <button class="settings-tab-btn" onclick="switchSettingsTab(this,'tab-data')">💾 Données</button>
             </div>
 
-            <!-- Personnalisation -->
-            <div class="mb-6">
-                <h4 class="font-bold mb-3">👤 Personnalisation</h4>
-                <input type="text" id="userName" placeholder="Ton prénom" class="w-full p-3 border rounded-lg mb-3" style="border-color: var(--border);">
-                <div class="mb-3">
-                    <label class="block text-sm font-medium mb-2">Choisis ton avatar</label>
-                    <div class="emoji-picker">
-                        <span class="emoji-btn" onclick="setAvatar('👨‍🎓')">👨‍🎓</span>
-                        <span class="emoji-btn" onclick="setAvatar('👩‍🎓')">👩‍🎓</span>
-                        <span class="emoji-btn" onclick="setAvatar('🦸‍♂️')">🦸‍♂️</span>
-                        <span class="emoji-btn" onclick="setAvatar('🦸‍♀️')">🦸‍♀️</span>
-                        <span class="emoji-btn" onclick="setAvatar('🧙‍♂️')">🧙‍♂️</span>
-                        <span class="emoji-btn" onclick="setAvatar('🧙‍♀️')">🧙‍♀️</span>
-                        <span class="emoji-btn" onclick="setAvatar('🐱')">🐱</span>
-                        <span class="emoji-btn" onclick="setAvatar('🐶')">🐶</span>
-                        <span class="emoji-btn" onclick="setAvatar('🦊')">🦊</span>
-                        <span class="emoji-btn" onclick="setAvatar('🐼')">🐼</span>
-                        <span class="emoji-btn" onclick="setAvatar('🦁')">🦁</span>
-                        <span class="emoji-btn" onclick="setAvatar('🐯')">🐯</span>
-                        <span class="emoji-btn" onclick="setAvatar('🚀')">🚀</span>
-                        <span class="emoji-btn" onclick="setAvatar('⚡')">⚡</span>
-                        <span class="emoji-btn" onclick="setAvatar('🔥')">🔥</span>
-                        <span class="emoji-btn" onclick="setAvatar('💎')">💎</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Apparence avancée -->
-            <div class="mb-6">
-                <h4 class="font-bold mb-3">🖌️ Apparence avancée</h4>
-                <div class="grid grid-cols-2 gap-3 mb-3">
-                    <div>
-                        <label class="block text-xs font-medium mb-1 opacity-70">Couleur principale</label>
-                        <div class="flex items-center gap-2 p-2 border rounded-lg" style="border-color:var(--border);">
-                            <input type="color" id="customPrimaryColor" value="#3b82f6" onchange="applyCustomColor('primary', this.value)" class="w-8 h-8 rounded cursor-pointer border-0">
-                            <span class="text-xs opacity-60">Primaire</span>
+            <!-- TAB THÈME -->
+            <div id="tab-theme" class="settings-panel active">
+                <p class="text-xs font-semibold uppercase opacity-50 mb-3">Choisir un thème</p>
+                <div class="grid grid-cols-4 gap-3 mb-5">
+                    <button onclick="setTheme('light')" class="theme-swatch" id="swatch-light">
+                        <div class="h-full w-full" style="background:linear-gradient(135deg,#6366f1,#ec4899);"></div>
+                        <p class="text-xs font-semibold text-center mt-1" style="color:var(--text-main);">Indigo</p>
+                    </button>
+                    <button onclick="setTheme('dark')" class="theme-swatch" id="swatch-dark">
+                        <div class="h-full w-full" style="background:linear-gradient(135deg,#818cf8,#a78bfa); position:relative;">
+                            <div style="position:absolute;inset:0;background:rgba(0,0,0,.55);"></div>
                         </div>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium mb-1 opacity-70">Couleur accent</label>
-                        <div class="flex items-center gap-2 p-2 border rounded-lg" style="border-color:var(--border);">
-                            <input type="color" id="customAccentColor" value="#ec4899" onchange="applyCustomColor('accent', this.value)" class="w-8 h-8 rounded cursor-pointer border-0">
-                            <span class="text-xs opacity-60">Accent</span>
+                        <p class="text-xs font-semibold text-center mt-1" style="color:var(--text-main);">Sombre</p>
+                    </button>
+                    <button onclick="setTheme('midnight')" class="theme-swatch" id="swatch-midnight">
+                        <div class="h-full w-full" style="background:linear-gradient(135deg,#c084fc,#67e8f9); position:relative;">
+                            <div style="position:absolute;inset:0;background:rgba(4,2,15,.7);"></div>
                         </div>
-                    </div>
+                        <p class="text-xs font-semibold text-center mt-1" style="color:var(--text-main);">Minuit</p>
+                    </button>
+                    <button onclick="setTheme('nord')" class="theme-swatch" id="swatch-nord">
+                        <div class="h-full w-full" style="background:linear-gradient(135deg,#88c0d0,#a3be8c); position:relative;">
+                            <div style="position:absolute;inset:0;background:rgba(46,52,64,.6);"></div>
+                        </div>
+                        <p class="text-xs font-semibold text-center mt-1" style="color:var(--text-main);">Nord</p>
+                    </button>
+                    <button onclick="setTheme('ocean')" class="theme-swatch" id="swatch-ocean">
+                        <div class="h-full w-full" style="background:linear-gradient(135deg,#0ea5e9,#22d3ee);"></div>
+                        <p class="text-xs font-semibold text-center mt-1" style="color:var(--text-main);">Océan</p>
+                    </button>
+                    <button onclick="setTheme('sunset')" class="theme-swatch" id="swatch-sunset">
+                        <div class="h-full w-full" style="background:linear-gradient(135deg,#f97316,#ef4444);"></div>
+                        <p class="text-xs font-semibold text-center mt-1" style="color:var(--text-main);">Sunset</p>
+                    </button>
+                    <button onclick="setTheme('forest')" class="theme-swatch" id="swatch-forest">
+                        <div class="h-full w-full" style="background:linear-gradient(135deg,#22c55e,#84cc16);"></div>
+                        <p class="text-xs font-semibold text-center mt-1" style="color:var(--text-main);">Forêt</p>
+                    </button>
+                    <button onclick="setTheme('rose')" class="theme-swatch" id="swatch-rose">
+                        <div class="h-full w-full" style="background:linear-gradient(135deg,#f43f5e,#fb923c);"></div>
+                        <p class="text-xs font-semibold text-center mt-1" style="color:var(--text-main);">Rosé</p>
+                    </button>
                 </div>
-                <div class="mb-3">
-                    <label class="block text-xs font-medium mb-2 opacity-70">Police d'affichage</label>
-                    <select id="fontSelect" onchange="applyFont(this.value)" class="w-full p-2 border rounded-lg text-sm" style="border-color:var(--border);">
-                        <option value="Segoe UI">Segoe UI (défaut)</option>
+
+                <p class="text-xs font-semibold uppercase opacity-50 mb-3">Couleurs personnalisées</p>
+                <div class="grid grid-cols-2 gap-3">
+                    <label class="flex items-center gap-3 p-3 rounded-xl cursor-pointer card">
+                        <input type="color" id="customPrimaryColor" value="#6366f1" onchange="applyCustomColor('primary', this.value)" class="w-9 h-9 rounded-lg cursor-pointer border-0 flex-shrink-0">
+                        <div><p class="text-sm font-semibold">Primaire</p><p class="text-xs opacity-50">Boutons, liens actifs</p></div>
+                    </label>
+                    <label class="flex items-center gap-3 p-3 rounded-xl cursor-pointer card">
+                        <input type="color" id="customAccentColor" value="#ec4899" onchange="applyCustomColor('accent', this.value)" class="w-9 h-9 rounded-lg cursor-pointer border-0 flex-shrink-0">
+                        <div><p class="text-sm font-semibold">Accent</p><p class="text-xs opacity-50">Dégradés, highlights</p></div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- TAB PROFIL -->
+            <div id="tab-profile" class="settings-panel">
+                <input type="text" id="userName" placeholder="Ton prénom" class="w-full p-3 border rounded-xl mb-4 text-sm font-medium" style="border-color: var(--border);">
+                <p class="text-xs font-semibold uppercase opacity-50 mb-3">Choisis ton avatar</p>
+                <div class="emoji-picker">
+                    <span class="emoji-btn" onclick="setAvatar('👨‍🎓')">👨‍🎓</span><span class="emoji-btn" onclick="setAvatar('👩‍🎓')">👩‍🎓</span>
+                    <span class="emoji-btn" onclick="setAvatar('🦸‍♂️')">🦸‍♂️</span><span class="emoji-btn" onclick="setAvatar('🦸‍♀️')">🦸‍♀️</span>
+                    <span class="emoji-btn" onclick="setAvatar('🧙‍♂️')">🧙‍♂️</span><span class="emoji-btn" onclick="setAvatar('🧙‍♀️')">🧙‍♀️</span>
+                    <span class="emoji-btn" onclick="setAvatar('🐱')">🐱</span><span class="emoji-btn" onclick="setAvatar('🐶')">🐶</span>
+                    <span class="emoji-btn" onclick="setAvatar('🦊')">🦊</span><span class="emoji-btn" onclick="setAvatar('🐼')">🐼</span>
+                    <span class="emoji-btn" onclick="setAvatar('🦁')">🦁</span><span class="emoji-btn" onclick="setAvatar('🐯')">🐯</span>
+                    <span class="emoji-btn" onclick="setAvatar('🚀')">🚀</span><span class="emoji-btn" onclick="setAvatar('⚡')">⚡</span>
+                    <span class="emoji-btn" onclick="setAvatar('🔥')">🔥</span><span class="emoji-btn" onclick="setAvatar('💎')">💎</span>
+                    <span class="emoji-btn" onclick="setAvatar('🎵')">🎵</span><span class="emoji-btn" onclick="setAvatar('🌙')">🌙</span>
+                    <span class="emoji-btn" onclick="setAvatar('🌈')">🌈</span><span class="emoji-btn" onclick="setAvatar('🍀')">🍀</span>
+                </div>
+                <button onclick="saveSettings()" class="btn-primary w-full mt-5">
+                    <i class="fas fa-save"></i> Sauvegarder le profil
+                </button>
+            </div>
+
+            <!-- TAB AFFICHAGE -->
+            <div id="tab-display" class="settings-panel">
+                <div class="mb-4">
+                    <p class="text-xs font-semibold uppercase opacity-50 mb-2">Police</p>
+                    <select id="fontSelect" onchange="applyFont(this.value)" class="w-full p-2.5 border rounded-xl text-sm font-medium" style="border-color:var(--border);">
+                        <option value="'Plus Jakarta Sans', sans-serif">Plus Jakarta Sans</option>
                         <option value="'Poppins', sans-serif">Poppins</option>
                         <option value="'Inter', sans-serif">Inter</option>
                         <option value="'Roboto', sans-serif">Roboto</option>
@@ -1156,86 +1113,85 @@
                         <option value="monospace">Monospace</option>
                     </select>
                 </div>
-                <div>
-                    <label class="block text-xs font-medium mb-2 opacity-70">Densité de l'interface</label>
+                <div class="mb-4">
+                    <p class="text-xs font-semibold uppercase opacity-50 mb-2">Densité</p>
                     <div class="flex gap-2">
-                        <button onclick="setDensity('compact')" class="flex-1 py-2 text-xs rounded-lg border transition hover:border-blue-400" style="border-color:var(--border);" id="density-compact">Compact</button>
-                        <button onclick="setDensity('normal')" class="flex-1 py-2 text-xs rounded-lg border transition hover:border-blue-400" style="border-color:var(--primary); background:var(--primary); color:white;" id="density-normal">Normal</button>
-                        <button onclick="setDensity('comfortable')" class="flex-1 py-2 text-xs rounded-lg border transition hover:border-blue-400" style="border-color:var(--border);" id="density-comfortable">Confortable</button>
+                        <button onclick="setDensity('compact')" id="density-compact" class="flex-1 py-2.5 text-xs rounded-xl border font-semibold transition" style="border-color:var(--border);">Compact</button>
+                        <button onclick="setDensity('normal')" id="density-normal" class="flex-1 py-2.5 text-xs rounded-xl border font-semibold transition" style="background:var(--primary);color:white;border-color:var(--primary);">Normal</button>
+                        <button onclick="setDensity('comfortable')" id="density-comfortable" class="flex-1 py-2.5 text-xs rounded-xl border font-semibold transition" style="border-color:var(--border);">Large</button>
+                    </div>
+                </div>
+                <div>
+                    <p class="text-xs font-semibold uppercase opacity-50 mb-2">Rayon des cartes</p>
+                    <div class="flex gap-2">
+                        <button onclick="setRadius('sharp')" class="flex-1 py-2.5 text-xs rounded border font-semibold" style="border-color:var(--border);" id="radius-sharp">Carré</button>
+                        <button onclick="setRadius('normal')" class="flex-1 py-2.5 text-xs rounded-xl border font-semibold" style="background:var(--primary);color:white;border-color:var(--primary);" id="radius-normal">Normal</button>
+                        <button onclick="setRadius('round')" class="flex-1 py-2.5 text-xs rounded-2xl border font-semibold" style="border-color:var(--border);" id="radius-round">Arrondi</button>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <p class="text-xs font-semibold uppercase opacity-50 mb-2">Raccourcis clavier</p>
+                    <div class="grid grid-cols-2 gap-1.5 text-xs">
+                        <div class="p-2 rounded-lg font-medium" style="background:var(--border);"><kbd class="font-mono">Alt+1</kbd> Dashboard</div>
+                        <div class="p-2 rounded-lg font-medium" style="background:var(--border);"><kbd class="font-mono">Alt+2</kbd> Cours</div>
+                        <div class="p-2 rounded-lg font-medium" style="background:var(--border);"><kbd class="font-mono">Alt+3</kbd> Planning</div>
+                        <div class="p-2 rounded-lg font-medium" style="background:var(--border);"><kbd class="font-mono">Alt+4</kbd> Notes</div>
+                        <div class="p-2 rounded-lg font-medium" style="background:var(--border);"><kbd class="font-mono">Alt+5</kbd> Stats</div>
+                        <div class="p-2 rounded-lg font-medium" style="background:var(--border);"><kbd class="font-mono">Alt+6</kbd> Tâches</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Options -->
-            <div class="mb-6">
-                <h4 class="font-bold mb-3">🎯 Options</h4>
-                <label class="flex items-center justify-between mb-3 p-3 rounded-lg card cursor-pointer">
-                    <div>
-                        <span class="font-medium">Animations</span>
-                        <p class="text-xs opacity-50">Transitions et effets visuels</p>
-                    </div>
-                    <input type="checkbox" id="animationsToggle" checked class="w-5 h-5">
-                </label>
-                <label class="flex items-center justify-between mb-3 p-3 rounded-lg card cursor-pointer">
-                    <div>
-                        <span class="font-medium">Notifications</span>
-                        <p class="text-xs opacity-50">Confirmations d'actions</p>
-                    </div>
-                    <input type="checkbox" id="notificationsToggle" checked class="w-5 h-5">
-                </label>
-                <label class="flex items-center justify-between mb-3 p-3 rounded-lg card cursor-pointer">
-                    <div>
-                        <span class="font-medium">Confettis 🎉</span>
-                        <p class="text-xs opacity-50">Célébration des bonnes notes</p>
-                    </div>
-                    <input type="checkbox" id="confettiToggle" checked class="w-5 h-5">
-                </label>
-                <label class="flex items-center justify-between mb-3 p-3 rounded-lg card cursor-pointer">
-                    <div>
-                        <span class="font-medium">Afficher le type de cours</span>
-                        <p class="text-xs opacity-50">CM, TD, TP sur le planning</p>
-                    </div>
-                    <input type="checkbox" id="showCourseTypeToggle" checked class="w-5 h-5">
-                </label>
-                <label class="flex items-center justify-between p-3 rounded-lg card cursor-pointer">
-                    <div>
-                        <span class="font-medium">Mode focus</span>
-                        <p class="text-xs opacity-50">Masque les éléments non essentiels</p>
-                    </div>
-                    <input type="checkbox" id="focusModeToggle" class="w-5 h-5" onchange="toggleFocusMode(this.checked)">
-                </label>
-            </div>
-
-            <!-- Raccourcis clavier -->
-            <div class="mb-6">
-                <h4 class="font-bold mb-3">⌨️ Raccourcis clavier</h4>
-                <div class="grid grid-cols-2 gap-2 text-xs">
-                    <div class="p-2 rounded" style="background:var(--border);"><kbd class="font-mono font-bold">Alt+1</kbd> → Dashboard</div>
-                    <div class="p-2 rounded" style="background:var(--border);"><kbd class="font-mono font-bold">Alt+2</kbd> → Cours</div>
-                    <div class="p-2 rounded" style="background:var(--border);"><kbd class="font-mono font-bold">Alt+3</kbd> → Planning</div>
-                    <div class="p-2 rounded" style="background:var(--border);"><kbd class="font-mono font-bold">Alt+4</kbd> → Notes</div>
-                    <div class="p-2 rounded" style="background:var(--border);"><kbd class="font-mono font-bold">Alt+5</kbd> → Stats</div>
-                    <div class="p-2 rounded" style="background:var(--border);"><kbd class="font-mono font-bold">Alt+6</kbd> → Tâches</div>
+            <!-- TAB OPTIONS -->
+            <div id="tab-options" class="settings-panel">
+                <div class="space-y-2">
+                    <label class="flex items-center justify-between p-3 rounded-xl card cursor-pointer">
+                        <div><span class="font-semibold text-sm">Animations</span><p class="text-xs opacity-50">Transitions et effets</p></div>
+                        <input type="checkbox" id="animationsToggle" checked class="w-5 h-5">
+                    </label>
+                    <label class="flex items-center justify-between p-3 rounded-xl card cursor-pointer">
+                        <div><span class="font-semibold text-sm">Notifications</span><p class="text-xs opacity-50">Confirmations d'actions</p></div>
+                        <input type="checkbox" id="notificationsToggle" checked class="w-5 h-5">
+                    </label>
+                    <label class="flex items-center justify-between p-3 rounded-xl card cursor-pointer">
+                        <div><span class="font-semibold text-sm">Confettis 🎉</span><p class="text-xs opacity-50">Célébration des bonnes notes</p></div>
+                        <input type="checkbox" id="confettiToggle" checked class="w-5 h-5">
+                    </label>
+                    <label class="flex items-center justify-between p-3 rounded-xl card cursor-pointer">
+                        <div><span class="font-semibold text-sm">Badge CM/TD/TP</span><p class="text-xs opacity-50">Type de cours sur le planning</p></div>
+                        <input type="checkbox" id="showCourseTypeToggle" checked class="w-5 h-5">
+                    </label>
+                    <label class="flex items-center justify-between p-3 rounded-xl card cursor-pointer">
+                        <div><span class="font-semibold text-sm">Mode focus 🎯</span><p class="text-xs opacity-50">Interface épurée</p></div>
+                        <input type="checkbox" id="focusModeToggle" class="w-5 h-5" onchange="toggleFocusMode(this.checked)">
+                    </label>
+                    <label class="flex items-center justify-between p-3 rounded-xl card cursor-pointer">
+                        <div><span class="font-semibold text-sm">Horloge en temps réel</span><p class="text-xs opacity-50">Affichée sur le dashboard</p></div>
+                        <input type="checkbox" id="clockToggle" checked class="w-5 h-5" onchange="toggleClock(this.checked)">
+                    </label>
                 </div>
             </div>
 
-            <!-- Actions -->
-            <div class="mb-6">
-                <h4 class="font-bold mb-3">💾 Données</h4>
-                <div class="grid grid-cols-2 gap-2 mb-2">
-                    <button onclick="exportAllData()" class="px-4 py-3 rounded-lg border hover:bg-green-50 text-sm transition" style="border-color: var(--border);">
-                        <i class="fas fa-download mr-2"></i> Exporter
+            <!-- TAB DONNÉES -->
+            <div id="tab-data" class="settings-panel">
+                <div class="space-y-2.5">
+                    <button onclick="exportAllData()" class="btn-ghost w-full justify-center">
+                        <i class="fas fa-download" style="color:#22c55e;"></i> Exporter toutes les données
                     </button>
-                    <button onclick="importData()" class="px-4 py-3 rounded-lg border hover:bg-blue-50 text-sm transition" style="border-color: var(--border);">
-                        <i class="fas fa-upload mr-2"></i> Importer
+                    <button onclick="importData()" class="btn-ghost w-full justify-center">
+                        <i class="fas fa-upload" style="color:#3b82f6;"></i> Importer des données
+                    </button>
+                    <div class="h-px my-1" style="background:var(--border);"></div>
+                    <button onclick="deleteAllCourses()" class="btn-ghost w-full justify-center" style="border-color:#fed7aa; color:#f97316;">
+                        <i class="fas fa-trash-alt"></i> Supprimer tous les cours
+                    </button>
+                    <button onclick="resetApp()" class="btn-danger w-full justify-center">
+                        <i class="fas fa-exclamation-triangle"></i> Réinitialiser l'application
                     </button>
                 </div>
-                <button onclick="deleteAllCourses()" class="w-full mb-2 px-4 py-3 rounded-lg border text-orange-600 hover:bg-orange-50 text-sm transition" style="border-color: #fed7aa;">
-                    <i class="fas fa-trash-alt mr-2"></i> Supprimer tous les cours
-                </button>
-                <button onclick="resetApp()" class="w-full px-4 py-3 rounded-lg border border-red-300 hover:bg-red-50 text-red-600 text-sm transition">
-                    <i class="fas fa-exclamation-triangle mr-2"></i> Réinitialiser l'application
-                </button>
+                <div class="mt-4 p-3 rounded-xl text-xs opacity-50 text-center" style="background:var(--border);">
+                    Toutes les données sont stockées localement dans ton navigateur.
+                </div>
             </div>
         </div>
     </div>
@@ -1452,9 +1408,9 @@
     <script>
         // ===== BASE DE DONNÉES =====
         const db = new Dexie("MyStudyAppUltimate");
-        db.version(3).stores({
+        db.version(4).stores({
             courses: '++id, name, semester, color',
-            files: '++id, courseId, name, blob',
+            files: '++id, courseId, name, blob, category',
             grades: '++id, courseId, label, value, coef, date',
             schedule: 'id, content',
             scheduleEvents: '++id, courseId, day, startTime, endTime, location, notes, weekStart',
@@ -1469,13 +1425,23 @@
 
         // ===== SETTINGS & THEME =====
         async function loadSettings() {
-            const theme = await getSetting('theme') || 'light';
+            const theme    = await getSetting('theme') || 'light';
             const userName = await getSetting('userName') || 'Champion';
-            const avatar = await getSetting('avatar') || '👨‍🎓';
-            
+            const avatar   = await getSetting('avatar') || '👨‍🎓';
+
             setTheme(theme);
             document.getElementById('userName').value = userName;
             updateGreeting();
+
+            // Radius
+            const radius = await getSetting('borderRadius') || 'normal';
+            setRadius(radius);
+
+            // Horloge
+            const showClockPref = await getSetting('showClock');
+            if (showClockPref !== false) {
+                setTimeout(() => toggleClock(true), 150);
+            }
         }
 
         async function getSetting(key) {
@@ -1490,6 +1456,7 @@
         function setTheme(theme) {
             document.documentElement.setAttribute('data-theme', theme);
             setSetting('theme', theme);
+            updateThemeSwatches(theme);
         }
 
         async function setAvatar(emoji) {
@@ -1522,6 +1489,8 @@
                 "Le seul moyen d'échouer est d'abandonner."
             ];
             document.getElementById('motivational-quote').innerText = quotes[Math.floor(Math.random() * quotes.length)];
+            const dateEl = document.getElementById('dash-date');
+            if (dateEl) dateEl.textContent = new Date().toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' });
         }
 
         document.getElementById('userName').addEventListener('change', (e) => {
@@ -1625,15 +1594,21 @@
             launchConfetti();
         }
 
-        async function uploadFile(courseId, inputElement) {
+        // Catégories de fichiers
+        const FILE_CATEGORIES = [
+            { id: 'cm',    label: 'CM',            icon: 'fa-chalkboard-teacher', color: '#3b82f6' },
+            { id: 'td',    label: 'TD',             icon: 'fa-pencil-alt',         color: '#8b5cf6' },
+            { id: 'tp',    label: 'TP',             icon: 'fa-flask',              color: '#06b6d4' },
+            { id: 'fiche', label: 'Fiches',         icon: 'fa-sticky-note',        color: '#f59e0b' },
+            { id: 'exam',  label: 'Examens',        icon: 'fa-graduation-cap',     color: '#ef4444' },
+            { id: 'autre', label: 'Autre',          icon: 'fa-folder',             color: '#6b7280' },
+        ];
+
+        async function uploadFile(courseId, inputElement, category) {
             const file = inputElement.files[0];
             if (!file) return;
-
-            await db.files.add({
-                courseId: courseId,
-                name: file.name,
-                blob: file
-            });
+            const cat = category || 'autre';
+            await db.files.add({ courseId, name: file.name, blob: file, category: cat });
             showNotification('📄 Fichier ajouté !');
             await refreshUI();
         }
@@ -1750,29 +1725,71 @@
                             </button>
                         </div>
                         
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium mb-2">📎 Ajouter un fichier</label>
-                            <input type="file" onchange="uploadFile(${course.id}, this)" accept=".pdf,.jpg,.jpeg,.png,.docx,.doc,.ppt,.pptx" class="text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:text-white hover:file:opacity-80 transition" style="file:background: ${course.color};">
+                        <!-- Zone d'upload par catégorie -->
+                        <div class="mb-3">
+                            <p class="text-xs font-semibold uppercase opacity-50 mb-2">📎 Ajouter un fichier</p>
+                            <div class="flex flex-wrap gap-2">
+                                ${FILE_CATEGORIES.map(cat => `
+                                    <label class="cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white transition hover:opacity-80 active:scale-95"
+                                        style="background:${cat.color};" title="Ajouter un fichier ${cat.label}">
+                                        <i class="fas ${cat.icon}"></i>
+                                        <span>${cat.label}</span>
+                                        <input type="file" class="hidden" accept=".pdf,.jpg,.jpeg,.png,.docx,.doc,.ppt,.pptx"
+                                            onchange="uploadFile(${course.id}, this, '${cat.id}')">
+                                    </label>
+                                `).join('')}
+                            </div>
                         </div>
 
-                        <div class="card p-3 rounded-lg">
-                            <div class="flex justify-between items-center mb-2">
-                                <p class="text-xs font-bold uppercase opacity-60">📁 Fichiers (${files.length})</p>
-                                ${files.length > 0 ? `<button onclick="downloadAllFiles(${course.id}, '${course.name}')" class="text-xs hover:underline" style="color: ${course.color};">Tout télécharger</button>` : ''}
+                        <!-- Onglets fichiers par catégorie -->
+                        <div class="card rounded-lg overflow-hidden">
+                            <!-- Barre d'onglets -->
+                            <div class="flex overflow-x-auto border-b" style="border-color:var(--border); scrollbar-width:none;">
+                                <button onclick="switchFileTab(this, ${course.id}, 'all')"
+                                    class="file-tab-btn flex-shrink-0 px-3 py-2 text-xs font-semibold border-b-2 transition whitespace-nowrap"
+                                    style="border-color:var(--primary); color:var(--primary);"
+                                    data-course="${course.id}" data-cat="all">
+                                    Tous <span class="ml-1 opacity-60">(${files.length})</span>
+                                </button>
+                                ${FILE_CATEGORIES.map(cat => {
+                                    const count = files.filter(f => (f.category||'autre') === cat.id).length;
+                                    return `<button onclick="switchFileTab(this, ${course.id}, '${cat.id}')"
+                                        class="file-tab-btn flex-shrink-0 px-3 py-2 text-xs font-medium border-b-2 border-transparent transition whitespace-nowrap hover:opacity-80"
+                                        style="color:${cat.color};"
+                                        data-course="${course.id}" data-cat="${cat.id}">
+                                        <i class="fas ${cat.icon} mr-1"></i>${cat.label}
+                                        ${count > 0 ? `<span class="ml-1 font-bold">${count}</span>` : ''}
+                                    </button>`;
+                                }).join('')}
                             </div>
-                            <ul class="space-y-2 max-h-48 overflow-y-auto">
-                                ${files.length === 0 ? '<li class="text-xs opacity-50 italic text-center py-2">Aucun fichier</li>' : ''}
-                                ${files.map(f => `
-                                    <li class="flex justify-between items-center text-sm p-3 rounded transition hover:shadow" style="background: var(--border);">
-                                        <a href="${URL.createObjectURL(f.blob)}" target="_blank" class="truncate flex-1 hover:underline font-medium" style="color: var(--primary);">
-                                            <i class="far fa-file-pdf mr-2"></i>${f.name}
-                                        </a>
-                                        <button onclick="deleteFile(${f.id})" class="ml-2 text-red-400 hover:text-red-600 transition">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </li>
-                                `).join('')}
-                            </ul>
+
+                            <!-- Contenu des fichiers -->
+                            <div class="p-3">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span id="file-tab-label-${course.id}" class="text-xs font-bold uppercase opacity-50">Tous les fichiers</span>
+                                    ${files.length > 0 ? `<button onclick="downloadAllFiles(${course.id}, '${course.name}')" class="text-xs hover:underline" style="color:${course.color};">⬇ Tout télécharger</button>` : ''}
+                                </div>
+                                <ul id="file-list-${course.id}" class="space-y-1.5 max-h-52 overflow-y-auto">
+                                    ${files.length === 0
+                                        ? '<li class="text-xs opacity-40 italic text-center py-4">Aucun fichier — clique sur une catégorie pour en ajouter</li>'
+                                        : files.map(f => {
+                                            const cat = FILE_CATEGORIES.find(c => c.id === (f.category||'autre')) || FILE_CATEGORIES[5];
+                                            return `<li class="file-item flex items-center gap-2 text-sm p-2 rounded-lg transition hover:shadow" data-cat="${f.category||'autre'}" style="background:var(--border);">
+                                                <span class="flex-shrink-0 w-6 h-6 rounded flex items-center justify-center text-white text-xs" style="background:${cat.color};">
+                                                    <i class="fas ${cat.icon}"></i>
+                                                </span>
+                                                <a href="${URL.createObjectURL(f.blob)}" target="_blank" class="truncate flex-1 hover:underline font-medium text-xs" style="color:var(--primary);">
+                                                    ${f.name}
+                                                </a>
+                                                <span class="text-xs font-bold px-1.5 py-0.5 rounded flex-shrink-0" style="background:${cat.color}20; color:${cat.color};">${cat.label}</span>
+                                                <button onclick="deleteFile(${f.id})" class="flex-shrink-0 text-red-400 hover:text-red-600 transition text-xs">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </li>`;
+                                        }).join('')
+                                    }
+                                </ul>
+                            </div>
                         </div>
                     `;
                     container.appendChild(div);
@@ -1784,6 +1801,37 @@
             
             const fileCount = await db.files.count();
             document.getElementById('dash-files-count').innerText = fileCount;
+        }
+
+        // ===== ONGLETS FICHIERS PAR CATÉGORIE =====
+        function switchFileTab(btn, courseId, category) {
+            // Mettre à jour l'apparence des onglets
+            document.querySelectorAll(`.file-tab-btn[data-course="${courseId}"]`).forEach(b => {
+                const cat = FILE_CATEGORIES.find(c => c.id === b.dataset.cat);
+                b.style.borderColor  = 'transparent';
+                b.style.color        = cat ? cat.color : 'var(--text-main)';
+                b.style.fontWeight   = '500';
+            });
+
+            // Activer l'onglet cliqué
+            const activeCat = FILE_CATEGORIES.find(c => c.id === category);
+            btn.style.borderColor = activeCat ? activeCat.color : 'var(--primary)';
+            btn.style.color       = activeCat ? activeCat.color : 'var(--primary)';
+            btn.style.fontWeight  = '700';
+
+            // Filtrer les fichiers
+            const items = document.querySelectorAll(`#file-list-${courseId} .file-item`);
+            items.forEach(item => {
+                item.style.display = (category === 'all' || item.dataset.cat === category) ? '' : 'none';
+            });
+
+            // Mettre à jour le label
+            const label = document.getElementById(`file-tab-label-${courseId}`);
+            if (label) {
+                label.textContent = category === 'all'
+                    ? 'Tous les fichiers'
+                    : (activeCat ? `Fichiers — ${activeCat.label}` : category);
+            }
         }
 
         async function downloadAllFiles(courseId, courseName) {
@@ -3136,6 +3184,69 @@
                 }, i * 30);
             }
         }
+
+        // ===== SETTINGS TABS =====
+        function switchSettingsTab(btn, panelId) {
+            document.querySelectorAll('.settings-tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.settings-panel').forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(panelId).classList.add('active');
+        }
+
+        // ===== THÈME — mettre à jour les swatches visuellement =====
+        const THEME_NAMES = ['light','dark','midnight','nord','ocean','sunset','forest','rose'];
+        function updateThemeSwatches(active) {
+            THEME_NAMES.forEach(t => {
+                const el = document.getElementById('swatch-' + t);
+                if (el) el.classList.toggle('active', t === active);
+            });
+        }
+
+        // ===== RAYON DES CARTES =====
+        function setRadius(mode) {
+            setSetting('borderRadius', mode);
+            const map = { sharp: { sm:'4px', md:'6px', lg:'8px', xl:'10px' },
+                          normal: { sm:'8px', md:'12px', lg:'16px', xl:'24px' },
+                          round:  { sm:'12px', md:'20px', lg:'28px', xl:'36px' } };
+            const r = map[mode] || map.normal;
+            document.documentElement.style.setProperty('--radius-sm', r.sm);
+            document.documentElement.style.setProperty('--radius-md', r.md);
+            document.documentElement.style.setProperty('--radius-lg', r.lg);
+            document.documentElement.style.setProperty('--radius-xl', r.xl);
+            ['sharp','normal','round'].forEach(m => {
+                const btn = document.getElementById('radius-' + m);
+                if (btn) {
+                    btn.style.background = m === mode ? 'var(--primary)' : '';
+                    btn.style.color      = m === mode ? 'white' : '';
+                    btn.style.borderColor = m === mode ? 'var(--primary)' : 'var(--border)';
+                }
+            });
+        }
+
+        // ===== HORLOGE TEMPS RÉEL =====
+        let clockInterval = null;
+        function toggleClock(on) {
+            setSetting('showClock', on);
+            const el = document.getElementById('live-clock');
+            if (!el) return;
+            if (on) {
+                el.style.display = '';
+                clockInterval = setInterval(updateClock, 1000);
+                updateClock();
+            } else {
+                el.style.display = 'none';
+                clearInterval(clockInterval);
+            }
+        }
+        function updateClock() {
+            const el = document.getElementById('live-clock');
+            if (!el) return;
+            const now = new Date();
+            el.textContent = now.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+        }
+
+        // ===== PATCH setTheme pour mettre à jour les swatches =====
+        const _origSetTheme = typeof setTheme === 'function' ? setTheme : null;
 
         // ===== SUPPRESSION EN MASSE DES COURS =====
         async function deleteAllCourses() {
