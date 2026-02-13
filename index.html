@@ -726,8 +726,8 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm opacity-80">Série de travail</p>
-                            <p class="text-4xl font-bold mt-2"><span id="streak-count">0</span> <i class="fas fa-fire streak-flame"></i></p>
-                            <p class="text-xs opacity-70 mt-1">Record : <span id="streak-record">0</span> jours 🏆</p>
+                            <p class="text-4xl font-bold mt-2"><span id="streak-count">1</span> <i class="fas fa-fire streak-flame"></i></p>
+                            <p class="text-xs opacity-70 mt-1">Record : <span id="streak-record">1</span> jours 🏆</p>
                         </div>
                         <i class="fas fa-bolt text-5xl opacity-20"></i>
                     </div>
@@ -3271,47 +3271,79 @@
                     }
                 };
                 await db.settings.put(streakData);
+                console.log('✅ Streak initialisé:', streakData.value);
             } else {
-                const lastVisit = new Date(streakData.value.lastVisit);
-                lastVisit.setHours(0, 0, 0, 0);
+                const lastVisitStr = streakData.value.lastVisit;
                 
-                const daysDiff = Math.floor((today - lastVisit) / (1000 * 60 * 60 * 24));
+                console.log('📅 Comparaison dates:', {
+                    today: todayStr,
+                    lastVisit: lastVisitStr,
+                    areEqual: todayStr === lastVisitStr
+                });
                 
-                if (daysDiff === 0) {
-                    // Même jour - ne rien faire
-                } else if (daysDiff === 1) {
-                    // Jour suivant - incrémenter le streak
-                    streakData.value.currentStreak++;
-                    streakData.value.lastVisit = todayStr;
-                    
-                    // Mettre à jour le record si nécessaire
-                    if (streakData.value.currentStreak > streakData.value.longestStreak) {
-                        streakData.value.longestStreak = streakData.value.currentStreak;
-                    }
-                    
-                    await db.settings.put(streakData);
-                    
-                    // Célébration pour les milestones
-                    if (streakData.value.currentStreak % 7 === 0) {
-                        showNotification(`🔥 ${streakData.value.currentStreak} jours de suite ! Continue comme ça !`);
-                        launchConfetti();
-                    }
+                // Comparer directement les chaînes de dates (YYYY-MM-DD)
+                if (todayStr === lastVisitStr) {
+                    // Même jour - ne rien faire du tout
+                    console.log('✅ Même jour - streak inchangé:', streakData.value.currentStreak);
                 } else {
-                    // Plus d'un jour - streak cassé, recommencer à 1
-                    streakData.value.currentStreak = 1;
-                    streakData.value.lastVisit = todayStr;
-                    await db.settings.put(streakData);
+                    // Calculer la différence en jours
+                    const lastVisit = new Date(lastVisitStr);
+                    lastVisit.setHours(0, 0, 0, 0);
+                    const daysDiff = Math.floor((today - lastVisit) / (1000 * 60 * 60 * 24));
+                    
+                    console.log('📊 Différence de jours:', daysDiff);
+                    
+                    if (daysDiff === 1) {
+                        // Jour suivant - incrémenter le streak
+                        streakData.value.currentStreak++;
+                        streakData.value.lastVisit = todayStr;
+                        
+                        console.log('🔥 Streak incrémenté:', streakData.value.currentStreak);
+                        
+                        // Mettre à jour le record si nécessaire
+                        if (streakData.value.currentStreak > streakData.value.longestStreak) {
+                            streakData.value.longestStreak = streakData.value.currentStreak;
+                        }
+                        
+                        await db.settings.put(streakData);
+                        
+                        // Célébration pour les milestones
+                        if (streakData.value.currentStreak % 7 === 0) {
+                            showNotification(`🔥 ${streakData.value.currentStreak} jours de suite ! Continue comme ça !`);
+                            launchConfetti();
+                        }
+                    } else if (daysDiff > 1) {
+                        // Plus d'un jour - streak cassé, recommencer à 1
+                        console.log('💔 Streak cassé - retour à 1');
+                        streakData.value.currentStreak = 1;
+                        streakData.value.lastVisit = todayStr;
+                        await db.settings.put(streakData);
+                    } else {
+                        // daysDiff < 1 (ne devrait pas arriver normalement)
+                        console.warn('⚠️ Situation anormale - daysDiff:', daysDiff);
+                        // On ne fait rien pour éviter les bugs
+                    }
                 }
             }
             
             // Afficher le streak actuel et le record
             const currentStreakData = await db.settings.get('streakData');
             if (currentStreakData) {
-                document.getElementById('streak-count').innerText = currentStreakData.value.currentStreak;
+                const streakCount = currentStreakData.value.currentStreak;
+                const longestStreak = currentStreakData.value.longestStreak;
+                
+                console.log('📊 Affichage streak:', {
+                    current: streakCount,
+                    record: longestStreak
+                });
+                
+                document.getElementById('streak-count').innerText = streakCount;
                 const recordEl = document.getElementById('streak-record');
                 if (recordEl) {
-                    recordEl.innerText = currentStreakData.value.longestStreak;
+                    recordEl.innerText = longestStreak;
                 }
+            } else {
+                console.warn('⚠️ Aucune donnée de streak trouvée');
             }
         }
         
