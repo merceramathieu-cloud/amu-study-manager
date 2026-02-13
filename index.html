@@ -712,6 +712,75 @@
         }
         
         /* ═══════════════════════════════════════════════
+           ANIMATIONS DE FOND
+        ═══════════════════════════════════════════════ */
+        .floating-emoji {
+            position: fixed;
+            font-size: 2rem;
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: 1;
+            animation: float 20s infinite ease-in-out;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.15;
+            }
+            90% {
+                opacity: 0.15;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes floatSlow {
+            0% {
+                transform: translateY(100vh) translateX(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.12;
+            }
+            50% {
+                transform: translateY(50vh) translateX(30px) rotate(180deg);
+            }
+            90% {
+                opacity: 0.12;
+            }
+            100% {
+                transform: translateY(-100px) translateX(-30px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes floatMedium {
+            0% {
+                transform: translateY(100vh) translateX(0) rotate(0deg) scale(1);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.15;
+            }
+            50% {
+                transform: translateY(50vh) translateX(-20px) rotate(180deg) scale(1.2);
+            }
+            90% {
+                opacity: 0.15;
+            }
+            100% {
+                transform: translateY(-100px) translateX(20px) rotate(360deg) scale(1);
+                opacity: 0;
+            }
+        }
+        
+        /* ═══════════════════════════════════════════════
            ANIMATIONS
         ═══════════════════════════════════════════════ */
         .tab-content { display: none; }
@@ -844,6 +913,8 @@
     </style>
 </head>
 <body>
+    <!-- Conteneur pour les émojis flottants -->
+    <div id="floating-emojis-container"></div>
 
     <!-- Navigation Premium -->
     <nav class="card sticky top-0 z-50 shadow-lg">
@@ -2086,6 +2157,97 @@
             updateGreeting();
         });
 
+        // ===== ANIMATIONS DE FOND AVEC ÉMOJIS =====
+        const EMOJI_SETS = {
+            dashboard: ['📚', '✏️', '📖', '🎓', '💡', '⭐', '🚀', '💪', '🔥', '✨'],
+            courses: ['📚', '📕', '📗', '📘', '📙', '📓', '📔', '📖', '📄', '📃'],
+            schedule: ['📅', '🗓️', '⏰', '⏱️', '⌚', '🕐', '🕑', '🕒', '📆', '⏲️'],
+            grades: ['⭐', '🌟', '✨', '🏆', '🥇', '🥈', '🥉', '💯', '📊', '📈'],
+            stats: ['📊', '📈', '📉', '💹', '🎯', '📐', '📏', '🧮', '💼', '📋'],
+            tasks: ['✅', '✓', '☑️', '✔️', '📝', '📌', '📍', '🎯', '🔖', '💪'],
+            achievements: ['🏆', '🥇', '🎖️', '👑', '💎', '⭐', '🌟', '✨', '🔥', '💪']
+        };
+
+        let currentEmojis = [];
+        let emojiInterval = null;
+
+        function createFloatingEmoji(emoji) {
+            const emojiEl = document.createElement('div');
+            emojiEl.className = 'floating-emoji';
+            emojiEl.textContent = emoji;
+            
+            // Position aléatoire horizontale
+            emojiEl.style.left = Math.random() * 100 + '%';
+            
+            // Variation de taille
+            const size = 1.5 + Math.random() * 1.5; // Entre 1.5rem et 3rem
+            emojiEl.style.fontSize = size + 'rem';
+            
+            // Variation d'animation
+            const animations = ['float', 'floatSlow', 'floatMedium'];
+            const randomAnimation = animations[Math.floor(Math.random() * animations.length)];
+            emojiEl.style.animationName = randomAnimation;
+            
+            // Durée aléatoire
+            const duration = 15 + Math.random() * 15; // Entre 15s et 30s
+            emojiEl.style.animationDuration = duration + 's';
+            
+            // Délai aléatoire
+            const delay = Math.random() * 5;
+            emojiEl.style.animationDelay = delay + 's';
+            
+            return emojiEl;
+        }
+
+        function startFloatingEmojis(tabId) {
+            // Nettoyer les émojis existants
+            stopFloatingEmojis();
+            
+            const container = document.getElementById('floating-emojis-container');
+            if (!container) return;
+            
+            const emojis = EMOJI_SETS[tabId] || EMOJI_SETS.dashboard;
+            
+            // Créer 8-12 émojis
+            const count = 8 + Math.floor(Math.random() * 5);
+            for (let i = 0; i < count; i++) {
+                const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+                const emojiEl = createFloatingEmoji(randomEmoji);
+                container.appendChild(emojiEl);
+                currentEmojis.push(emojiEl);
+            }
+            
+            // Ajouter périodiquement de nouveaux émojis (tous les 5-8 secondes)
+            emojiInterval = setInterval(() => {
+                if (currentEmojis.length < 15) {
+                    const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+                    const emojiEl = createFloatingEmoji(randomEmoji);
+                    container.appendChild(emojiEl);
+                    currentEmojis.push(emojiEl);
+                    
+                    // Supprimer après l'animation
+                    setTimeout(() => {
+                        if (emojiEl.parentNode) {
+                            emojiEl.remove();
+                            currentEmojis = currentEmojis.filter(e => e !== emojiEl);
+                        }
+                    }, 30000); // 30 secondes max
+                }
+            }, 5000 + Math.random() * 3000);
+        }
+
+        function stopFloatingEmojis() {
+            const container = document.getElementById('floating-emojis-container');
+            if (container) {
+                container.innerHTML = '';
+            }
+            currentEmojis = [];
+            if (emojiInterval) {
+                clearInterval(emojiInterval);
+                emojiInterval = null;
+            }
+        }
+
         // ===== NAVIGATION =====
         function showTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -2122,6 +2284,9 @@
             if (tabId === 'stats') renderCharts();
             if (tabId === 'dashboard') updateDashboard();
             if (tabId === 'tasks') renderTasks();
+            
+            // Démarrer les animations d'émojis pour cet onglet
+            startFloatingEmojis(tabId);
         }
 
         function toggleMobileMenu() {
@@ -4825,6 +4990,9 @@ Cette action est irréversible.`);
             await refreshUI();
             updateGreeting();
             await updateAchievementsDisplay(); // Charger les succès
+            
+            // Démarrer les animations d'émojis pour le dashboard (onglet par défaut)
+            startFloatingEmojis('dashboard');
             
             // Démarrer la vérification automatique du streak à minuit
             scheduleStreakCheck();
