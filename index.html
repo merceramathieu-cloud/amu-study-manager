@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>MyStudySpace Ultimate 🚀</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
@@ -126,6 +126,11 @@
            BASE
         ═══════════════════════════════════════════════ */
         *, *::before, *::after { box-sizing: border-box; }
+        
+        html {
+            min-width: 320px;
+            overflow-x: hidden;
+        }
 
         body {
             font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
@@ -133,6 +138,8 @@
             color: var(--text-main);
             transition: background 0.4s ease, color 0.4s ease;
             -webkit-font-smoothing: antialiased;
+            min-width: 320px;
+            overflow-x: hidden;
         }
 
         input, select, textarea {
@@ -663,7 +670,7 @@
         </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <main class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8" style="width: 100%;">
 
         <!-- DASHBOARD ULTIMATE -->
         <div id="dashboard" class="tab-content active space-y-6">
