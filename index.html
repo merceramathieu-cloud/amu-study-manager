@@ -3,13 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>MyStudySpace Ultimate 🚀</title>
+    <meta name="theme-color" content="#6366f1">
+    <meta name="description" content="AMU Pro — Espace étudiant Aix-Marseille Université">
+    <title>AMU Pro 🚀</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;0,14..32,900&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     <style>
         /* ═══════════════════════════════════════════════
            DESIGN SYSTEM — THÈMES
@@ -32,6 +36,10 @@
             --radius-md: 12px;
             --radius-lg: 16px;
             --radius-xl: 24px;
+            /* Typographie */
+            --font-sans: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --font-display: 'Syne', 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
         }
 
         /* ── Thème sombre ─────────── */
@@ -385,27 +393,19 @@
         html {
             min-width: 320px;
             overflow-x: hidden;
-            /* Forcer le zoom à 100% */
-            zoom: 1.0;
-            -moz-transform: scale(1.0);
-            -webkit-transform: scale(1.0);
-            transform: scale(1.0);
+            scroll-behavior: smooth;
         }
 
         body {
-            font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
             background: var(--bg-main);
             color: var(--text-main);
             transition: background 0.4s ease, color 0.4s ease;
             -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
             min-width: 320px;
             overflow-x: hidden;
-            /* Forcer le zoom à 100% */
-            zoom: 1.0;
-            -moz-transform: scale(1.0);
-            -webkit-transform: scale(1.0);
-            transform: scale(1.0);
-            transform-origin: top left;
         }
 
         input, select, textarea {
@@ -646,10 +646,89 @@
            GRADIENT TEXT
         ═══════════════════════════════════════════════ */
         .gradient-text {
-            background: linear-gradient(135deg, var(--primary), var(--accent));
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+        }
+
+        /* ── Logo AMU Pro ─────────────────────────────── */
+        .amu-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            cursor: default;
+        }
+        .amu-logo-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 60%, var(--accent) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px color-mix(in srgb, var(--primary) 40%, transparent),
+                        inset 0 1px 0 rgba(255,255,255,0.25);
+            position: relative;
+            overflow: hidden;
+        }
+        .amu-logo-icon::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 60%);
+            border-radius: inherit;
+        }
+        .amu-logo-icon svg {
+            width: 20px;
+            height: 20px;
+            position: relative;
+            z-index: 1;
+            filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2));
+        }
+        .amu-logo-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1;
+        }
+        .amu-logo-name {
+            font-family: 'Syne', 'Inter', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .amu-logo-sub {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.58rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-soft);
+            -webkit-text-fill-color: var(--text-soft);
+            margin-top: 1px;
+        }
+
+        /* ── Headings avec Syne ────────────────────────── */
+        h1, h2 {
+            font-family: 'Syne', 'Inter', sans-serif;
+            letter-spacing: -0.03em;
+        }
+        h3, h4 {
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        /* ── Code / mono ────────────────────────────────── */
+        code, .mono {
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.88em;
         }
 
         /* ═══════════════════════════════════════════════
@@ -921,10 +1000,20 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center space-x-4">
-                    <span class="text-2xl font-bold gradient-text" title="Développé par Mathieu Mercera">
-                        <i class="fas fa-graduation-cap"></i> <span class="hidden sm:inline">MyStudySpace</span>
-                    </span>
-                    <span class="badge hidden md:inline" style="background: var(--primary); color: white;">ULTIMATE</span>
+                    <div class="amu-logo" title="AMU Pro — Développé par Mathieu Mercera">
+                        <div class="amu-logo-icon">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 3L3 8.5V15.5L12 21L21 15.5V8.5L12 3Z" stroke="white" stroke-width="1.8" stroke-linejoin="round"/>
+                                <path d="M12 3V21M3 8.5L21 8.5" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                                <circle cx="12" cy="12" r="2.5" fill="white" opacity="0.9"/>
+                            </svg>
+                        </div>
+                        <div class="amu-logo-text hidden sm:flex">
+                            <span class="amu-logo-name">AMU Pro</span>
+                            <span class="amu-logo-sub">Espace Étudiant</span>
+                        </div>
+                    </div>
+
                 </div>
                 
                 <!-- Navigation Desktop -->
@@ -1478,7 +1567,7 @@
                         <span class="font-bold gradient-text">Mathieu Mercera</span>
                     </div>
                     <div class="text-xs opacity-50">
-                        MyStudySpace Ultimate © 2026 - Tous droits réservés
+                        AMU Pro © 2026 - Tous droits réservés
                     </div>
                 </div>
             </div>
@@ -1689,9 +1778,9 @@
                 <div class="mb-4">
                     <p class="text-xs font-semibold uppercase opacity-50 mb-2">Police</p>
                     <select id="fontSelect" onchange="applyFont(this.value)" class="w-full p-2.5 border rounded-xl text-sm font-medium" style="border-color:var(--border);">
+                        <option value="'Inter', sans-serif" selected>Inter (défaut)</option>
                         <option value="'Plus Jakarta Sans', sans-serif">Plus Jakarta Sans</option>
                         <option value="'Poppins', sans-serif">Poppins</option>
-                        <option value="'Inter', sans-serif">Inter</option>
                         <option value="'Roboto', sans-serif">Roboto</option>
                         <option value="'Nunito', sans-serif">Nunito</option>
                         <option value="monospace">Monospace</option>
@@ -1784,7 +1873,7 @@
                     <div class="mt-3 pt-3" style="border-top: 1px solid var(--border);">
                         <p class="text-xs opacity-70 mb-1">Développé par</p>
                         <p class="font-bold gradient-text">Mathieu Mercera</p>
-                        <p class="text-xs opacity-50 mt-1">MyStudySpace Ultimate © 2026</p>
+                        <p class="text-xs opacity-50 mt-1">AMU Pro © 2026</p>
                     </div>
                 </div>
             </div>
