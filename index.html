@@ -425,11 +425,14 @@
         
         .schedule-grid { 
             display: grid; 
-            gap: 1px; 
             background: var(--border);
             border: 2px solid var(--border);
             border-radius: 12px;
             overflow: hidden;
+        }
+
+        .schedule-grid > * {
+            outline: 1px solid var(--border);
         }
         
         .schedule-header { 
@@ -666,6 +669,13 @@
                     <button onclick="showTab('tasks')" class="nav-item px-3 py-2 text-sm font-medium hover:text-blue-600">
                         <i class="fas fa-tasks mr-1"></i> Tâches
                     </button>
+                    <a href="https://ent.univ-amu.fr/" target="_blank" rel="noopener noreferrer" 
+                       class="px-3 py-2 text-sm font-medium flex items-center gap-1 rounded-lg transition-all"
+                       style="background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white;"
+                       title="Accéder à l'ENT AMU">
+                        <i class="fas fa-university"></i>
+                        <span class="hidden xl:inline">ENT AMU</span>
+                    </a>
                     <button onclick="openSettings()" class="px-3 py-2 text-sm font-medium hover:text-blue-600">
                         <i class="fas fa-cog"></i>
                     </button>
@@ -673,6 +683,12 @@
 
                 <!-- Navigation Mobile -->
                 <div class="flex lg:hidden items-center space-x-2">
+                    <a href="https://ent.univ-amu.fr/" target="_blank" rel="noopener noreferrer"
+                       class="px-3 py-2 text-sm font-medium rounded-lg flex items-center"
+                       style="background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white;"
+                       title="ENT AMU">
+                        <i class="fas fa-university"></i>
+                    </a>
                     <button onclick="openSettings()" class="px-3 py-2 text-sm font-medium hover:text-blue-600">
                         <i class="fas fa-cog"></i>
                     </button>
@@ -703,6 +719,12 @@
                     <button onclick="showTab('tasks'); closeMobileMenu()" class="nav-item-mobile px-3 py-3 text-sm font-medium text-left hover:bg-gray-50 rounded">
                         <i class="fas fa-tasks mr-2 w-5"></i> Tâches
                     </button>
+                    <a href="https://ent.univ-amu.fr/" target="_blank" rel="noopener noreferrer"
+                       class="nav-item-mobile px-3 py-3 text-sm font-medium text-left rounded flex items-center"
+                       style="background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; margin-top: 4px;">
+                        <i class="fas fa-university mr-2 w-5"></i> ENT AMU
+                        <i class="fas fa-external-link-alt ml-auto text-xs opacity-70"></i>
+                    </a>
                 </div>
             </div>
         </div>
@@ -852,6 +874,12 @@
                         <button onclick="exportSchedule()" class="px-3 py-2 rounded-lg md:hidden" style="background: var(--primary); color: white;" title="Exporter">
                             <i class="fas fa-download"></i>
                         </button>
+                        <button onclick="openEdtImportModal()" class="px-3 py-2 rounded-lg hidden md:block font-medium" style="background: linear-gradient(135deg, #f97316, #ea580c); color: white;">
+                            <i class="fas fa-university mr-2"></i> EDT AMU
+                        </button>
+                        <button onclick="openEdtImportModal()" class="px-3 py-2 rounded-lg md:hidden" style="background: linear-gradient(135deg, #f97316, #ea580c); color: white;" title="Importer EDT AMU">
+                            <i class="fas fa-university"></i>
+                        </button>
                     </div>
                 </div>
                 
@@ -863,6 +891,12 @@
                         <span class="md:hidden">Appuie sur + pour ajouter un cours. Appui long pour supprimer.</span>
                         <span class="md:hidden block mt-1">👉 Fais défiler horizontalement pour voir tous les jours</span>
                     </p>
+                </div>
+
+                <!-- Bandeau statut import EDT -->
+                <div id="edtImportStatus" class="hidden mb-4 p-3 rounded-lg flex items-center gap-3 text-sm font-medium" style="background: #fff7ed; border: 1px solid #fed7aa; color: #c2410c;">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <span id="edtImportStatusText">Importation en cours...</span>
                 </div>
                 
                 <div class="overflow-x-auto pb-4" style="-webkit-overflow-scrolling: touch;">
@@ -1144,36 +1178,127 @@
         </div>
     </div>
 
-    <!-- Modal Ajouter Cours à l'Agenda -->
+    <!-- Modal Ajouter / Modifier Cours à l'Agenda -->
     <div id="addScheduleEventModal" class="modal">
-        <div class="modal-content">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-2xl font-bold gradient-text">➕ Ajouter un cours</h3>
+        <div class="modal-content" style="max-width:520px;">
+            <div class="flex justify-between items-center mb-5">
+                <h3 id="scheduleModalTitle" class="text-2xl font-bold gradient-text">➕ Ajouter un cours</h3>
                 <button onclick="closeAddScheduleEvent()" class="text-2xl">&times;</button>
             </div>
-            
-            <select id="eventCourseSelect" class="w-full p-3 border rounded-lg mb-4" style="border-color: var(--border);">
-                <option value="">Sélectionner une matière...</option>
-            </select>
+
+            <!-- Onglets : Choisir depuis mes cours / Nom libre -->
+            <div class="flex rounded-lg overflow-hidden border mb-5" style="border-color:var(--border);">
+                <button id="tabPickCourse" onclick="switchEventTab('pick')"
+                    class="flex-1 py-2 text-sm font-medium transition"
+                    style="background:var(--primary);color:white;">
+                    <i class="fas fa-book mr-1"></i> Mes cours
+                </button>
+                <button id="tabFreeName" onclick="switchEventTab('free')"
+                    class="flex-1 py-2 text-sm font-medium transition"
+                    style="background:var(--border);color:var(--text-main);">
+                    <i class="fas fa-pen mr-1"></i> Nom libre
+                </button>
+            </div>
+
+            <!-- Panneau : Sélection depuis mes cours -->
+            <div id="panelPickCourse">
+                <label class="block text-sm font-medium mb-2">Matière</label>
+                <select id="eventCourseSelect" class="w-full p-3 border rounded-lg mb-4" style="border-color:var(--border);">
+                    <option value="">Sélectionner une matière...</option>
+                </select>
+            </div>
+
+            <!-- Panneau : Nom libre -->
+            <div id="panelFreeName" class="hidden">
+                <label class="block text-sm font-medium mb-2">Nom du cours</label>
+                <input type="text" id="eventFreeName" placeholder="ex: SLP2U09L" class="w-full p-3 border rounded-lg mb-3" style="border-color:var(--border);">
+                <label class="block text-sm font-medium mb-2">Couleur</label>
+                <div class="flex gap-2 mb-4">
+                    <button onclick="setEventFreeColor('#3b82f6')" class="w-8 h-8 rounded-full bg-blue-500 ring-2 ring-offset-1 ring-transparent hover:ring-blue-500 transition" data-freecolor="#3b82f6"></button>
+                    <button onclick="setEventFreeColor('#8b5cf6')" class="w-8 h-8 rounded-full bg-purple-500 ring-2 ring-offset-1 ring-transparent hover:ring-purple-500 transition" data-freecolor="#8b5cf6"></button>
+                    <button onclick="setEventFreeColor('#ec4899')" class="w-8 h-8 rounded-full bg-pink-500 ring-2 ring-offset-1 ring-transparent hover:ring-pink-500 transition" data-freecolor="#ec4899"></button>
+                    <button onclick="setEventFreeColor('#22c55e')" class="w-8 h-8 rounded-full bg-green-500 ring-2 ring-offset-1 ring-transparent hover:ring-green-500 transition" data-freecolor="#22c55e"></button>
+                    <button onclick="setEventFreeColor('#f59e0b')" class="w-8 h-8 rounded-full bg-amber-500 ring-2 ring-offset-1 ring-transparent hover:ring-amber-500 transition" data-freecolor="#f59e0b"></button>
+                    <button onclick="setEventFreeColor('#ef4444')" class="w-8 h-8 rounded-full bg-red-500 ring-2 ring-offset-1 ring-transparent hover:ring-red-500 transition" data-freecolor="#ef4444"></button>
+                    <button onclick="setEventFreeColor('#06b6d4')" class="w-8 h-8 rounded-full bg-cyan-500 ring-2 ring-offset-1 ring-transparent hover:ring-cyan-500 transition" data-freecolor="#06b6d4"></button>
+                </div>
+            </div>
 
             <div class="grid grid-cols-2 gap-3 mb-4">
                 <div>
-                    <label class="block text-sm mb-1">Heure de début</label>
-                    <input type="time" id="eventStartTime" class="w-full p-2 border rounded-lg" style="border-color: var(--border);">
+                    <label class="block text-sm font-medium mb-1">Heure de début</label>
+                    <input type="time" id="eventStartTime" class="w-full p-2 border rounded-lg" style="border-color:var(--border);">
                 </div>
                 <div>
-                    <label class="block text-sm mb-1">Heure de fin</label>
-                    <input type="time" id="eventEndTime" class="w-full p-2 border rounded-lg" style="border-color: var(--border);">
+                    <label class="block text-sm font-medium mb-1">Heure de fin</label>
+                    <input type="time" id="eventEndTime" class="w-full p-2 border rounded-lg" style="border-color:var(--border);">
                 </div>
             </div>
 
-            <input type="text" id="eventLocation" placeholder="Salle (optionnel)" class="w-full p-3 border rounded-lg mb-4" style="border-color: var(--border);">
-            
-            <textarea id="eventNotes" placeholder="Notes (optionnel)" class="w-full p-3 border rounded-lg mb-4" rows="2" style="border-color: var(--border);"></textarea>
+            <input type="text" id="eventLocation" placeholder="Salle (optionnel)" class="w-full p-3 border rounded-lg mb-3" style="border-color:var(--border);">
+            <textarea id="eventNotes" placeholder="Notes (optionnel)" class="w-full p-3 border rounded-lg mb-5" rows="2" style="border-color:var(--border);"></textarea>
 
-            <button onclick="saveScheduleEvent()" class="w-full px-6 py-3 rounded-lg text-white font-medium" style="background: linear-gradient(135deg, var(--primary), var(--secondary));">
-                <i class="fas fa-check mr-2"></i> Ajouter au planning
-            </button>
+            <div class="flex gap-3">
+                <button id="deleteEventBtn" onclick="deleteCurrentEvent()" class="hidden px-4 py-3 rounded-lg border font-medium text-red-500 hover:bg-red-50 transition" style="border-color:#fca5a5;">
+                    <i class="fas fa-trash mr-1"></i> Supprimer
+                </button>
+                <button onclick="saveScheduleEvent()" class="flex-1 px-4 py-3 rounded-lg text-white font-medium" style="background:linear-gradient(135deg,var(--primary),var(--secondary));">
+                    <i class="fas fa-check mr-2"></i>
+                    <span id="saveEventBtnLabel">Ajouter au planning</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Import EDT AMU -->
+    <div id="edtImportModal" class="modal">
+        <div class="modal-content" style="max-width: 550px;">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold gradient-text">🏛️ Importer mon EDT AMU</h3>
+                <button onclick="closeEdtImportModal()" class="text-2xl">&times;</button>
+            </div>
+
+            <div class="p-4 rounded-lg mb-5" style="background: #fff7ed; border: 1px solid #fed7aa;">
+                <p class="text-sm font-medium mb-1" style="color: #c2410c;"><i class="fas fa-info-circle mr-2"></i>Comment ça marche ?</p>
+                <p class="text-xs opacity-80" style="color: #9a3412;">
+                    Colle le lien iCal de ton EDT AMU (ADE) ci-dessous. Tu peux modifier les dates pour choisir la période à importer. Les cours seront automatiquement ajoutés à ton planning.
+                </p>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-2">🔗 Lien iCal ADE</label>
+                <textarea id="edtUrlInput" rows="3" class="w-full p-3 border rounded-lg text-xs" style="border-color: var(--border); font-family: monospace;"
+                    placeholder="https://ade-web-consult.univ-amu.fr/jsp/custom/modules/plannings/anonymous_cal.jsp?...">https://ade-web-consult.univ-amu.fr/jsp/custom/modules/plannings/anonymous_cal.jsp?projectId=8&resources=146872&calType=vcal&firstDate=2026-02-16&lastDate=2026-02-20</textarea>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 mb-5">
+                <div>
+                    <label class="block text-sm font-medium mb-2">📅 Date de début</label>
+                    <input type="date" id="edtFirstDate" class="w-full p-3 border rounded-lg" style="border-color: var(--border);">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">📅 Date de fin</label>
+                    <input type="date" id="edtLastDate" class="w-full p-3 border rounded-lg" style="border-color: var(--border);">
+                </div>
+            </div>
+
+            <div class="mb-5 p-3 rounded-lg text-sm" style="background: var(--border);">
+                <label class="flex items-center gap-3 cursor-pointer">
+                    <input type="checkbox" id="edtReplaceExisting" class="w-4 h-4">
+                    <span>Remplacer les cours existants sur la période importée</span>
+                </label>
+            </div>
+
+            <div id="edtModalStatus" class="hidden p-3 rounded-lg mb-4 text-sm font-medium"></div>
+
+            <div class="flex gap-3">
+                <button onclick="closeEdtImportModal()" class="flex-1 px-4 py-3 rounded-lg border font-medium" style="border-color: var(--border);">
+                    Annuler
+                </button>
+                <button onclick="importEdtAmu()" class="flex-1 px-4 py-3 rounded-lg text-white font-medium" style="background: linear-gradient(135deg, #f97316, #ea580c);">
+                    <i class="fas fa-file-import mr-2"></i> Importer
+                </button>
+            </div>
         </div>
     </div>
 
@@ -1750,143 +1875,175 @@
 
         async function initSchedule() {
             const showWeekend = await getSetting('showWeekend') || false;
-            const compactView = await getSetting('compactView') || false;
             const scheduleStart = await getSetting('scheduleStart') || '08:00';
-            const scheduleEnd = await getSetting('scheduleEnd') || '18:00';
+            const scheduleEnd   = await getSetting('scheduleEnd')   || '18:00';
 
-            // Calcul des heures
             const startHour = parseInt(scheduleStart.split(':')[0]);
-            const endHour = parseInt(scheduleEnd.split(':')[0]);
+            const endHour   = parseInt(scheduleEnd.split(':')[0]);
             const hours = [];
-            for(let h = startHour; h <= endHour; h++) {
-                hours.push(`${h.toString().padStart(2, '0')}:00`);
+            for (let h = startHour; h <= endHour; h++) {
+                hours.push(`${h.toString().padStart(2,'0')}:00`);
             }
 
-            const days = showWeekend 
-                ? ['Heure', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
-                : ['Heure', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi'];
+            const dayLabels = showWeekend
+                ? ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche']
+                : ['Lundi','Mardi','Mercredi','Jeudi','Vendredi'];
 
-            const grid = document.getElementById('scheduleGrid');
-            grid.innerHTML = '';
-            grid.style.gridTemplateColumns = `80px repeat(${days.length - 1}, 1fr)`;
+            const numDays = dayLabels.length;
+            const numRows = hours.length; // une ligne par heure
 
-            // Affichage de la semaine
+            // ── Affichage semaine ────────────────────────────────────────────
             const weekEnd = new Date(currentWeekStart);
             weekEnd.setDate(weekEnd.getDate() + 6);
-            document.getElementById('weekDisplay').innerText = 
+            document.getElementById('weekDisplay').innerText =
                 `Semaine du ${formatDate(currentWeekStart)} au ${formatDate(weekEnd)}`;
 
-            // En-têtes avec dates
-            days.forEach((day, index) => {
+            // ── Grille : row 1 = headers, rows 2..N+1 = heures ──────────────
+            const grid = document.getElementById('scheduleGrid');
+            grid.innerHTML = '';
+            // Colonnes : 80px pour les heures + 1fr par jour
+            grid.style.gridTemplateColumns = `80px repeat(${numDays}, 1fr)`;
+            // Lignes : auto pour header + 70px par créneau horaire
+            grid.style.gridTemplateRows = `auto repeat(${numRows}, 70px)`;
+
+            // ── En-têtes (row 1) ─────────────────────────────────────────────
+            // Cellule coin haut-gauche
+            const cornerDiv = document.createElement('div');
+            cornerDiv.className = 'schedule-header';
+            cornerDiv.innerText = 'Heure';
+            cornerDiv.style.gridRow = '1';
+            cornerDiv.style.gridColumn = '1';
+            grid.appendChild(cornerDiv);
+
+            dayLabels.forEach((day, idx) => {
                 const div = document.createElement('div');
                 div.className = 'schedule-header';
-                
-                if(index === 0) {
-                    div.innerText = day;
-                } else {
-                    const dayDate = new Date(currentWeekStart);
-                    dayDate.setDate(dayDate.getDate() + (index - 1));
-                    const isToday = dayDate.toDateString() === new Date().toDateString();
-                    
-                    div.innerHTML = `
-                        <div class="text-xs opacity-80">${day}</div>
-                        <div class="font-bold ${isToday ? 'text-yellow-300' : ''}">${dayDate.getDate()}</div>
-                    `;
-                    
-                    if(isToday) {
-                        div.style.background = 'linear-gradient(135deg, var(--accent), var(--primary))';
-                    }
-                }
-                
+                div.style.gridRow = '1';
+                div.style.gridColumn = `${idx + 2}`;
+
+                const dayDate = new Date(currentWeekStart);
+                dayDate.setDate(dayDate.getDate() + idx);
+                const isToday = dayDate.toDateString() === new Date().toDateString();
+
+                div.innerHTML = `
+                    <div class="text-xs opacity-80">${day}</div>
+                    <div class="font-bold ${isToday ? 'text-yellow-300' : ''}">${dayDate.getDate()}</div>
+                `;
+                if (isToday) div.style.background = 'linear-gradient(135deg, var(--accent), var(--primary))';
                 grid.appendChild(div);
             });
 
-            // Cellules de planning
-            const courses = await db.courses.toArray();
+            // ── Cellules heures + jours (rows 2..N+1) ────────────────────────
+            const courses     = await db.courses.toArray();
             const weekStartStr = currentWeekStart.toISOString().split('T')[0];
 
+            // Pré-charger tous les events de la semaine en une seule requête
+            const allEvents = await db.scheduleEvents
+                .where('weekStart').equals(weekStartStr)
+                .toArray();
+
+            // Ensemble des cellules déjà couvertes par un span (col, row) → true
+            const coveredCells = new Set();
+
             for (let h = 0; h < hours.length; h++) {
-                // Colonne heure
+                const gridRow = h + 2; // row CSS (header = 1, premier créneau = 2)
+
+                // ── Cellule heure ──────────────────────────────────────────
                 const timeDiv = document.createElement('div');
                 timeDiv.className = 'p-2 text-center text-xs font-bold flex items-center justify-center';
-                timeDiv.style.background = 'var(--border)';
+                timeDiv.style.background   = 'var(--border)';
+                timeDiv.style.gridRow      = `${gridRow}`;
+                timeDiv.style.gridColumn   = '1';
                 timeDiv.innerText = hours[h];
                 grid.appendChild(timeDiv);
 
-                // Cellules pour chaque jour
-                for (let d = 1; d < days.length; d++) {
+                // ── Cellules jours ─────────────────────────────────────────
+                for (let d = 0; d < numDays; d++) {
+                    const gridCol = d + 2;
+                    const cellKey = `${gridCol}-${gridRow}`;
+
+                    // Si cette cellule est déjà couverte par un span → on la saute
+                    if (coveredCells.has(cellKey)) continue;
+
                     const cell = document.createElement('div');
                     cell.className = 'schedule-cell relative group';
-                    cell.dataset.day = d - 1; // 0 = lundi
+                    cell.dataset.day  = d;
                     cell.dataset.hour = hours[h];
-                    
-                    // Vérifier s'il y a un événement
-                    const events = await db.scheduleEvents
-                        .where('weekStart').equals(weekStartStr)
-                        .and(e => e.day === (d - 1) && e.startTime === hours[h])
-                        .toArray();
+                    cell.style.gridRow    = `${gridRow}`;
+                    cell.style.gridColumn = `${gridCol}`;
 
-                    if(events.length > 0) {
-                        const event = events[0];
-                        const course = courses.find(c => c.id === event.courseId);
-                        
-                        if(course) {
-                            const duration = calculateDuration(event.startTime, event.endTime);
-                            cell.innerHTML = `
-                                <div class="p-2 rounded h-full" style="background: ${course.color}20; border-left: 3px solid ${course.color};">
-                                    <div class="font-bold text-sm" style="color: ${course.color};">${course.name}</div>
-                                    <div class="text-xs opacity-70 mt-1">${event.startTime} - ${event.endTime}</div>
-                                    ${event.location ? `<div class="text-xs opacity-60 mt-1"><i class="fas fa-map-marker-alt mr-1"></i>${event.location}</div>` : ''}
-                                </div>
-                            `;
-                            
-                            // Si durée > 1h, étendre la cellule
-                            if(duration > 1) {
-                                cell.style.gridRow = `span ${duration}`;
+                    // Event qui démarre exactement à cette heure/jour
+                    const event = allEvents.find(e => e.day === d && e.startTime === hours[h]);
+
+                    if (event) {
+                        const course   = event.courseId ? courses.find(c => c.id === event.courseId) : null;
+                        const duration = calculateDuration(event.startTime, event.endTime);
+
+                        // Résoudre nom et couleur (cours DB ou nom libre)
+                        const displayName  = course ? course.name  : (event.freeName  || 'Cours');
+                        const displayColor = course ? course.color : (event.freeColor || '#3b82f6');
+
+                        if (duration > 0) {
+                            cell.style.gridRow = `${gridRow} / span ${duration}`;
+
+                            for (let s = 1; s < duration; s++) {
+                                coveredCells.add(`${gridCol}-${gridRow + s}`);
                             }
+
+                            cell.innerHTML = `
+                                <div class="p-2 rounded h-full cursor-pointer" style="background:${displayColor}25; border-left:3px solid ${displayColor};">
+                                    <div class="flex justify-between items-start">
+                                        <div class="font-bold text-sm leading-tight" style="color:${displayColor};">${displayName}</div>
+                                        <button class="edit-event-btn opacity-0 group-hover:opacity-100 transition ml-1 flex-shrink-0 w-5 h-5 rounded text-xs flex items-center justify-center" style="background:${displayColor}; color:white;" title="Modifier">
+                                            <i class="fas fa-pen" style="font-size:0.55rem;"></i>
+                                        </button>
+                                    </div>
+                                    <div class="text-xs opacity-70 mt-1">${event.startTime} – ${event.endTime}</div>
+                                    ${event.location ? `<div class="text-xs opacity-60 mt-1 truncate"><i class="fas fa-map-marker-alt mr-1"></i>${event.location}</div>` : ''}
+                                </div>`;
+
+                            // Clic sur le crayon → édition
+                            cell.querySelector('.edit-event-btn').addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                openEditScheduleEvent(event);
+                            });
+
+                            // Clic sur la cellule entière → édition aussi
+                            cell.addEventListener('click', (e) => {
+                                if (!e.target.closest('button')) openEditScheduleEvent(event);
+                            });
                         }
+
+                        // Suppression double-clic / long-press
+                        let pressTimer;
+                        cell.addEventListener('touchstart', () => {
+                            pressTimer = setTimeout(async () => {
+                                if (confirm('Supprimer ce cours ?')) {
+                                    await db.scheduleEvents.delete(event.id);
+                                    initSchedule();
+                                    showNotification('🗑️ Cours supprimé');
+                                }
+                            }, 800);
+                        });
+                        cell.addEventListener('touchend',  () => clearTimeout(pressTimer));
+                        cell.addEventListener('touchmove', () => clearTimeout(pressTimer));
+                        cell.ondblclick = async () => {
+                            if (confirm('Supprimer ce cours ?')) {
+                                await db.scheduleEvents.delete(event.id);
+                                await initSchedule();
+                                showNotification('🗑️ Cours supprimé');
+                            }
+                        };
                     }
 
-                    // Bouton ajouter au survol
+                    // Bouton + au survol
                     const addBtn = document.createElement('button');
                     addBtn.innerHTML = '<i class="fas fa-plus"></i>';
                     addBtn.className = 'absolute top-1 right-1 w-6 h-6 rounded-full text-xs opacity-0 group-hover:opacity-100 transition';
                     addBtn.style.background = 'var(--primary)';
                     addBtn.style.color = 'white';
-                    addBtn.onclick = () => openAddScheduleEvent(d - 1, hours[h]);
+                    addBtn.onclick = (e) => { e.stopPropagation(); openAddScheduleEvent(d, hours[h]); };
                     cell.appendChild(addBtn);
-
-                    // Double-clic pour supprimer (desktop) ou long press (mobile)
-                    let pressTimer;
-                    cell.addEventListener('touchstart', (e) => {
-                        if(events.length > 0) {
-                            pressTimer = setTimeout(() => {
-                                if(confirm('Supprimer ce cours ?')) {
-                                    db.scheduleEvents.delete(events[0].id);
-                                    initSchedule();
-                                    showNotification('🗑️ Cours supprimé');
-                                }
-                            }, 800);
-                        }
-                    });
-
-                    cell.addEventListener('touchend', () => {
-                        clearTimeout(pressTimer);
-                    });
-
-                    cell.addEventListener('touchmove', () => {
-                        clearTimeout(pressTimer);
-                    });
-
-                    cell.ondblclick = async () => {
-                        if(events.length > 0) {
-                            if(confirm('Supprimer ce cours ?')) {
-                                await db.scheduleEvents.delete(events[0].id);
-                                await initSchedule();
-                                showNotification('🗑️ Cours supprimé');
-                            }
-                        }
-                    };
 
                     grid.appendChild(cell);
                 }
@@ -1897,6 +2054,257 @@
             const start = parseInt(startTime.split(':')[0]);
             const end = parseInt(endTime.split(':')[0]);
             return end - start;
+        }
+
+        // ===== IMPORT EDT AMU =====
+
+        function openEdtImportModal() {
+            // Pré-remplir les dates avec la semaine courante
+            const monday = new Date(currentWeekStart);
+            const friday = new Date(currentWeekStart);
+            friday.setDate(friday.getDate() + 4);
+            document.getElementById('edtFirstDate').value = monday.toISOString().split('T')[0];
+            document.getElementById('edtLastDate').value = friday.toISOString().split('T')[0];
+            document.getElementById('edtModalStatus').classList.add('hidden');
+            document.getElementById('edtImportModal').classList.add('active');
+        }
+
+        function closeEdtImportModal() {
+            document.getElementById('edtImportModal').classList.remove('active');
+        }
+
+        function updateEdtUrlDates() {
+            const first = document.getElementById('edtFirstDate').value;
+            const last = document.getElementById('edtLastDate').value;
+            if (!first || !last) return;
+            let url = document.getElementById('edtUrlInput').value;
+            url = url.replace(/firstDate=[^&]+/, `firstDate=${first}`);
+            url = url.replace(/lastDate=[^&]+/, `lastDate=${last}`);
+            document.getElementById('edtUrlInput').value = url;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('edtFirstDate').addEventListener('change', updateEdtUrlDates);
+            document.getElementById('edtLastDate').addEventListener('change', updateEdtUrlDates);
+        });
+
+        function parseIcal(icalText) {
+            const events = [];
+
+            // Déplier les lignes continuées RFC 5545 (ligne suivante commence par espace/tab)
+            const unfolded = icalText.replace(/\r\n([ \t])/g, '$1').replace(/\n([ \t])/g, '$1');
+            const lines = unfolded.split(/\r\n|\n|\r/);
+
+            let current = null;
+            for (const line of lines) {
+                if (line === 'BEGIN:VEVENT') {
+                    current = {};
+                } else if (line === 'END:VEVENT' && current) {
+                    if (current.dtstart && current.dtend) events.push(current);
+                    current = null;
+                } else if (current) {
+                    const colonIdx = line.indexOf(':');
+                    if (colonIdx === -1) continue;
+                    const propName = line.substring(0, colonIdx).split(';')[0].toUpperCase();
+                    const value    = line.substring(colonIdx + 1);
+
+                    if (propName === 'DTSTART') {
+                        current.dtstart = parseIcalDate(value.trim());
+                    } else if (propName === 'DTEND') {
+                        current.dtend = parseIcalDate(value.trim());
+                    } else if (propName === 'SUMMARY') {
+                        current.summary = value.trim();
+                    } else if (propName === 'LOCATION') {
+                        current.location = value.trim();
+                    } else if (propName === 'DESCRIPTION') {
+                        // ADE encode les sauts de ligne en \n littéral
+                        current.description = value
+                            .replace(/\\n/g, '\n')
+                            .replace(/\\,/g, ',')
+                            .replace(/\\/g, '')
+                            .trim();
+                    }
+                }
+            }
+            return events;
+        }
+
+        function parseIcalDate(str) {
+            // Format: 20260217T080000Z ou 20260217T080000
+            const s = str.replace('Z', '');
+            const year = parseInt(s.substring(0, 4));
+            const month = parseInt(s.substring(4, 6)) - 1;
+            const day = parseInt(s.substring(6, 8));
+            const hour = parseInt(s.substring(9, 11));
+            const min = parseInt(s.substring(11, 13));
+            // ADE renvoie en UTC, on convertit en heure locale (Europe/Paris = UTC+1 ou +2)
+            const utcDate = new Date(Date.UTC(year, month, day, hour, min));
+            return utcDate;
+        }
+
+        function padTwo(n) { return n.toString().padStart(2, '0'); }
+
+        async function importEdtAmu() {
+            let rawUrl = document.getElementById('edtUrlInput').value.trim();
+            const replaceExisting = document.getElementById('edtReplaceExisting').checked;
+            const statusDiv = document.getElementById('edtModalStatus');
+
+            if (!rawUrl) {
+                showEdtStatus('error', '⚠️ Veuillez coller un lien iCal.');
+                return;
+            }
+
+            // Mettre à jour les dates dans l'URL depuis les champs
+            const first = document.getElementById('edtFirstDate').value;
+            const last = document.getElementById('edtLastDate').value;
+            if (first) rawUrl = rawUrl.replace(/firstDate=[^&]+/, `firstDate=${first}`);
+            if (last)  rawUrl = rawUrl.replace(/lastDate=[^&]+/, `lastDate=${last}`);
+
+            showEdtStatus('loading', '⏳ Récupération de l\'EDT en cours...');
+
+            // Proxy CORS public pour contourner la restriction cross-origin
+            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(rawUrl)}`;
+
+            let icalText;
+            try {
+                const resp = await fetch(proxyUrl);
+                if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                icalText = await resp.text();
+            } catch (e) {
+                showEdtStatus('error', `❌ Impossible de récupérer l'EDT. Vérifie ton lien ou ta connexion. (${e.message})`);
+                return;
+            }
+
+            if (!icalText.includes('BEGIN:VCALENDAR')) {
+                showEdtStatus('error', '❌ Le fichier récupéré ne semble pas être un calendrier valide.');
+                return;
+            }
+
+            showEdtStatus('loading', '📋 Analyse des cours...');
+
+            const events = parseIcal(icalText);
+            if (events.length === 0) {
+                showEdtStatus('warn', '⚠️ Aucun cours trouvé dans la période sélectionnée.');
+                return;
+            }
+
+            // Récupérer ou créer les matières dans la DB
+            const existingCourses = await db.courses.toArray();
+            const courseMap = {}; // name -> id
+
+            for (const ev of events) {
+                const name = cleanCourseName(ev.summary, ev.description);
+                if (!courseMap[name]) {
+                    let found = existingCourses.find(c => c.name.toLowerCase() === name.toLowerCase());
+                    if (!found) {
+                        const colors = ['#3b82f6','#8b5cf6','#ec4899','#22c55e','#f59e0b','#ef4444','#06b6d4','#f97316'];
+                        const color = colors[Object.keys(courseMap).length % colors.length];
+                        const id = await db.courses.add({ name, semester: 'S2', color, emoji: '🎓' });
+                        courseMap[name] = id;
+                    } else {
+                        courseMap[name] = found.id;
+                    }
+                }
+            }
+
+            let imported = 0;
+            let skipped = 0;
+
+            for (const ev of events) {
+                const name = cleanCourseName(ev.summary, ev.description);
+                const courseId = courseMap[name];
+                
+                // Calculer lundi de la semaine de cet event
+                const evMonday = getMonday(ev.dtstart);
+                const weekStartStr = evMonday.toISOString().split('T')[0];
+                
+                // Jour de la semaine (0=lundi...4=vendredi)
+                const dayOfWeek = ((ev.dtstart.getDay() + 6) % 7); // 0=lundi
+                if (dayOfWeek > 4) { skipped++; continue; } // ignorer week-end
+                
+                const startH = `${padTwo(ev.dtstart.getHours())}:00`;
+                const endH = `${padTwo(ev.dtend.getHours())}:00`;
+                const location = ev.location || '';
+
+                // Supprimer les existants si remplacement demandé
+                if (replaceExisting) {
+                    const toDelete = await db.scheduleEvents
+                        .where('weekStart').equals(weekStartStr)
+                        .and(e => e.day === dayOfWeek && e.startTime === startH)
+                        .toArray();
+                    for (const d of toDelete) await db.scheduleEvents.delete(d.id);
+                }
+
+                await db.scheduleEvents.add({
+                    courseId, day: dayOfWeek,
+                    startTime: startH, endTime: endH,
+                    location, notes: ev.description || '',
+                    weekStart: weekStartStr
+                });
+                imported++;
+            }
+
+            await renderCourses();
+            await initSchedule();
+            await updateDashboard();
+
+            showEdtStatus('success', `✅ ${imported} cours importés avec succès ! ${skipped > 0 ? `(${skipped} ignorés)` : ''}`);
+            showNotification(`🎓 EDT importé : ${imported} cours ajoutés !`);
+
+            // Fermer la modale après 2s
+            setTimeout(closeEdtImportModal, 2000);
+        }
+
+        function extractCourseNameFromSummary(summary) {
+            // Format ADE AMU : "SLP2U07L - Biologie cellulaire - CM1"
+            // ou avec préfixes : "**SLP2U23L - PPPE - TD", "*SLP2U07L - Biologie cellulaire - TD4"
+            // ou codes doubles : "SLP2U21L/SOP2U02L - Thermochimie - CM1"
+            // On veut toujours la partie MILIEU entre les tirets = le vrai nom de matière
+            const cleaned = (summary || '').replace(/^\**/, '').trim();
+            const parts = cleaned.split(/\s+-\s+/);
+            if (parts.length >= 2) {
+                return parts[1].trim();
+            }
+            return null;
+        }
+
+        function cleanCourseName(summary, description) {
+            // PRIORITÉ 1 : extraire le nom depuis le SUMMARY (format "CODE - NOM - TYPE")
+            // C'est la source la plus fiable dans les fichiers ADE AMU
+            const fromSummary = extractCourseNameFromSummary(summary);
+            if (fromSummary && fromSummary.length > 0) {
+                return fromSummary.substring(0, 80);
+            }
+
+            // PRIORITÉ 2 : première ligne non-junk de la DESCRIPTION
+            if (description) {
+                const lines = description
+                    .split('\n')
+                    .map(l => l.trim())
+                    .filter(l => l && l.length > 3)
+                    // Ignorer groupes, promos, enseignants, codes seuls
+                    .filter(l => !/^G\s*[-–]?\s*\d+$/i.test(l))
+                    .filter(l => !/^PROMO/i.test(l))
+                    .filter(l => !/^(M\.|Mr|Mme|Dr|Pr|Prof)\s/i.test(l))
+                    .filter(l => !/^[A-Z]{2,}\d[A-Z0-9]*(\/[A-Z]{2,}\d[A-Z0-9]*)?$/i.test(l));
+                if (lines.length > 0) return lines[0].substring(0, 80);
+            }
+
+            // PRIORITÉ 3 : SUMMARY brut en dernier recours
+            return (summary || 'Cours').replace(/^\**/, '').replace(/\s+/g, ' ').trim().substring(0, 80);
+        }
+
+        function showEdtStatus(type, msg) {
+            const div = document.getElementById('edtModalStatus');
+            div.classList.remove('hidden');
+            const styles = {
+                loading: 'background: #eff6ff; border: 1px solid #bfdbfe; color: #1d4ed8;',
+                success: 'background: #f0fdf4; border: 1px solid #bbf7d0; color: #15803d;',
+                error:   'background: #fef2f2; border: 1px solid #fecaca; color: #dc2626;',
+                warn:    'background: #fffbeb; border: 1px solid #fde68a; color: #d97706;'
+            };
+            div.style.cssText = styles[type] || styles.loading;
+            div.innerHTML = msg;
         }
 
         function openScheduleSettings() {
@@ -1944,62 +2352,145 @@
             showNotification('✅ Paramètres appliqués !');
         }
 
-        function openAddScheduleEvent(day, hour) {
+        // ── État de la modale agenda ──────────────────────────────────────────
+        let currentEditingEvent = null;   // null = ajout, objet = modification
+        let eventFreeColor = '#3b82f6';
+        let currentEventTab = 'pick';     // 'pick' | 'free'
+
+        function switchEventTab(tab) {
+            currentEventTab = tab;
+            const isPick = tab === 'pick';
+            document.getElementById('panelPickCourse').classList.toggle('hidden', !isPick);
+            document.getElementById('panelFreeName').classList.toggle('hidden', isPick);
+            document.getElementById('tabPickCourse').style.background = isPick ? 'var(--primary)' : 'var(--border)';
+            document.getElementById('tabPickCourse').style.color    = isPick ? 'white' : 'var(--text-main)';
+            document.getElementById('tabFreeName').style.background = !isPick ? 'var(--primary)' : 'var(--border)';
+            document.getElementById('tabFreeName').style.color      = !isPick ? 'white' : 'var(--text-main)';
+        }
+
+        function setEventFreeColor(color) {
+            eventFreeColor = color;
+            document.querySelectorAll('[data-freecolor]').forEach(btn => {
+                btn.style.outline = btn.dataset.freecolor === color ? `3px solid ${color}` : 'none';
+            });
+        }
+
+        async function openAddScheduleEvent(day, hour) {
+            currentEditingEvent = null;
             selectedScheduleCell = { day, hour };
-            document.getElementById('addScheduleEventModal').classList.add('active');
+
+            // Titre & boutons
+            document.getElementById('scheduleModalTitle').textContent = '➕ Ajouter un cours';
+            document.getElementById('saveEventBtnLabel').textContent  = 'Ajouter au planning';
+            document.getElementById('deleteEventBtn').classList.add('hidden');
+
+            // Heures
             document.getElementById('eventStartTime').value = hour;
-            
-            // Auto-remplir heure de fin (+1h)
-            const endHour = parseInt(hour.split(':')[0]) + 1;
-            document.getElementById('eventEndTime').value = `${endHour.toString().padStart(2, '0')}:00`;
-            
-            // Remplir le select des cours
-            populateEventCourseSelect();
+            const endH = parseInt(hour.split(':')[0]) + 1;
+            document.getElementById('eventEndTime').value = `${endH.toString().padStart(2,'0')}:00`;
+
+            // Reset champs
+            document.getElementById('eventLocation').value = '';
+            document.getElementById('eventNotes').value    = '';
+            document.getElementById('eventFreeName').value = '';
+            setEventFreeColor('#3b82f6');
+            switchEventTab('pick');
+
+            await populateEventCourseSelect(null);
+            document.getElementById('addScheduleEventModal').classList.add('active');
+        }
+
+        async function openEditScheduleEvent(event) {
+            currentEditingEvent = event;
+            selectedScheduleCell = { day: event.day, hour: event.startTime };
+
+            // Titre & boutons
+            document.getElementById('scheduleModalTitle').textContent = '✏️ Modifier le cours';
+            document.getElementById('saveEventBtnLabel').textContent  = 'Enregistrer';
+            document.getElementById('deleteEventBtn').classList.remove('hidden');
+
+            // Heures & infos
+            document.getElementById('eventStartTime').value = event.startTime;
+            document.getElementById('eventEndTime').value   = event.endTime;
+            document.getElementById('eventLocation').value  = event.location || '';
+            document.getElementById('eventNotes').value     = event.notes    || '';
+
+            // Récupérer le cours lié
+            const course = await db.courses.get(event.courseId);
+
+            if (course) {
+                // Si le cours existe dans la DB → onglet "Mes cours"
+                switchEventTab('pick');
+                await populateEventCourseSelect(event.courseId);
+            } else {
+                // Cours importé sans correspondance → onglet "Nom libre"
+                switchEventTab('free');
+                document.getElementById('eventFreeName').value = event.freeName || '';
+                setEventFreeColor(event.freeColor || '#3b82f6');
+                await populateEventCourseSelect(null);
+            }
+
+            document.getElementById('addScheduleEventModal').classList.add('active');
         }
 
         function closeAddScheduleEvent() {
             document.getElementById('addScheduleEventModal').classList.remove('active');
-            selectedScheduleCell = null;
+            selectedScheduleCell   = null;
+            currentEditingEvent    = null;
         }
 
-        async function populateEventCourseSelect() {
+        async function populateEventCourseSelect(selectedId) {
             const courses = await db.courses.toArray();
-            const select = document.getElementById('eventCourseSelect');
-            
+            const select  = document.getElementById('eventCourseSelect');
             select.innerHTML = '<option value="">Sélectionner une matière...</option>' +
-                courses.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+                courses.map(c => `<option value="${c.id}" ${c.id === selectedId ? 'selected' : ''}>${c.name}</option>`).join('');
         }
 
         async function saveScheduleEvent() {
-            const courseId = parseInt(document.getElementById('eventCourseSelect').value);
             const startTime = document.getElementById('eventStartTime').value;
-            const endTime = document.getElementById('eventEndTime').value;
-            const location = document.getElementById('eventLocation').value;
-            const notes = document.getElementById('eventNotes').value;
+            const endTime   = document.getElementById('eventEndTime').value;
+            const location  = document.getElementById('eventLocation').value;
+            const notes     = document.getElementById('eventNotes').value;
 
-            if(!courseId || !selectedScheduleCell) {
-                return showNotification('⚠️ Matière manquante', 'warning');
+            let courseId  = null;
+            let freeName  = null;
+            let freeColor = null;
+
+            if (currentEventTab === 'pick') {
+                courseId = parseInt(document.getElementById('eventCourseSelect').value);
+                if (!courseId) return showNotification('⚠️ Sélectionne une matière', 'warning');
+            } else {
+                freeName  = document.getElementById('eventFreeName').value.trim();
+                freeColor = eventFreeColor;
+                if (!freeName) return showNotification('⚠️ Saisis un nom de cours', 'warning');
             }
 
             const weekStartStr = currentWeekStart.toISOString().split('T')[0];
+            const day = selectedScheduleCell ? selectedScheduleCell.day :
+                        currentEditingEvent  ? currentEditingEvent.day  : 0;
 
-            await db.scheduleEvents.add({
-                courseId,
-                day: selectedScheduleCell.day,
-                startTime,
-                endTime,
-                location,
-                notes,
-                weekStart: weekStartStr
-            });
+            const record = { courseId, freeName, freeColor, day, startTime, endTime, location, notes, weekStart: weekStartStr };
 
-            // Reset form
-            document.getElementById('eventLocation').value = '';
-            document.getElementById('eventNotes').value = '';
+            if (currentEditingEvent) {
+                await db.scheduleEvents.update(currentEditingEvent.id, record);
+                showNotification('✅ Cours mis à jour !');
+            } else {
+                await db.scheduleEvents.add(record);
+                showNotification('✅ Cours ajouté à l\'agenda !');
+            }
 
             closeAddScheduleEvent();
             await initSchedule();
-            showNotification('✅ Cours ajouté à l\'agenda !');
+        }
+
+        async function deleteCurrentEvent() {
+            if (!currentEditingEvent) return;
+            if (confirm('Supprimer ce cours du planning ?')) {
+                await db.scheduleEvents.delete(currentEditingEvent.id);
+                closeAddScheduleEvent();
+                await initSchedule();
+                showNotification('🗑️ Cours supprimé');
+            }
         }
 
         async function clearSchedule() {
