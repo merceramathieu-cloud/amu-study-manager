@@ -685,14 +685,22 @@
             <!-- Stats rapides -->
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div class="stat-card">
-                    <div class="flex items-center justify-between">
+                    <div class="flex items-center justify-between mb-2">
                         <div>
                             <p class="text-sm opacity-80">Moyenne Générale</p>
                             <p class="text-4xl font-bold mt-2" id="dash-global-avg">--/20</p>
                         </div>
                         <i class="fas fa-trophy text-5xl opacity-20"></i>
                     </div>
-                    <div class="progress-bar mt-3">
+                    <div class="flex items-center gap-2 mb-2">
+                        <select id="semesterSelector" onchange="updateDashboardAverage()" 
+                            class="text-xs px-2 py-1 rounded border" 
+                            style="border-color: var(--border); font-weight: 600;">
+                            <option value="current">📗 Semestre actuel</option>
+                            <option value="previous">📘 Semestre précédent</option>
+                        </select>
+                    </div>
+                    <div class="progress-bar">
                         <div class="progress-fill" id="avg-progress" style="width: 0%"></div>
                     </div>
                 </div>
@@ -1211,6 +1219,8 @@
                 <option value="S2">Semestre 2</option>
             </select>
             
+            <input type="number" id="courseEctsInput" placeholder="Crédits ECTS (optionnel)" min="0" max="30" step="0.5" class="w-full p-3 border rounded-lg mb-4" style="border-color: var(--border);">
+            
             <div class="mb-4">
                 <label class="block text-sm font-medium mb-2">Couleur de la matière (pour l'agenda)</label>
                 <div class="flex gap-2">
@@ -1400,6 +1410,43 @@
         </div>
     </div>
 
+    <!-- Modal Édition de Note -->
+    <div id="editGradeModal" class="modal">
+        <div class="modal-content" style="max-width:480px;">
+            <div class="flex justify-between items-center mb-5">
+                <h3 class="text-2xl font-bold gradient-text">✏️ Modifier la note</h3>
+                <button onclick="closeEditGrade()" class="text-2xl">&times;</button>
+            </div>
+
+            <input type="hidden" id="editGradeId">
+            
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-2">Intitulé</label>
+                <input type="text" id="editGradeLabel" placeholder="Ex: Contrôle continu 1" class="w-full p-3 border rounded-lg" style="border-color: var(--border);">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Note /20</label>
+                    <input type="number" id="editGradeValue" min="0" max="20" step="0.01" placeholder="15.5" class="w-full p-3 border rounded-lg" style="border-color: var(--border);">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Coefficient</label>
+                    <input type="number" id="editGradeCoef" min="0.1" max="10" step="0.1" placeholder="1" class="w-full p-3 border rounded-lg" style="border-color: var(--border);">
+                </div>
+            </div>
+
+            <div class="flex gap-3">
+                <button onclick="closeEditGrade()" class="flex-1 px-4 py-3 rounded-lg border font-medium" style="border-color: var(--border);">
+                    Annuler
+                </button>
+                <button onclick="saveEditGrade()" class="flex-1 px-4 py-3 rounded-lg text-white font-medium" style="background: linear-gradient(135deg, var(--primary), var(--secondary));">
+                    <i class="fas fa-save mr-2"></i> Enregistrer
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Floating Action Button -->
     <div class="floating-action" onclick="openQuickMenu()" title="Menu rapide">
         <i class="fas fa-magic text-2xl"></i>
@@ -1408,8 +1455,8 @@
     <script>
         // ===== BASE DE DONNÉES =====
         const db = new Dexie("MyStudyAppUltimate");
-        db.version(4).stores({
-            courses: '++id, name, semester, color',
+        db.version(5).stores({
+            courses: '++id, name, semester, color, ects',
             files: '++id, courseId, name, blob, category',
             grades: '++id, courseId, label, value, coef, date',
             schedule: 'id, content',
@@ -1582,11 +1629,13 @@
         async function addCourse() {
             const name = document.getElementById('courseNameInput').value;
             const semester = document.getElementById('courseSemesterInput').value;
+            const ects = parseFloat(document.getElementById('courseEctsInput').value) || null;
             
             if(!name) return showNotification('⚠️ Nom manquant', 'warning');
 
-            await db.courses.add({ name, semester, color: selectedCourseColor });
+            await db.courses.add({ name, semester, color: selectedCourseColor, ects });
             document.getElementById('courseNameInput').value = '';
+            document.getElementById('courseEctsInput').value = '';
             selectedCourseColor = '#3b82f6';
             closeCourseModal();
             showNotification('✅ Cours ajouté avec succès !');
@@ -1709,6 +1758,7 @@
                                 <h4 class="font-bold text-xl mb-2" style="color: ${course.color}">${course.name}</h4>
                                 <div class="flex gap-2 flex-wrap">
                                     <span class="badge text-xs" style="background: ${course.color}; color: white;">${course.semester}</span>
+                                    ${course.ects ? `<span class="badge text-xs" style="background: var(--secondary); color: white;">🎓 ${course.ects} ECTS</span>` : ''}
                                     <span class="badge text-xs" style="background: var(--border); color: var(--text-main);">
                                         📊 Moyenne: ${avgGrade}/20
                                     </span>
@@ -1877,12 +1927,18 @@
             
             let totalWeightedSum = 0;
             let totalCoef = 0;
+            
+            // Variables pour moyennes par semestre
+            let s1WeightedSum = 0;
+            let s1Coef = 0;
+            let s2WeightedSum = 0;
+            let s2Coef = 0;
 
             // Grouper par semestre
             const s1Courses = courses.filter(c => c.semester === 'S1');
             const s2Courses = courses.filter(c => c.semester === 'S2');
 
-            const renderSemester = async (semesterCourses, semesterName) => {
+            const renderSemester = async (semesterCourses, semesterName, isS1) => {
                 const semesterDiv = document.createElement('div');
                 semesterDiv.className = 'mb-6';
                 
@@ -1909,6 +1965,15 @@
                     totalCoef++;
                     semesterTotal += parseFloat(avg);
                     semesterCount++;
+                    
+                    // Accumuler pour moyennes par semestre
+                    if (isS1) {
+                        s1WeightedSum += parseFloat(avg);
+                        s1Coef++;
+                    } else {
+                        s2WeightedSum += parseFloat(avg);
+                        s2Coef++;
+                    }
 
                     // Calcul des stats
                     const maxGrade = Math.max(...grades.map(g => g.value));
@@ -1924,6 +1989,7 @@
                                         <span class="badge text-xs" style="background: ${course.color}; color: white;">
                                             ${grades.length} note${grades.length > 1 ? 's' : ''}
                                         </span>
+                                        ${course.ects ? `<span class="badge text-xs" style="background: var(--secondary); color: white;">🎓 ${course.ects} ECTS</span>` : ''}
                                         <span class="badge text-xs" style="background: var(--border); color: var(--text-main);">
                                             📊 Moy: ${avg}/20
                                         </span>
@@ -1972,9 +2038,12 @@
                                                     ${g.coef > 1 ? `<span class="badge ml-2" style="background: ${course.color}; color: white; font-size: 0.6rem;">Coef. ${g.coef}</span>` : ''}
                                                 </div>
                                             </div>
-                                            <div class="flex items-center gap-3">
+                                            <div class="flex items-center gap-2">
                                                 <span class="font-mono font-bold text-lg ${g.value >= 15 ? 'text-green-600' : g.value >= 10 ? 'text-blue-600' : 'text-red-600'}">${g.value}/20</span>
-                                                <button onclick="deleteGrade(${g.id})" class="text-red-300 hover:text-red-500 transition">
+                                                <button onclick="openEditGrade(${g.id})" class="text-blue-400 hover:text-blue-600 transition" title="Modifier">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button onclick="deleteGrade(${g.id})" class="text-red-300 hover:text-red-500 transition" title="Supprimer">
                                                     <i class="fas fa-times"></i>
                                                 </button>
                                             </div>
@@ -2007,14 +2076,17 @@
                 container.appendChild(semesterDiv);
             };
 
-            await renderSemester(s1Courses, '📘 Semestre 1');
-            await renderSemester(s2Courses, '📗 Semestre 2');
+            await renderSemester(s1Courses, '📘 Semestre 1', true);
+            await renderSemester(s2Courses, '📗 Semestre 2', false);
             
-            const globalAvg = totalCoef > 0 ? (totalWeightedSum / totalCoef).toFixed(2) : "--";
-            document.getElementById('dash-global-avg').innerText = globalAvg + "/20";
+            // Stocker les moyennes par semestre pour utilisation ultérieure
+            window.semesterAverages = {
+                s1: s1Coef > 0 ? (s1WeightedSum / s1Coef).toFixed(2) : "--",
+                s2: s2Coef > 0 ? (s2WeightedSum / s2Coef).toFixed(2) : "--"
+            };
             
-            const avgProgress = globalAvg !== "--" ? (parseFloat(globalAvg) / 20) * 100 : 0;
-            document.getElementById('avg-progress').style.width = avgProgress + '%';
+            // Afficher la moyenne du semestre actuel par défaut
+            updateDashboardAverage();
         }
 
         async function deleteGrade(id) {
@@ -2023,6 +2095,83 @@
                 showNotification('🗑️ Note supprimée');
                 await refreshUI();
             }
+        }
+        
+        // Fonction pour ouvrir le modal d'édition de note
+        async function openEditGrade(gradeId) {
+            const grade = await db.grades.get(gradeId);
+            if (!grade) return;
+            
+            document.getElementById('editGradeId').value = gradeId;
+            document.getElementById('editGradeLabel').value = grade.label || '';
+            document.getElementById('editGradeValue').value = grade.value;
+            document.getElementById('editGradeCoef').value = grade.coef || 1;
+            
+            document.getElementById('editGradeModal').classList.add('active');
+        }
+        
+        // Fonction pour fermer le modal d'édition de note
+        function closeEditGrade() {
+            document.getElementById('editGradeModal').classList.remove('active');
+        }
+        
+        // Fonction pour sauvegarder les modifications de la note
+        async function saveEditGrade() {
+            const gradeId = parseInt(document.getElementById('editGradeId').value);
+            const label = document.getElementById('editGradeLabel').value;
+            const value = parseFloat(document.getElementById('editGradeValue').value);
+            const coef = parseFloat(document.getElementById('editGradeCoef').value) || 1;
+            
+            if (isNaN(value) || value < 0 || value > 20) {
+                return showNotification('⚠️ La note doit être entre 0 et 20', 'warning');
+            }
+            
+            await db.grades.update(gradeId, { label, value, coef });
+            
+            closeEditGrade();
+            showNotification('✅ Note modifiée !');
+            await refreshUI();
+        }
+        
+        // Fonction pour déterminer le semestre actuel (basé sur le mois)
+        function getCurrentSemester() {
+            const now = new Date();
+            const month = now.getMonth(); // 0 = janvier, 11 = décembre
+            
+            // Semestre 1 : septembre (8) à janvier (0)
+            // Semestre 2 : février (1) à juin (5)
+            // En été (juillet-août), on affiche le S2 qui vient de se terminer
+            if (month >= 1 && month <= 7) {
+                return 'S2';
+            } else {
+                return 'S1';
+            }
+        }
+        
+        // Fonction pour mettre à jour la moyenne affichée selon le semestre sélectionné
+        function updateDashboardAverage() {
+            const selector = document.getElementById('semesterSelector');
+            const selectedValue = selector ? selector.value : 'current';
+            
+            if (!window.semesterAverages) {
+                window.semesterAverages = { s1: "--", s2: "--" };
+            }
+            
+            let displayAvg;
+            const currentSem = getCurrentSemester();
+            
+            if (selectedValue === 'current') {
+                // Afficher le semestre actuel
+                displayAvg = currentSem === 'S2' ? window.semesterAverages.s2 : window.semesterAverages.s1;
+            } else {
+                // Afficher le semestre précédent
+                displayAvg = currentSem === 'S2' ? window.semesterAverages.s1 : window.semesterAverages.s2;
+            }
+            
+            document.getElementById('dash-global-avg').innerText = displayAvg + "/20";
+            
+            const avgProgress = displayAvg !== "--" ? (parseFloat(displayAvg) / 20) * 100 : 0;
+            document.getElementById('avg-progress').style.width = avgProgress + '%';
         }
 
         async function saveAllGrades() {
