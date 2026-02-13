@@ -1204,6 +1204,12 @@
                         <div><span class="font-semibold text-sm">Horloge en temps réel</span><p class="text-xs opacity-50">Affichée sur le dashboard</p></div>
                         <input type="checkbox" id="clockToggle" checked class="w-5 h-5" onchange="toggleClock(this.checked)">
                     </label>
+                    
+                    <div class="h-px my-3" style="background:var(--border);"></div>
+                    
+                    <button onclick="resetStreak()" class="btn-ghost w-full justify-center" style="border-color:#fed7aa; color:#f97316;">
+                        <i class="fas fa-redo-alt"></i> Réinitialiser la série de travail
+                    </button>
                 </div>
             </div>
 
@@ -3469,6 +3475,41 @@
                     setTimeout(() => confetti.remove(), 3000);
                 }, i * 30);
             }
+        }
+        
+        // ===== RESET STREAK =====
+        async function resetStreak() {
+            if(!confirm('⚠️ Êtes-vous sûr de vouloir réinitialiser votre série de travail ? Cette action est irréversible.')) {
+                return;
+            }
+            
+            // Supprimer les données de streak
+            await db.settings.delete('streakData');
+            
+            // Réinitialiser l'affichage
+            document.getElementById('streak-count').innerText = '1';
+            const recordEl = document.getElementById('streak-record');
+            if (recordEl) {
+                recordEl.innerText = '1';
+            }
+            
+            // Recréer les données à 1
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const todayStr = today.toISOString().split('T')[0];
+            
+            const newStreakData = {
+                key: 'streakData',
+                value: {
+                    currentStreak: 1,
+                    lastVisit: todayStr,
+                    longestStreak: 1
+                }
+            };
+            await db.settings.put(newStreakData);
+            
+            showNotification('🔄 Série de travail réinitialisée !');
+            console.log('✅ Streak réinitialisé:', newStreakData.value);
         }
 
         // ===== SETTINGS TABS =====
