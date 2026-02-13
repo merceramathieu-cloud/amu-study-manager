@@ -698,6 +698,20 @@
         .emoji-btn:hover { background: var(--border); transform: scale(1.2); }
 
         /* ═══════════════════════════════════════════════
+           SYSTÈME DE SUCCÈS
+        ═══════════════════════════════════════════════ */
+        .achievement-card {
+            transition: all 0.3s ease;
+        }
+        .achievement-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+        .grayscale {
+            filter: grayscale(100%);
+        }
+        
+        /* ═══════════════════════════════════════════════
            ANIMATIONS
         ═══════════════════════════════════════════════ */
         .tab-content { display: none; }
@@ -862,6 +876,9 @@
                     <button onclick="showTab('tasks')" class="nav-item px-3 py-2 text-sm font-medium hover:text-blue-600">
                         <i class="fas fa-tasks mr-1"></i> Tâches
                     </button>
+                    <button onclick="showTab('achievements')" class="nav-item px-3 py-2 text-sm font-medium hover:text-blue-600">
+                        <i class="fas fa-trophy mr-1"></i> Succès
+                    </button>
                     <a href="https://ent.univ-amu.fr/" target="_blank" rel="noopener noreferrer"
                        class="nav-pill" style="background:linear-gradient(135deg,var(--primary),var(--secondary)); color:white;"
                        title="ENT AMU">
@@ -918,6 +935,9 @@
                     </button>
                     <button onclick="showTab('tasks'); closeMobileMenu()" class="nav-item-mobile px-3 py-3 text-sm font-medium text-left hover:bg-gray-50 rounded">
                         <i class="fas fa-tasks mr-2 w-5"></i> Tâches
+                    </button>
+                    <button onclick="showTab('achievements'); closeMobileMenu()" class="nav-item-mobile px-3 py-3 text-sm font-medium text-left hover:bg-gray-50 rounded">
+                        <i class="fas fa-trophy mr-2 w-5"></i> Succès
                     </button>
                     <a href="https://ent.univ-amu.fr/" target="_blank" rel="noopener noreferrer"
                        class="nav-item-mobile px-3 py-3 text-sm font-medium text-left rounded flex items-center"
@@ -1280,6 +1300,53 @@
                     <div class="card p-4">
                         <h4 class="font-bold mb-3 flex items-center"><span class="w-3 h-3 rounded-full bg-green-400 mr-2"></span> Terminé</h4>
                         <div id="tasks-done" class="space-y-2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================== SUCCÈS ===================== -->
+        <div id="achievements" class="tab-content space-y-6">
+            <div class="card shadow-lg rounded-lg p-6">
+                <h3 class="text-3xl font-bold gradient-text mb-2">🏆 Succès</h3>
+                <p class="text-sm opacity-60 mb-6">Débloquez des récompenses !</p>
+                
+                <!-- Progression XP et Niveau -->
+                <div class="card p-6 mb-6" style="background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white;">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <p class="text-sm opacity-90">Niveau actuel</p>
+                            <p class="text-5xl font-bold" id="user-level">1</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-sm opacity-90">Expérience</p>
+                            <p class="text-3xl font-bold"><span id="user-xp">0</span> XP</p>
+                        </div>
+                    </div>
+                    <div class="bg-white bg-opacity-20 rounded-full h-3 overflow-hidden mb-2">
+                        <div id="xp-progress-bar" class="bg-white h-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                    <p class="text-xs text-center opacity-90"><span id="xp-needed">100</span> XP pour le niveau suivant</p>
+                    
+                    <!-- Titre actuel -->
+                    <div class="mt-4 pt-4 border-t border-white border-opacity-20">
+                        <p class="text-sm opacity-90 mb-1">Votre titre</p>
+                        <p class="text-2xl font-bold" id="current-title">🎓 Étudiant</p>
+                    </div>
+                </div>
+
+                <!-- Grille des succès -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6" id="achievements-grid">
+                    <!-- Les succès seront générés dynamiquement -->
+                </div>
+
+                <!-- Parcours des titres -->
+                <div class="card p-6">
+                    <h3 class="text-2xl font-bold gradient-text mb-4">🎖️ Parcours des Titres</h3>
+                    <p class="text-sm opacity-60 mb-6">Voici tous les titres que vous pouvez débloquer en montant de niveau !</p>
+                    
+                    <div class="space-y-3" id="titles-progression">
+                        <!-- Les titres seront générés dynamiquement -->
                     </div>
                 </div>
             </div>
@@ -1948,13 +2015,14 @@
             const hour = new Date().getHours();
             const userName = await getSetting('userName') || 'Champion';
             const avatar = await getSetting('avatar') || '👨‍🎓';
+            const userTitle = await getUserTitle();
             
             let greeting = '';
             if (hour < 12) greeting = 'Bonjour';
             else if (hour < 18) greeting = 'Bon après-midi';
             else greeting = 'Bonsoir';
             
-            document.getElementById('greeting').innerHTML = `${avatar} ${greeting} ${userName} !`;
+            document.getElementById('greeting').innerHTML = `${avatar} ${greeting} <span class="gradient-text">${userName}</span>, ${userTitle} !`;
             
             // Citation motivante aléatoire
             const quotes = [
@@ -2073,6 +2141,7 @@
             showNotification('✅ Cours ajouté avec succès !');
             await refreshUI();
             launchConfetti();
+            await checkAndUpdateAchievements(); // Vérifier les succès
         }
 
         // Catégories de fichiers
@@ -2092,6 +2161,7 @@
             await db.files.add({ courseId, name: file.name, blob: file, category: cat });
             showNotification('📄 Fichier ajouté !');
             await refreshUI();
+            await checkAndUpdateAchievements(); // Vérifier les succès
         }
 
         async function deleteFile(id) {
@@ -2348,6 +2418,7 @@
             
             showNotification('🎯 Note enregistrée !');
             await refreshUI();
+            await checkAndUpdateAchievements(); // Vérifier les succès
             
             if(value >= 15) launchConfetti();
         }
@@ -3419,6 +3490,7 @@
             showNotification('✅ Tâche ajoutée !');
             await renderTasks();
             updateStreak();
+            await checkAndUpdateAchievements(); // Vérifier les succès
         }
 
         async function renderTasks() {
@@ -3471,6 +3543,7 @@
                     const newStatus = id.replace('tasks-', '');
                     await db.tasks.update(taskId, { status: newStatus });
                     await renderTasks();
+                    await checkAndUpdateAchievements(); // Vérifier les succès
                 };
             });
 
@@ -3484,6 +3557,7 @@
             if(!task.completed) {
                 showNotification('🎉 Tâche complétée !');
                 launchConfetti();
+                await checkAndUpdateAchievements(); // Vérifier les succès
             }
         }
 
@@ -4154,6 +4228,259 @@ Cette action est irréversible.`);
             setDensity(density);
         }
 
+        // ===== SYSTÈME DE SUCCÈS ET TITRES =====
+        
+        // Définition des succès
+        const ACHIEVEMENTS = [
+            { id: 'first-step', name: 'Premier Pas', desc: 'Créer votre première tâche', icon: '🎯', xp: 10, condition: () => checkTaskCount(1) },
+            { id: 'studious', name: 'Studieux', desc: 'Compléter 10 tâches', icon: '📝', xp: 50, condition: () => checkCompletedTasks(10) },
+            { id: 'marathonian', name: 'Marathonien', desc: '7 jours de suite actif', icon: '💧', xp: 100, condition: () => checkStreak(7) },
+            { id: 'file-master', name: 'Archiviste', desc: 'Stocker 20 fichiers', icon: '📂', xp: 75, condition: () => checkFileCount(20) },
+            { id: 'excellence', name: 'Excellence', desc: 'Obtenir une moyenne de 18+', icon: '🌟', xp: 150, condition: () => checkAverage(18) },
+            { id: 'organized', name: 'Organisé', desc: 'Créer 5 cours', icon: '📚', xp: 30, condition: () => checkCourseCount(5) },
+            { id: 'perfectionist', name: 'Perfectionniste', desc: '10 notes au-dessus de 15', icon: '💯', xp: 120, condition: () => checkHighGrades(10, 15) },
+            { id: 'productive', name: 'Productif', desc: '50 tâches complétées', icon: '⚡', xp: 200, condition: () => checkCompletedTasks(50) },
+            { id: 'legend', name: 'Légende', desc: '100 tâches complétées', icon: '👑', xp: 500, condition: () => checkCompletedTasks(100) }
+        ];
+
+        // Définition des titres par niveau
+        const TITLES = [
+            { level: 1, title: '🎓 Étudiant', minXP: 0 },
+            { level: 2, title: '📚 Apprenti', minXP: 50 },
+            { level: 3, title: '💪 Travailleur acharné', minXP: 150 },
+            { level: 4, title: '🌟 Étoile montante', minXP: 300 },
+            { level: 5, title: '🔥 Expert', minXP: 500 },
+            { level: 6, title: '⚡ Prodige', minXP: 800 },
+            { level: 7, title: '💎 Maître', minXP: 1200 },
+            { level: 8, title: '👑 Légende', minXP: 1700 },
+            { level: 9, title: '🏆 Champion', minXP: 2500 },
+            { level: 10, title: '🌌 Génie absolu', minXP: 3500 }
+        ];
+
+        // Fonctions de vérification des conditions
+        async function checkTaskCount(min) {
+            const tasks = await db.tasks.toArray();
+            return tasks.length >= min;
+        }
+
+        async function checkCompletedTasks(min) {
+            const tasks = await db.tasks.where('status').equals('done').toArray();
+            return tasks.length >= min;
+        }
+
+        async function checkStreak(days) {
+            const streak = await getSetting('streak') || 1;
+            return streak >= days;
+        }
+
+        async function checkFileCount(min) {
+            const files = await db.files.toArray();
+            return files.length >= min;
+        }
+
+        async function checkAverage(minAvg) {
+            const courses = await db.courses.toArray();
+            if (courses.length === 0) return false;
+            
+            let totalAvg = 0;
+            let count = 0;
+            
+            for (const course of courses) {
+                const grades = await db.grades.where('courseId').equals(course.id).toArray();
+                if (grades.length > 0) {
+                    let sum = 0, coefSum = 0;
+                    grades.forEach(g => {
+                        sum += g.value * g.coef;
+                        coefSum += g.coef;
+                    });
+                    totalAvg += sum / coefSum;
+                    count++;
+                }
+            }
+            
+            return count > 0 && (totalAvg / count) >= minAvg;
+        }
+
+        async function checkCourseCount(min) {
+            const courses = await db.courses.toArray();
+            return courses.length >= min;
+        }
+
+        async function checkHighGrades(count, minGrade) {
+            const grades = await db.grades.toArray();
+            const highGrades = grades.filter(g => g.value >= minGrade);
+            return highGrades.length >= count;
+        }
+
+        // Système d'XP et de niveaux
+        async function getUserXP() {
+            return await getSetting('userXP') || 0;
+        }
+
+        async function addXP(amount) {
+            const currentXP = await getUserXP();
+            const newXP = currentXP + amount;
+            await setSetting('userXP', newXP);
+            await checkLevelUp(newXP);
+            await updateAchievementsDisplay();
+            return newXP;
+        }
+
+        async function getUserLevel() {
+            const xp = await getUserXP();
+            for (let i = TITLES.length - 1; i >= 0; i--) {
+                if (xp >= TITLES[i].minXP) {
+                    return TITLES[i].level;
+                }
+            }
+            return 1;
+        }
+
+        async function getUserTitle() {
+            const xp = await getUserXP();
+            for (let i = TITLES.length - 1; i >= 0; i--) {
+                if (xp >= TITLES[i].minXP) {
+                    return TITLES[i].title;
+                }
+            }
+            return TITLES[0].title;
+        }
+
+        async function getNextLevelXP() {
+            const currentLevel = await getUserLevel();
+            const nextLevel = TITLES.find(t => t.level === currentLevel + 1);
+            return nextLevel ? nextLevel.minXP : TITLES[TITLES.length - 1].minXP;
+        }
+
+        async function checkLevelUp(currentXP) {
+            const currentLevel = await getUserLevel();
+            const nextLevel = TITLES.find(t => t.level === currentLevel + 1);
+            
+            if (nextLevel && currentXP >= nextLevel.minXP) {
+                showNotification(`🎉 Niveau ${nextLevel.level} atteint ! Nouveau titre : ${nextLevel.title}`);
+                await updateGreeting();
+            }
+        }
+
+        // Gestion des succès débloqués
+        async function getUnlockedAchievements() {
+            return await getSetting('unlockedAchievements') || [];
+        }
+
+        async function unlockAchievement(achievementId) {
+            const unlocked = await getUnlockedAchievements();
+            if (!unlocked.includes(achievementId)) {
+                unlocked.push(achievementId);
+                await setSetting('unlockedAchievements', unlocked);
+                
+                const achievement = ACHIEVEMENTS.find(a => a.id === achievementId);
+                if (achievement) {
+                    await addXP(achievement.xp);
+                    showNotification(`🏆 Succès débloqué : ${achievement.icon} ${achievement.name} (+${achievement.xp} XP) !`);
+                }
+            }
+        }
+
+        async function checkAchievements() {
+            for (const achievement of ACHIEVEMENTS) {
+                const unlocked = await getUnlockedAchievements();
+                if (!unlocked.includes(achievement.id)) {
+                    const isUnlocked = await achievement.condition();
+                    if (isUnlocked) {
+                        await unlockAchievement(achievement.id);
+                    }
+                }
+            }
+        }
+
+        // Affichage des succès
+        async function updateAchievementsDisplay() {
+            const grid = document.getElementById('achievements-grid');
+            if (!grid) return;
+            
+            const unlocked = await getUnlockedAchievements();
+            const xp = await getUserXP();
+            const level = await getUserLevel();
+            const title = await getUserTitle();
+            const nextLevelXP = await getNextLevelXP();
+            const currentLevelXP = TITLES.find(t => t.level === level)?.minXP || 0;
+            const xpInCurrentLevel = xp - currentLevelXP;
+            const xpNeededForNextLevel = nextLevelXP - currentLevelXP;
+            const xpProgress = xpNeededForNextLevel > 0 ? (xpInCurrentLevel / xpNeededForNextLevel) * 100 : 100;
+            
+            // Mise à jour des infos de niveau
+            document.getElementById('user-level').textContent = level;
+            document.getElementById('user-xp').textContent = xp;
+            document.getElementById('current-title').textContent = title;
+            document.getElementById('xp-needed').textContent = Math.max(0, nextLevelXP - xp);
+            document.getElementById('xp-progress-bar').style.width = Math.min(xpProgress, 100) + '%';
+            
+            // Génération des cartes de succès
+            grid.innerHTML = ACHIEVEMENTS.map(achievement => {
+                const isUnlocked = unlocked.includes(achievement.id);
+                return `
+                    <div class="card p-4 ${isUnlocked ? '' : 'opacity-50'}" style="border: 2px solid ${isUnlocked ? 'var(--primary)' : 'var(--border)'};">
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="text-4xl ${isUnlocked ? '' : 'grayscale'}">${achievement.icon}</div>
+                            <div class="px-2 py-1 rounded text-xs font-bold text-white" style="background: ${isUnlocked ? 'linear-gradient(135deg, #22c55e, #16a34a)' : '#94a3b8'};">
+                                ${isUnlocked ? '✓ Débloqué' : '🔒 Verrouillé'}
+                            </div>
+                        </div>
+                        <h4 class="font-bold text-lg mb-1">${achievement.name}</h4>
+                        <p class="text-sm opacity-70 mb-2">${achievement.desc}</p>
+                        <div class="flex items-center gap-2 text-sm font-bold" style="color: var(--primary);">
+                            <i class="fas fa-star"></i>
+                            <span>${achievement.xp} XP</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Génération de la progression des titres
+            const titlesContainer = document.getElementById('titles-progression');
+            if (titlesContainer) {
+                titlesContainer.innerHTML = TITLES.map((titleData, index) => {
+                    const isUnlocked = xp >= titleData.minXP;
+                    const isCurrent = titleData.level === level;
+                    const nextTitle = TITLES[index + 1];
+                    const xpNeeded = nextTitle ? nextTitle.minXP - titleData.minXP : 0;
+                    
+                    return `
+                        <div class="card p-4 transition-all ${isCurrent ? 'ring-2 ring-offset-2' : ''}" 
+                             style="border: 2px solid ${isUnlocked ? 'var(--primary)' : 'var(--border)'}; ${isCurrent ? 'ring-color: var(--primary);' : ''}">
+                            <div class="flex items-center gap-4">
+                                <div class="flex-shrink-0">
+                                    <div class="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold ${isUnlocked ? '' : 'opacity-30 grayscale'}" 
+                                         style="background: ${isUnlocked ? 'linear-gradient(135deg, var(--primary), var(--secondary))' : 'var(--border)'}; color: white;">
+                                        ${titleData.level}
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <h4 class="font-bold text-lg ${isUnlocked ? '' : 'opacity-50'}">${titleData.title}</h4>
+                                        ${isCurrent ? '<span class="px-2 py-1 rounded text-xs font-bold text-white" style="background: linear-gradient(135deg, var(--primary), var(--secondary));">ACTUEL</span>' : ''}
+                                        ${isUnlocked && !isCurrent ? '<span class="px-2 py-1 rounded text-xs font-bold" style="background: #22c55e; color: white;">✓ DÉBLOQUÉ</span>' : ''}
+                                        ${!isUnlocked ? '<span class="px-2 py-1 rounded text-xs font-bold" style="background: #94a3b8; color: white;">🔒 VERROUILLÉ</span>' : ''}
+                                    </div>
+                                    <p class="text-sm opacity-70">
+                                        ${isUnlocked ? `Débloqué avec ${titleData.minXP} XP` : `Requis : ${titleData.minXP} XP`}
+                                        ${nextTitle && isUnlocked ? ` • ${xpNeeded} XP pour le niveau suivant` : ''}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        // Vérifier les succès après certaines actions
+        async function checkAndUpdateAchievements() {
+            await checkAchievements();
+            await updateAchievementsDisplay();
+            await updateGreeting();
+        }
+
         // ===== REFRESH UI =====
         async function refreshUI() {
             await renderCourses();
@@ -4169,6 +4496,7 @@ Cette action est irréversible.`);
             await initSchedule();
             await refreshUI();
             updateGreeting();
+            await updateAchievementsDisplay(); // Charger les succès
             
             // Démarrer la vérification automatique du streak à minuit
             scheduleStreakCheck();
