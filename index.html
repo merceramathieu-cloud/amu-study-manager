@@ -1951,7 +1951,7 @@
                 `;
 
                 let semesterTotal = 0;
-                let semesterCount = 0;
+                let semesterCoefTotal = 0;
 
                 for (const course of semesterCourses) {
                     const grades = await db.grades.where('courseId').equals(course.id).toArray();
@@ -1961,18 +1961,21 @@
                     const coefSum = grades.reduce((a, b) => a + (b.coef || 1), 0);
                     const avg = (weightedSum / coefSum).toFixed(2);
                     
-                    totalWeightedSum += parseFloat(avg);
-                    totalCoef++;
-                    semesterTotal += parseFloat(avg);
-                    semesterCount++;
+                    // Utiliser les ECTS comme coefficient du cours, sinon coefficient = 1
+                    const courseCoef = course.ects || 1;
+                    
+                    totalWeightedSum += parseFloat(avg) * courseCoef;
+                    totalCoef += courseCoef;
+                    semesterTotal += parseFloat(avg) * courseCoef;
+                    semesterCoefTotal += courseCoef;
                     
                     // Accumuler pour moyennes par semestre
                     if (isS1) {
-                        s1WeightedSum += parseFloat(avg);
-                        s1Coef++;
+                        s1WeightedSum += parseFloat(avg) * courseCoef;
+                        s1Coef += courseCoef;
                     } else {
-                        s2WeightedSum += parseFloat(avg);
-                        s2Coef++;
+                        s2WeightedSum += parseFloat(avg) * courseCoef;
+                        s2Coef += courseCoef;
                     }
 
                     // Calcul des stats
@@ -2057,8 +2060,8 @@
 
                 semesterHtml += '</div>';
 
-                if(semesterCount > 0) {
-                    const semesterAvg = (semesterTotal / semesterCount).toFixed(2);
+                if(semesterCoefTotal > 0) {
+                    const semesterAvg = (semesterTotal / semesterCoefTotal).toFixed(2);
                     semesterHtml = `
                         <div class="flex items-center gap-3 mb-4">
                             <h4 class="text-xl font-bold gradient-text">${semesterName}</h4>
