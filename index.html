@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>MyStudySpace Ultimate 🚀</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
@@ -130,6 +130,11 @@
         html {
             min-width: 320px;
             overflow-x: hidden;
+            /* Forcer le zoom à 100% */
+            zoom: 1.0;
+            -moz-transform: scale(1.0);
+            -webkit-transform: scale(1.0);
+            transform: scale(1.0);
         }
 
         body {
@@ -140,6 +145,12 @@
             -webkit-font-smoothing: antialiased;
             min-width: 320px;
             overflow-x: hidden;
+            /* Forcer le zoom à 100% */
+            zoom: 1.0;
+            -moz-transform: scale(1.0);
+            -webkit-transform: scale(1.0);
+            transform: scale(1.0);
+            transform-origin: top left;
         }
 
         input, select, textarea {
@@ -1507,6 +1518,30 @@
         let copiedScheduleCell = null;
         let currentWeekStart = getMonday(new Date());
         let selectedScheduleCell = null;
+
+        // ===== DÉTECTION ET CORRECTION DU ZOOM =====
+        function checkAndFixZoom() {
+            // Détecter si le viewport est trop petit
+            const viewportWidth = window.innerWidth;
+            const screenWidth = window.screen.width;
+            
+            console.log('📏 Dimensions:', {
+                viewport: viewportWidth,
+                screen: screenWidth,
+                ratio: viewportWidth / screenWidth
+            });
+            
+            // Si le viewport semble trop petit par rapport à l'écran, c'est probablement un zoom
+            if (viewportWidth < 900 && screenWidth > 1200) {
+                console.warn('⚠️ Zoom détecté - tentative de correction');
+                document.body.style.zoom = '1.0';
+                document.documentElement.style.zoom = '1.0';
+            }
+        }
+        
+        // Exécuter au chargement et au redimensionnement
+        window.addEventListener('load', checkAndFixZoom);
+        window.addEventListener('resize', checkAndFixZoom);
 
         // ===== SETTINGS & THEME =====
         async function loadSettings() {
