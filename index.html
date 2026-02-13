@@ -720,6 +720,7 @@
                         <div>
                             <p class="text-sm opacity-80">Série de travail</p>
                             <p class="text-4xl font-bold mt-2"><span id="streak-count">0</span> <i class="fas fa-fire streak-flame"></i></p>
+                            <p class="text-xs opacity-70 mt-1">Record : <span id="streak-record">0</span> jours 🏆</p>
                         </div>
                         <i class="fas fa-bolt text-5xl opacity-20"></i>
                     </div>
@@ -3245,11 +3246,81 @@
         }
 
         async function updateStreak() {
-            // Simulation de série basée sur les tâches complétées
-            const tasks = await db.tasks.toArray();
-            const completed = tasks.filter(t => t.completed).length;
-            const streak = Math.floor(completed / 3); // 1 jour par 3 tâches
-            document.getElementById('streak-count').innerText = streak;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Minuit du jour actuel
+            const todayStr = today.toISOString().split('T')[0];
+            
+            // Récupérer ou créer le record de streak
+            let streakData = await db.settings.get('streakData');
+            
+            if (!streakData) {
+                // Première visite - initialiser
+                streakData = {
+                    key: 'streakData',
+                    value: {
+                        currentStreak: 1,
+                        lastVisit: todayStr,
+                        longestStreak: 1
+                    }
+                };
+                await db.settings.put(streakData);
+            } else {
+                const lastVisit = new Date(streakData.value.lastVisit);
+                lastVisit.setHours(0, 0, 0, 0);
+                
+                const daysDiff = Math.floor((today - lastVisit) / (1000 * 60 * 60 * 24));
+                
+                if (daysDiff === 0) {
+                    // Même jour - ne rien faire
+                } else if (daysDiff === 1) {
+                    // Jour suivant - incrémenter le streak
+                    streakData.value.currentStreak++;
+                    streakData.value.lastVisit = todayStr;
+                    
+                    // Mettre à jour le record si nécessaire
+                    if (streakData.value.currentStreak > streakData.value.longestStreak) {
+                        streakData.value.longestStreak = streakData.value.currentStreak;
+                    }
+                    
+                    await db.settings.put(streakData);
+                    
+                    // Célébration pour les milestones
+                    if (streakData.value.currentStreak % 7 === 0) {
+                        showNotification(`🔥 ${streakData.value.currentStreak} jours de suite ! Continue comme ça !`);
+                        launchConfetti();
+                    }
+                } else {
+                    // Plus d'un jour - streak cassé, recommencer à 1
+                    streakData.value.currentStreak = 1;
+                    streakData.value.lastVisit = todayStr;
+                    await db.settings.put(streakData);
+                }
+            }
+            
+            // Afficher le streak actuel et le record
+            const currentStreakData = await db.settings.get('streakData');
+            if (currentStreakData) {
+                document.getElementById('streak-count').innerText = currentStreakData.value.currentStreak;
+                const recordEl = document.getElementById('streak-record');
+                if (recordEl) {
+                    recordEl.innerText = currentStreakData.value.longestStreak;
+                }
+            }
+        }
+        
+        // Vérifier le streak à minuit automatiquement
+        function scheduleStreakCheck() {
+            const now = new Date();
+            const tomorrow = new Date(now);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            tomorrow.setHours(0, 0, 1, 0); // 00:00:01 du lendemain
+            
+            const timeUntilMidnight = tomorrow - now;
+            
+            setTimeout(async () => {
+                await updateStreak();
+                scheduleStreakCheck(); // Reprogrammer pour le jour suivant
+            }, timeUntilMidnight);
         }
 
         // ===== QUICK ACTIONS =====
@@ -3624,6 +3695,9 @@ Cette action est irréversible.`);
             await initSchedule();
             await refreshUI();
             updateGreeting();
+            
+            // Démarrer la vérification automatique du streak à minuit
+            scheduleStreakCheck();
             
             // Style des boutons filtres
             document.querySelectorAll('.filter-btn').forEach(btn => {
