@@ -810,11 +810,34 @@
                 </div>
             </div>
 
-            <!-- Prochain cours -->
+            <!-- Prochain cours + semaine -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="card rounded-lg p-6 shadow-lg">
+                    <h3 class="text-xl font-bold mb-4">📅 Aujourd'hui</h3>
+                    <div id="today-schedule" class="space-y-2">
+                        <p class="text-sm opacity-70">Chargement du planning...</p>
+                    </div>
+                </div>
+                <div class="card rounded-lg p-6 shadow-lg">
+                    <h3 class="text-xl font-bold mb-4">📊 Cette semaine</h3>
+                    <div id="week-summary" class="space-y-2">
+                        <p class="text-sm opacity-70">Chargement...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progression du semestre -->
             <div class="card rounded-lg p-6 shadow-lg">
-                <h3 class="text-xl font-bold mb-4">📅 Aujourd'hui</h3>
-                <div id="today-schedule" class="space-y-2">
-                    <p class="text-sm opacity-70">Chargement du planning...</p>
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="text-xl font-bold">🗓️ Progression du semestre</h3>
+                    <span id="semester-percent" class="text-sm font-bold" style="color:var(--primary);">--</span>
+                </div>
+                <div class="progress-bar mb-2">
+                    <div class="progress-fill" id="semester-progress-bar" style="width:0%"></div>
+                </div>
+                <div class="flex justify-between text-xs opacity-50">
+                    <span id="semester-start-label">Début</span>
+                    <span id="semester-end-label">Fin</span>
                 </div>
             </div>
         </div>
@@ -822,19 +845,57 @@
         <!-- COURS & FICHIERS AMÉLIORÉS -->
         <div id="courses" class="tab-content space-y-6">
             <div class="card shadow-lg rounded-lg p-6">
-                <div class="flex justify-between items-center mb-6">
+                <!-- Barre titre + actions -->
+                <div class="flex flex-wrap justify-between items-center gap-3 mb-5">
                     <h3 class="text-2xl font-bold gradient-text">📚 Mes Matières</h3>
-                    <button onclick="openCourseModal()" class="px-6 py-2 rounded-lg font-medium text-white" style="background: linear-gradient(135deg, var(--primary), var(--secondary));">
-                        <i class="fas fa-plus mr-2"></i> Nouveau Cours
-                    </button>
+                    <div class="flex flex-wrap gap-2">
+                        <!-- Recherche -->
+                        <div class="relative hidden sm:block">
+                            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-xs opacity-40"></i>
+                            <input type="text" id="courseSearch" placeholder="Rechercher..." oninput="searchCourses(this.value)"
+                                class="pl-8 pr-3 py-2 text-sm border rounded-lg" style="border-color:var(--border); width:160px;">
+                        </div>
+                        <!-- Vue grille/liste -->
+                        <button onclick="toggleCoursesView()" id="coursesViewBtn" title="Changer la vue"
+                            class="px-3 py-2 rounded-lg border text-sm" style="border-color:var(--border);">
+                            <i class="fas fa-th-large"></i>
+                        </button>
+                        <!-- Supprimer tous -->
+                        <button onclick="deleteAllCourses()" title="Supprimer tous les cours"
+                            class="px-3 py-2 rounded-lg border text-sm text-red-500 hover:bg-red-50 transition" style="border-color:#fca5a5;">
+                            <i class="fas fa-trash-alt mr-1"></i><span class="hidden sm:inline">Tout supprimer</span>
+                        </button>
+                        <!-- Trier -->
+                        <select id="coursesSortSelect" onchange="renderCourses()" class="px-3 py-2 text-sm border rounded-lg" style="border-color:var(--border);">
+                            <option value="name">Trier : A→Z</option>
+                            <option value="avg">Trier : Moyenne</option>
+                            <option value="semester">Trier : Semestre</option>
+                        </select>
+                        <!-- Nouveau cours -->
+                        <button onclick="openCourseModal()" class="px-4 py-2 rounded-lg font-medium text-white text-sm" style="background: linear-gradient(135deg, var(--primary), var(--secondary));">
+                            <i class="fas fa-plus mr-1"></i> Nouveau
+                        </button>
+                    </div>
                 </div>
 
-                <!-- Filtres -->
-                <div class="flex gap-3 mb-6">
-                    <button onclick="filterCourses('all')" class="filter-btn active px-4 py-2 rounded-lg transition" data-filter="all">Tous</button>
-                    <button onclick="filterCourses('S1')" class="filter-btn px-4 py-2 rounded-lg transition" data-filter="S1">Semestre 1</button>
-                    <button onclick="filterCourses('S2')" class="filter-btn px-4 py-2 rounded-lg transition" data-filter="S2">Semestre 2</button>
+                <!-- Recherche mobile -->
+                <div class="sm:hidden mb-4">
+                    <div class="relative">
+                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-xs opacity-40"></i>
+                        <input type="text" placeholder="Rechercher un cours..." oninput="searchCourses(this.value)"
+                            class="w-full pl-8 pr-3 py-2 text-sm border rounded-lg" style="border-color:var(--border);">
+                    </div>
                 </div>
+
+                <!-- Filtres semestre -->
+                <div class="flex gap-2 mb-5 flex-wrap">
+                    <button onclick="filterCourses('all')" class="filter-btn active px-3 py-1.5 rounded-lg transition text-sm" data-filter="all">Tous</button>
+                    <button onclick="filterCourses('S1')" class="filter-btn px-3 py-1.5 rounded-lg transition text-sm" data-filter="S1">📘 S1</button>
+                    <button onclick="filterCourses('S2')" class="filter-btn px-3 py-1.5 rounded-lg transition text-sm" data-filter="S2">📗 S2</button>
+                </div>
+
+                <!-- Compteur -->
+                <div id="coursesCount" class="text-xs opacity-50 mb-4"></div>
 
                 <div id="coursesList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </div>
@@ -1065,33 +1126,114 @@
                 </div>
             </div>
 
+            <!-- Apparence avancée -->
+            <div class="mb-6">
+                <h4 class="font-bold mb-3">🖌️ Apparence avancée</h4>
+                <div class="grid grid-cols-2 gap-3 mb-3">
+                    <div>
+                        <label class="block text-xs font-medium mb-1 opacity-70">Couleur principale</label>
+                        <div class="flex items-center gap-2 p-2 border rounded-lg" style="border-color:var(--border);">
+                            <input type="color" id="customPrimaryColor" value="#3b82f6" onchange="applyCustomColor('primary', this.value)" class="w-8 h-8 rounded cursor-pointer border-0">
+                            <span class="text-xs opacity-60">Primaire</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium mb-1 opacity-70">Couleur accent</label>
+                        <div class="flex items-center gap-2 p-2 border rounded-lg" style="border-color:var(--border);">
+                            <input type="color" id="customAccentColor" value="#ec4899" onchange="applyCustomColor('accent', this.value)" class="w-8 h-8 rounded cursor-pointer border-0">
+                            <span class="text-xs opacity-60">Accent</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="block text-xs font-medium mb-2 opacity-70">Police d'affichage</label>
+                    <select id="fontSelect" onchange="applyFont(this.value)" class="w-full p-2 border rounded-lg text-sm" style="border-color:var(--border);">
+                        <option value="Segoe UI">Segoe UI (défaut)</option>
+                        <option value="'Poppins', sans-serif">Poppins</option>
+                        <option value="'Inter', sans-serif">Inter</option>
+                        <option value="'Roboto', sans-serif">Roboto</option>
+                        <option value="'Nunito', sans-serif">Nunito</option>
+                        <option value="monospace">Monospace</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium mb-2 opacity-70">Densité de l'interface</label>
+                    <div class="flex gap-2">
+                        <button onclick="setDensity('compact')" class="flex-1 py-2 text-xs rounded-lg border transition hover:border-blue-400" style="border-color:var(--border);" id="density-compact">Compact</button>
+                        <button onclick="setDensity('normal')" class="flex-1 py-2 text-xs rounded-lg border transition hover:border-blue-400" style="border-color:var(--primary); background:var(--primary); color:white;" id="density-normal">Normal</button>
+                        <button onclick="setDensity('comfortable')" class="flex-1 py-2 text-xs rounded-lg border transition hover:border-blue-400" style="border-color:var(--border);" id="density-comfortable">Confortable</button>
+                    </div>
+                </div>
+            </div>
+
             <!-- Options -->
             <div class="mb-6">
                 <h4 class="font-bold mb-3">🎯 Options</h4>
                 <label class="flex items-center justify-between mb-3 p-3 rounded-lg card cursor-pointer">
-                    <span>Animations</span>
+                    <div>
+                        <span class="font-medium">Animations</span>
+                        <p class="text-xs opacity-50">Transitions et effets visuels</p>
+                    </div>
                     <input type="checkbox" id="animationsToggle" checked class="w-5 h-5">
                 </label>
                 <label class="flex items-center justify-between mb-3 p-3 rounded-lg card cursor-pointer">
-                    <span>Notifications</span>
+                    <div>
+                        <span class="font-medium">Notifications</span>
+                        <p class="text-xs opacity-50">Confirmations d'actions</p>
+                    </div>
                     <input type="checkbox" id="notificationsToggle" checked class="w-5 h-5">
                 </label>
                 <label class="flex items-center justify-between mb-3 p-3 rounded-lg card cursor-pointer">
-                    <span>Confettis de réussite</span>
+                    <div>
+                        <span class="font-medium">Confettis 🎉</span>
+                        <p class="text-xs opacity-50">Célébration des bonnes notes</p>
+                    </div>
                     <input type="checkbox" id="confettiToggle" checked class="w-5 h-5">
                 </label>
+                <label class="flex items-center justify-between mb-3 p-3 rounded-lg card cursor-pointer">
+                    <div>
+                        <span class="font-medium">Afficher le type de cours</span>
+                        <p class="text-xs opacity-50">CM, TD, TP sur le planning</p>
+                    </div>
+                    <input type="checkbox" id="showCourseTypeToggle" checked class="w-5 h-5">
+                </label>
+                <label class="flex items-center justify-between p-3 rounded-lg card cursor-pointer">
+                    <div>
+                        <span class="font-medium">Mode focus</span>
+                        <p class="text-xs opacity-50">Masque les éléments non essentiels</p>
+                    </div>
+                    <input type="checkbox" id="focusModeToggle" class="w-5 h-5" onchange="toggleFocusMode(this.checked)">
+                </label>
+            </div>
+
+            <!-- Raccourcis clavier -->
+            <div class="mb-6">
+                <h4 class="font-bold mb-3">⌨️ Raccourcis clavier</h4>
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                    <div class="p-2 rounded" style="background:var(--border);"><kbd class="font-mono font-bold">Alt+1</kbd> → Dashboard</div>
+                    <div class="p-2 rounded" style="background:var(--border);"><kbd class="font-mono font-bold">Alt+2</kbd> → Cours</div>
+                    <div class="p-2 rounded" style="background:var(--border);"><kbd class="font-mono font-bold">Alt+3</kbd> → Planning</div>
+                    <div class="p-2 rounded" style="background:var(--border);"><kbd class="font-mono font-bold">Alt+4</kbd> → Notes</div>
+                    <div class="p-2 rounded" style="background:var(--border);"><kbd class="font-mono font-bold">Alt+5</kbd> → Stats</div>
+                    <div class="p-2 rounded" style="background:var(--border);"><kbd class="font-mono font-bold">Alt+6</kbd> → Tâches</div>
+                </div>
             </div>
 
             <!-- Actions -->
             <div class="mb-6">
                 <h4 class="font-bold mb-3">💾 Données</h4>
-                <button onclick="exportAllData()" class="w-full mb-2 px-4 py-3 rounded-lg border hover:bg-green-50" style="border-color: var(--border);">
-                    <i class="fas fa-download mr-2"></i> Exporter toutes mes données
+                <div class="grid grid-cols-2 gap-2 mb-2">
+                    <button onclick="exportAllData()" class="px-4 py-3 rounded-lg border hover:bg-green-50 text-sm transition" style="border-color: var(--border);">
+                        <i class="fas fa-download mr-2"></i> Exporter
+                    </button>
+                    <button onclick="importData()" class="px-4 py-3 rounded-lg border hover:bg-blue-50 text-sm transition" style="border-color: var(--border);">
+                        <i class="fas fa-upload mr-2"></i> Importer
+                    </button>
+                </div>
+                <button onclick="deleteAllCourses()" class="w-full mb-2 px-4 py-3 rounded-lg border text-orange-600 hover:bg-orange-50 text-sm transition" style="border-color: #fed7aa;">
+                    <i class="fas fa-trash-alt mr-2"></i> Supprimer tous les cours
                 </button>
-                <button onclick="importData()" class="w-full mb-2 px-4 py-3 rounded-lg border hover:bg-blue-50" style="border-color: var(--border);">
-                    <i class="fas fa-upload mr-2"></i> Importer des données
-                </button>
-                <button onclick="resetApp()" class="w-full px-4 py-3 rounded-lg border border-red-300 hover:bg-red-50 text-red-600">
+                <button onclick="resetApp()" class="w-full px-4 py-3 rounded-lg border border-red-300 hover:bg-red-50 text-red-600 text-sm transition">
                     <i class="fas fa-exclamation-triangle mr-2"></i> Réinitialiser l'application
                 </button>
             </div>
@@ -1528,14 +1670,32 @@
         }
 
         async function renderCourses() {
-            const courses = await db.courses.toArray();
+            let courses = await db.courses.toArray();
             const container = document.getElementById('coursesList');
             const select = document.getElementById('gradeCourseSelect');
-            
+
             container.innerHTML = '';
             select.innerHTML = '<option value="">Choisir une matière...</option>';
 
-            // Grouper par semestre
+            // Tri selon sélection
+            const sortVal = document.getElementById('coursesSortSelect')?.value || 'name';
+            if (sortVal === 'name') {
+                courses.sort((a, b) => a.name.localeCompare(b.name));
+            } else if (sortVal === 'semester') {
+                courses.sort((a, b) => a.semester.localeCompare(b.semester) || a.name.localeCompare(b.name));
+            } else if (sortVal === 'avg') {
+                const avgs = {};
+                for (const c of courses) {
+                    const g = await db.grades.where('courseId').equals(c.id).toArray();
+                    avgs[c.id] = g.length > 0 ? g.reduce((a,b) => a + b.value*(b.coef||1),0) / g.reduce((a,b) => a+(b.coef||1),0) : -1;
+                }
+                courses.sort((a, b) => avgs[b.id] - avgs[a.id]);
+            }
+
+            // Compteur
+            const countEl = document.getElementById('coursesCount');
+            if (countEl) countEl.textContent = `${courses.length} cours au total`;
+
             const s1Courses = courses.filter(c => c.semester === 'S1');
             const s2Courses = courses.filter(c => c.semester === 'S2');
 
@@ -1990,16 +2150,29 @@
                                 coveredCells.add(`${gridCol}-${gridRow + s}`);
                             }
 
+                            // Extraire le type de cours depuis les notes (SUMMARY d'origine ADE)
+                            const showType = document.getElementById('showCourseTypeToggle')?.checked !== false;
+                            let courseType = '';
+                            if (showType && event.notes) {
+                                const typeMatch = event.notes.match(/-(\s*)(CM\d?|TD\d?|TP\d?|Cours|Exam)/i);
+                                if (typeMatch) courseType = typeMatch[2].toUpperCase();
+                            }
+
                             cell.innerHTML = `
                                 <div class="p-2 rounded h-full cursor-pointer" style="background:${displayColor}25; border-left:3px solid ${displayColor};">
                                     <div class="flex justify-between items-start">
-                                        <div class="font-bold text-sm leading-tight" style="color:${displayColor};">${displayName}</div>
-                                        <button class="edit-event-btn opacity-0 group-hover:opacity-100 transition ml-1 flex-shrink-0 w-5 h-5 rounded text-xs flex items-center justify-center" style="background:${displayColor}; color:white;" title="Modifier">
-                                            <i class="fas fa-pen" style="font-size:0.55rem;"></i>
-                                        </button>
+                                        <div class="font-bold text-sm leading-tight flex-1 min-w-0" style="color:${displayColor};">
+                                            <span class="truncate block">${displayName}</span>
+                                        </div>
+                                        <div class="flex items-center gap-1 ml-1 flex-shrink-0">
+                                            ${courseType ? `<span class="text-white text-xs rounded px-1 font-bold" style="background:${displayColor}; font-size:0.6rem;">${courseType}</span>` : ''}
+                                            <button class="edit-event-btn opacity-0 group-hover:opacity-100 transition w-5 h-5 rounded text-xs flex items-center justify-center" style="background:${displayColor}; color:white;" title="Modifier">
+                                                <i class="fas fa-pen" style="font-size:0.55rem;"></i>
+                                            </button>
+                                        </div>
                                     </div>
                                     <div class="text-xs opacity-70 mt-1">${event.startTime} – ${event.endTime}</div>
-                                    ${event.location ? `<div class="text-xs opacity-60 mt-1 truncate"><i class="fas fa-map-marker-alt mr-1"></i>${event.location}</div>` : ''}
+                                    ${event.location ? `<div class="text-xs opacity-60 mt-0.5 truncate"><i class="fas fa-map-marker-alt mr-1"></i>${event.location}</div>` : ''}
                                 </div>`;
 
                             // Clic sur le crayon → édition
@@ -2188,22 +2361,40 @@
                 return;
             }
 
-            // Récupérer ou créer les matières dans la DB
-            const existingCourses = await db.courses.toArray();
-            const courseMap = {}; // name -> id
+            // ── Construire le courseMap : nom normalisé → id ────────────────
+            // On recharge la DB à chaque import pour éviter les doublons
+            // même si on ré-importe plusieurs semaines à la suite.
+            const normalize = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim();
 
+            const courseMap = {}; // nom normalisé → id
+
+            // Collecter tous les noms uniques de l'import
+            const uniqueNames = {}; // nom normalisé → nom original (première occurrence)
             for (const ev of events) {
-                const name = cleanCourseName(ev.summary, ev.description);
-                if (!courseMap[name]) {
-                    let found = existingCourses.find(c => c.name.toLowerCase() === name.toLowerCase());
-                    if (!found) {
-                        const colors = ['#3b82f6','#8b5cf6','#ec4899','#22c55e','#f59e0b','#ef4444','#06b6d4','#f97316'];
-                        const color = colors[Object.keys(courseMap).length % colors.length];
-                        const id = await db.courses.add({ name, semester: 'S2', color, emoji: '🎓' });
-                        courseMap[name] = id;
-                    } else {
-                        courseMap[name] = found.id;
-                    }
+                const raw  = cleanCourseName(ev.summary, ev.description);
+                const key  = normalize(raw);
+                if (!uniqueNames[key]) uniqueNames[key] = raw;
+            }
+
+            // Pour chaque nom unique, chercher ou créer le cours en DB
+            const colors = ['#3b82f6','#8b5cf6','#ec4899','#22c55e','#f59e0b','#ef4444','#06b6d4','#f97316'];
+            let colorIdx = 0;
+
+            for (const [key, originalName] of Object.entries(uniqueNames)) {
+                // Recharger les cours depuis la DB à chaque itération
+                // pour prendre en compte ceux créés juste avant dans cette boucle
+                const allCourses = await db.courses.toArray();
+                const found = allCourses.find(c => normalize(c.name) === key);
+
+                if (found) {
+                    // Cours déjà existant → on réutilise son id, rien à créer
+                    courseMap[key] = found.id;
+                } else {
+                    // Nouveau cours → on le crée une seule fois
+                    const color = colors[colorIdx % colors.length];
+                    colorIdx++;
+                    const id = await db.courses.add({ name: originalName, semester: 'S2', color, emoji: '🎓' });
+                    courseMap[key] = id;
                 }
             }
 
@@ -2211,9 +2402,9 @@
             let skipped = 0;
 
             for (const ev of events) {
-                const name = cleanCourseName(ev.summary, ev.description);
-                const courseId = courseMap[name];
-                
+                const name     = cleanCourseName(ev.summary, ev.description);
+                const courseId = courseMap[normalize(name)];
+
                 // Calculer lundi de la semaine de cet event
                 const evMonday = getMonday(ev.dtstart);
                 const weekStartStr = evMonday.toISOString().split('T')[0];
@@ -2825,6 +3016,8 @@
         async function updateDashboard() {
             await updateTodaySchedule();
             await updateStreak();
+            await updateWeekSummary();
+            updateSemesterProgress();
         }
 
         async function updateStreak() {
@@ -2944,6 +3137,191 @@
             }
         }
 
+        // ===== SUPPRESSION EN MASSE DES COURS =====
+        async function deleteAllCourses() {
+            const courses = await db.courses.toArray();
+            if (courses.length === 0) return showNotification('ℹ️ Aucun cours à supprimer');
+
+            const confirmed = confirm(`⚠️ Supprimer les ${courses.length} cours et toutes leurs notes/fichiers ?
+
+Cette action est irréversible.`);
+            if (!confirmed) return;
+            const doubleConfirm = confirm('❗ Dernière confirmation : vraiment tout supprimer ?');
+            if (!doubleConfirm) return;
+
+            for (const course of courses) {
+                await db.grades.where('courseId').equals(course.id).delete();
+                await db.files.where('courseId').equals(course.id).delete();
+            }
+            await db.courses.clear();
+            await db.scheduleEvents.clear();
+            showNotification('🗑️ Tous les cours supprimés');
+            await refreshUI();
+        }
+
+        // ===== RECHERCHE COURS =====
+        function searchCourses(query) {
+            const q = query.toLowerCase().trim();
+            document.querySelectorAll('.course-card').forEach(card => {
+                const name = card.querySelector('h4')?.textContent?.toLowerCase() || '';
+                card.style.display = (!q || name.includes(q)) ? '' : 'none';
+            });
+        }
+
+        // ===== VUE GRILLE / LISTE =====
+        let coursesViewMode = 'grid';
+        function toggleCoursesView() {
+            coursesViewMode = coursesViewMode === 'grid' ? 'list' : 'grid';
+            const list = document.getElementById('coursesList');
+            const btn  = document.getElementById('coursesViewBtn');
+            if (coursesViewMode === 'list') {
+                list.classList.remove('md:grid-cols-2');
+                list.classList.add('grid-cols-1');
+                btn.innerHTML = '<i class="fas fa-th-large"></i>';
+            } else {
+                list.classList.add('md:grid-cols-2');
+                list.classList.remove('grid-cols-1');
+                btn.innerHTML = '<i class="fas fa-list"></i>';
+            }
+        }
+
+        // ===== COULEURS PERSONNALISÉES =====
+        function applyCustomColor(type, value) {
+            if (type === 'primary') {
+                document.documentElement.style.setProperty('--primary', value);
+                setSetting('customPrimary', value);
+            } else {
+                document.documentElement.style.setProperty('--accent', value);
+                setSetting('customAccent', value);
+            }
+        }
+
+        // ===== POLICE =====
+        function applyFont(font) {
+            document.body.style.fontFamily = font;
+            setSetting('fontFamily', font);
+        }
+
+        // ===== DENSITÉ =====
+        function setDensity(mode) {
+            setSetting('density', mode);
+            const root = document.documentElement;
+            ['compact', 'normal', 'comfortable'].forEach(m => {
+                const btn = document.getElementById(`density-${m}`);
+                if (btn) {
+                    btn.style.background = m === mode ? 'var(--primary)' : '';
+                    btn.style.color      = m === mode ? 'white' : '';
+                    btn.style.borderColor = m === mode ? 'var(--primary)' : 'var(--border)';
+                }
+            });
+            if (mode === 'compact') {
+                root.style.setProperty('--spacing', '0.75rem');
+                document.querySelectorAll('.p-6').forEach(el => el.classList.replace('p-6', 'p-4'));
+                document.querySelectorAll('.p-5').forEach(el => el.classList.replace('p-5', 'p-3'));
+            } else if (mode === 'comfortable') {
+                root.style.setProperty('--spacing', '1.5rem');
+            }
+        }
+
+        // ===== MODE FOCUS =====
+        function toggleFocusMode(on) {
+            setSetting('focusMode', on);
+            document.querySelectorAll('.stat-card, .floating-action').forEach(el => {
+                el.style.opacity = on ? '0' : '';
+                el.style.pointerEvents = on ? 'none' : '';
+            });
+            showNotification(on ? '🎯 Mode focus activé' : '🔓 Mode focus désactivé');
+        }
+
+        // ===== RACCOURCIS CLAVIER =====
+        document.addEventListener('keydown', (e) => {
+            if (!e.altKey) return;
+            const tabs = ['dashboard','courses','schedule','grades','stats','tasks'];
+            const idx = parseInt(e.key) - 1;
+            if (idx >= 0 && idx < tabs.length) {
+                e.preventDefault();
+                showTab(tabs[idx]);
+            }
+        });
+
+        // ===== RÉSUMÉ SEMAINE =====
+        async function updateWeekSummary() {
+            const container = document.getElementById('week-summary');
+            if (!container) return;
+            const weekStartStr = currentWeekStart.toISOString().split('T')[0];
+            const events = await db.scheduleEvents.where('weekStart').equals(weekStartStr).toArray();
+            const courses = await db.courses.toArray();
+
+            if (events.length === 0) {
+                container.innerHTML = '<p class="text-sm opacity-50 italic">Aucun cours cette semaine</p>';
+                return;
+            }
+
+            const byDay = ['Lun','Mar','Mer','Jeu','Ven'];
+            const grouped = {};
+            for (const ev of events) {
+                const label = byDay[ev.day] || '?';
+                if (!grouped[label]) grouped[label] = [];
+                const course = courses.find(c => c.id === ev.courseId);
+                const name = course ? course.name : (ev.freeName || 'Cours');
+                grouped[label].push({ name, startTime: ev.startTime, color: course?.color || ev.freeColor || '#3b82f6' });
+            }
+
+            container.innerHTML = Object.entries(grouped).map(([day, evts]) => `
+                <div class="flex items-center gap-3 text-sm">
+                    <span class="font-bold w-8 text-xs opacity-60">${day}</span>
+                    <div class="flex flex-wrap gap-1">
+                        ${evts.map(ev => `<span class="px-2 py-0.5 rounded text-xs text-white font-medium" style="background:${ev.color};">${ev.name.substring(0,15)}${ev.name.length>15?'…':''}</span>`).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ===== PROGRESSION SEMESTRE =====
+        function updateSemesterProgress() {
+            const now = new Date();
+            // Semestre 2 typique : début janvier, fin juin
+            const semStart = new Date(now.getFullYear(), 0, 13);  // 13 jan
+            const semEnd   = new Date(now.getFullYear(), 5, 30);  // 30 juin
+            const total  = semEnd - semStart;
+            const elapsed = Math.max(0, Math.min(now - semStart, total));
+            const pct = Math.round((elapsed / total) * 100);
+
+            const bar   = document.getElementById('semester-progress-bar');
+            const label = document.getElementById('semester-percent');
+            const startLbl = document.getElementById('semester-start-label');
+            const endLbl   = document.getElementById('semester-end-label');
+            if (bar) bar.style.width = pct + '%';
+            if (label) label.textContent = pct + '%';
+            if (startLbl) startLbl.textContent = semStart.toLocaleDateString('fr-FR', { day:'numeric', month:'short' });
+            if (endLbl)   endLbl.textContent   = semEnd.toLocaleDateString('fr-FR', { day:'numeric', month:'short' });
+        }
+
+        // ===== CHARGEMENT DES PREFS VISUELLES =====
+        async function loadVisualPrefs() {
+            const customPrimary = await getSetting('customPrimary');
+            const customAccent  = await getSetting('customAccent');
+            const fontFamily    = await getSetting('fontFamily');
+            const density       = await getSetting('density') || 'normal';
+
+            if (customPrimary) {
+                document.documentElement.style.setProperty('--primary', customPrimary);
+                const el = document.getElementById('customPrimaryColor');
+                if (el) el.value = customPrimary;
+            }
+            if (customAccent) {
+                document.documentElement.style.setProperty('--accent', customAccent);
+                const el = document.getElementById('customAccentColor');
+                if (el) el.value = customAccent;
+            }
+            if (fontFamily) {
+                document.body.style.fontFamily = fontFamily;
+                const el = document.getElementById('fontSelect');
+                if (el) el.value = fontFamily;
+            }
+            setDensity(density);
+        }
+
         // ===== REFRESH UI =====
         async function refreshUI() {
             await renderCourses();
@@ -2955,6 +3333,7 @@
         // ===== INIT =====
         (async () => {
             await loadSettings();
+            await loadVisualPrefs();
             await initSchedule();
             await refreshUI();
             updateGreeting();
