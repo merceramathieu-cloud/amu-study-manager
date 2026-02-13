@@ -4230,17 +4230,145 @@ Cette action est irréversible.`);
 
         // ===== SYSTÈME DE SUCCÈS ET TITRES =====
         
-        // Définition des succès
+        // Définition des succès avec progression
         const ACHIEVEMENTS = [
-            { id: 'first-step', name: 'Premier Pas', desc: 'Créer votre première tâche', icon: '🎯', xp: 10, condition: () => checkTaskCount(1) },
-            { id: 'studious', name: 'Studieux', desc: 'Compléter 10 tâches', icon: '📝', xp: 50, condition: () => checkCompletedTasks(10) },
-            { id: 'marathonian', name: 'Marathonien', desc: '7 jours de suite actif', icon: '💧', xp: 100, condition: () => checkStreak(7) },
-            { id: 'file-master', name: 'Archiviste', desc: 'Stocker 20 fichiers', icon: '📂', xp: 75, condition: () => checkFileCount(20) },
-            { id: 'excellence', name: 'Excellence', desc: 'Obtenir une moyenne de 18+', icon: '🌟', xp: 150, condition: () => checkAverage(18) },
-            { id: 'organized', name: 'Organisé', desc: 'Créer 5 cours', icon: '📚', xp: 30, condition: () => checkCourseCount(5) },
-            { id: 'perfectionist', name: 'Perfectionniste', desc: '10 notes au-dessus de 15', icon: '💯', xp: 120, condition: () => checkHighGrades(10, 15) },
-            { id: 'productive', name: 'Productif', desc: '50 tâches complétées', icon: '⚡', xp: 200, condition: () => checkCompletedTasks(50) },
-            { id: 'legend', name: 'Légende', desc: '100 tâches complétées', icon: '👑', xp: 500, condition: () => checkCompletedTasks(100) }
+            { 
+                id: 'first-step', 
+                name: 'Premier Pas', 
+                desc: 'Créer votre première tâche', 
+                icon: '🎯', 
+                xp: 10, 
+                target: 1,
+                condition: () => checkTaskCount(1),
+                progress: async () => {
+                    const tasks = await db.tasks.toArray();
+                    return { current: tasks.length, target: 1 };
+                }
+            },
+            { 
+                id: 'studious', 
+                name: 'Studieux', 
+                desc: 'Compléter 10 tâches', 
+                icon: '📝', 
+                xp: 50, 
+                target: 10,
+                condition: () => checkCompletedTasks(10),
+                progress: async () => {
+                    const tasks = await db.tasks.where('status').equals('done').toArray();
+                    return { current: tasks.length, target: 10 };
+                }
+            },
+            { 
+                id: 'marathonian', 
+                name: 'Marathonien', 
+                desc: '7 jours de suite actif', 
+                icon: '💧', 
+                xp: 100, 
+                target: 7,
+                condition: () => checkStreak(7),
+                progress: async () => {
+                    const streak = await getSetting('streak') || 1;
+                    return { current: Math.min(streak, 7), target: 7 };
+                }
+            },
+            { 
+                id: 'file-master', 
+                name: 'Archiviste', 
+                desc: 'Stocker 20 fichiers', 
+                icon: '📂', 
+                xp: 75, 
+                target: 20,
+                condition: () => checkFileCount(20),
+                progress: async () => {
+                    const files = await db.files.toArray();
+                    return { current: files.length, target: 20 };
+                }
+            },
+            { 
+                id: 'excellence', 
+                name: 'Excellence', 
+                desc: 'Obtenir une moyenne de 18+', 
+                icon: '🌟', 
+                xp: 150, 
+                target: 18,
+                condition: () => checkAverage(18),
+                progress: async () => {
+                    const courses = await db.courses.toArray();
+                    if (courses.length === 0) return { current: 0, target: 18, isAverage: true };
+                    
+                    let totalAvg = 0;
+                    let count = 0;
+                    
+                    for (const course of courses) {
+                        const grades = await db.grades.where('courseId').equals(course.id).toArray();
+                        if (grades.length > 0) {
+                            let sum = 0, coefSum = 0;
+                            grades.forEach(g => {
+                                sum += g.value * g.coef;
+                                coefSum += g.coef;
+                            });
+                            totalAvg += sum / coefSum;
+                            count++;
+                        }
+                    }
+                    
+                    const avg = count > 0 ? totalAvg / count : 0;
+                    return { current: Math.round(avg * 10) / 10, target: 18, isAverage: true };
+                }
+            },
+            { 
+                id: 'organized', 
+                name: 'Organisé', 
+                desc: 'Créer 5 cours', 
+                icon: '📚', 
+                xp: 30, 
+                target: 5,
+                condition: () => checkCourseCount(5),
+                progress: async () => {
+                    const courses = await db.courses.toArray();
+                    return { current: courses.length, target: 5 };
+                }
+            },
+            { 
+                id: 'perfectionist', 
+                name: 'Perfectionniste', 
+                desc: '10 notes au-dessus de 15', 
+                icon: '💯', 
+                xp: 120, 
+                target: 10,
+                condition: () => checkHighGrades(10, 15),
+                progress: async () => {
+                    const grades = await db.grades.toArray();
+                    const highGrades = grades.filter(g => g.value >= 15);
+                    return { current: highGrades.length, target: 10 };
+                }
+            },
+            { 
+                id: 'productive', 
+                name: 'Productif', 
+                desc: '50 tâches complétées', 
+                icon: '⚡', 
+                xp: 200, 
+                target: 50,
+                condition: () => checkCompletedTasks(50),
+                progress: async () => {
+                    const tasks = await db.tasks.where('status').equals('done').toArray();
+                    return { current: tasks.length, target: 50 };
+                }
+            },
+            { 
+                id: 'legend', 
+                name: 'Légende', 
+                desc: '100 tâches complétées', 
+                icon: '👑', 
+                xp: 500, 
+                target: 100,
+                condition: () => checkCompletedTasks(100),
+                progress: async () => {
+                    const tasks = await db.tasks.where('status').equals('done').toArray();
+                    return { current: tasks.length, target: 100 };
+                }
+            }
         ];
 
         // Définition des titres par niveau
@@ -4416,8 +4544,18 @@ Cette action est irréversible.`);
             document.getElementById('xp-progress-bar').style.width = Math.min(xpProgress, 100) + '%';
             
             // Génération des cartes de succès
-            grid.innerHTML = ACHIEVEMENTS.map(achievement => {
+            const achievementsWithProgress = await Promise.all(
+                ACHIEVEMENTS.map(async (achievement) => {
+                    const progress = achievement.progress ? await achievement.progress() : null;
+                    return { ...achievement, progressData: progress };
+                })
+            );
+            
+            grid.innerHTML = achievementsWithProgress.map(achievement => {
                 const isUnlocked = unlocked.includes(achievement.id);
+                const prog = achievement.progressData;
+                const percentage = prog ? Math.min((prog.current / prog.target) * 100, 100) : 0;
+                
                 return `
                     <div class="card p-4 ${isUnlocked ? '' : 'opacity-50'}" style="border: 2px solid ${isUnlocked ? 'var(--primary)' : 'var(--border)'};">
                         <div class="flex items-start justify-between mb-3">
@@ -4427,7 +4565,22 @@ Cette action est irréversible.`);
                             </div>
                         </div>
                         <h4 class="font-bold text-lg mb-1">${achievement.name}</h4>
-                        <p class="text-sm opacity-70 mb-2">${achievement.desc}</p>
+                        <p class="text-sm opacity-70 mb-3">${achievement.desc}</p>
+                        
+                        ${!isUnlocked && prog ? `
+                            <div class="mb-3">
+                                <div class="flex justify-between text-xs mb-1 font-semibold">
+                                    <span style="color: var(--primary);">Progression</span>
+                                    <span style="color: var(--primary);">
+                                        ${prog.isAverage ? `${prog.current}/20` : `${prog.current}/${prog.target}`}
+                                    </span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden" style="background: var(--border);">
+                                    <div class="h-full rounded-full transition-all duration-500" style="width: ${percentage}%; background: linear-gradient(90deg, var(--primary), var(--secondary));"></div>
+                                </div>
+                            </div>
+                        ` : ''}
+                        
                         <div class="flex items-center gap-2 text-sm font-bold" style="color: var(--primary);">
                             <i class="fas fa-star"></i>
                             <span>${achievement.xp} XP</span>
