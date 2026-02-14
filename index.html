@@ -13,7 +13,9 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;0,14..32,900&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;0,14..32,900&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;600&family=Outfit:wght@300;400;500;600;700;800;900&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+    <!-- GSAP for premium animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <style>
         /* ═══════════════════════════════════════════════
            DESIGN SYSTEM — THÈMES
@@ -989,9 +991,769 @@
             box-shadow: var(--shadow-sm);
         }
         .quick-action-card:active { transform: translateY(0); }
+
+        /* ══════════════════════════════════════════════════
+           🆕 AURORA BACKGROUND EFFECT
+        ══════════════════════════════════════════════════ */
+        .aurora-bg {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .aurora-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.12;
+            animation: auroraMove 18s ease-in-out infinite;
+        }
+        .aurora-blob:nth-child(1) {
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, var(--primary), transparent);
+            top: -200px; left: -150px;
+            animation-delay: 0s;
+        }
+        .aurora-blob:nth-child(2) {
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, var(--secondary), transparent);
+            top: 30%; right: -100px;
+            animation-delay: -6s;
+        }
+        .aurora-blob:nth-child(3) {
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, var(--accent), transparent);
+            bottom: -100px; left: 30%;
+            animation-delay: -12s;
+        }
+        @keyframes auroraMove {
+            0%, 100% { transform: translate(0,0) scale(1); }
+            25% { transform: translate(60px,-40px) scale(1.05); }
+            50% { transform: translate(-40px,60px) scale(0.95); }
+            75% { transform: translate(-60px,-20px) scale(1.08); }
+        }
+        [data-theme="dark"] .aurora-blob,
+        [data-theme="midnight"] .aurora-blob,
+        [data-theme="matrix"] .aurora-blob,
+        [data-theme="neon"] .aurora-blob,
+        [data-theme="cyberpunk"] .aurora-blob,
+        [data-theme="galaxy"] .aurora-blob { opacity: 0.08; }
+
+        /* ══════════════════════════════════════════════════
+           🆕 GLASSMORPHISM CARDS
+        ══════════════════════════════════════════════════ */
+        .glass-card {
+            background: color-mix(in srgb, var(--bg-card) 70%, transparent) !important;
+            backdrop-filter: blur(16px) saturate(160%);
+            -webkit-backdrop-filter: blur(16px) saturate(160%);
+            border: 1px solid color-mix(in srgb, var(--border) 60%, transparent) !important;
+        }
+
+        /* ══════════════════════════════════════════════════
+           🆕 POMODORO TIMER
+        ══════════════════════════════════════════════════ */
+        .pomodoro-ring {
+            transform: rotate(-90deg);
+            transform-origin: center;
+        }
+        #pom-ring {
+            transform: rotate(-90deg);
+            transform-origin: 60px 60px;
+        }
+        .pomodoro-ring-bg {
+            fill: none;
+            stroke: var(--border);
+            stroke-width: 8;
+        }
+        .pomodoro-ring-fill {
+            fill: none;
+            stroke: var(--primary);
+            stroke-width: 8;
+            stroke-linecap: round;
+            stroke-dasharray: 339.29;
+            stroke-dashoffset: 0;
+            transition: stroke-dashoffset 1s linear;
+            filter: drop-shadow(0 0 6px var(--primary));
+        }
+        .pomodoro-pulsing {
+            animation: pomPulse 2s ease-in-out infinite;
+        }
+        @keyframes pomPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        /* ══════════════════════════════════════════════════
+           🆕 FOCUS MODE OVERLAY
+        ══════════════════════════════════════════════════ */
+        #focus-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+        }
+        #focus-overlay.active {
+            display: flex;
+            animation: fadeIn 0.5s ease;
+        }
+        .focus-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-xl);
+            padding: 48px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+            border: 1px solid var(--border);
+        }
+
+        /* ══════════════════════════════════════════════════
+           🆕 HABIT TRACKER
+        ══════════════════════════════════════════════════ */
+        .habit-day {
+            width: 32px; height: 32px;
+            border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.65rem; font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1.5px solid var(--border);
+        }
+        .habit-day.done {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+            box-shadow: 0 2px 8px color-mix(in srgb, var(--primary) 40%, transparent);
+        }
+        .habit-day:hover { transform: scale(1.1); }
+        .habit-day.today { border-color: var(--accent); }
+
+        /* ══════════════════════════════════════════════════
+           🆕 NOTE RAPIDE / STICKY NOTES
+        ══════════════════════════════════════════════════ */
+        .sticky-note {
+            border-radius: var(--radius-md);
+            padding: 16px;
+            position: relative;
+            min-height: 120px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12), 4px 4px 0 rgba(0,0,0,0.06);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .sticky-note:hover {
+            transform: translateY(-3px) rotate(0deg);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.18), 4px 4px 0 rgba(0,0,0,0.08);
+        }
+        .sticky-note textarea {
+            background: transparent !important;
+            border: none !important;
+            resize: none;
+            font-family: var(--font-sans);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            width: 100%;
+            outline: none !important;
+            box-shadow: none !important;
+            color: rgba(0,0,0,0.75) !important;
+        }
+
+        /* ══════════════════════════════════════════════════
+           🆕 GRADE PREDICTION / SIMULATEUR
+        ══════════════════════════════════════════════════ */
+        .simulator-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 6px;
+            background: var(--border);
+            border-radius: 99px;
+            outline: none;
+            cursor: pointer;
+        }
+        .simulator-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px; height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            cursor: pointer;
+            box-shadow: 0 2px 8px color-mix(in srgb, var(--primary) 40%, transparent);
+            border: 2px solid white;
+        }
+
+        /* ══════════════════════════════════════════════════
+           🆕 PROGRESS RING
+        ══════════════════════════════════════════════════ */
+        .progress-ring-container {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+        .progress-ring-track {
+            fill: none;
+            stroke: var(--border);
+        }
+        .progress-ring-fill {
+            fill: none;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1);
+        }
+        .progress-ring-text {
+            position: absolute;
+            text-align: center;
+        }
+
+        /* ══════════════════════════════════════════════════
+           🆕 COUNTDOWN EXAMS
+        ══════════════════════════════════════════════════ */
+        .exam-countdown-card {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        .exam-countdown-card::before {
+            content: '';
+            position: absolute;
+            top: -50%; right: -20%;
+            width: 200px; height: 200px;
+            background: rgba(255,255,255,0.07);
+            border-radius: 50%;
+        }
+        .exam-digit {
+            background: rgba(255,255,255,0.15);
+            border-radius: var(--radius-sm);
+            padding: 8px 12px;
+            font-family: var(--font-mono);
+            font-size: 1.5rem;
+            font-weight: 700;
+            min-width: 48px;
+            text-align: center;
+        }
+
+        /* ══════════════════════════════════════════════════
+           🆕 WEATHER WIDGET
+        ══════════════════════════════════════════════════ */
+        .weather-widget {
+            background: linear-gradient(135deg, #0ea5e9, #06b6d4);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        .weather-widget::after {
+            content: '☁️';
+            position: absolute;
+            font-size: 5rem;
+            opacity: 0.15;
+            right: 10px; top: 10px;
+            animation: cloudFloat 6s ease-in-out infinite;
+        }
+        @keyframes cloudFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* ══════════════════════════════════════════════════
+           🆕 SEARCH COMMAND PALETTE
+        ══════════════════════════════════════════════════ */
+        #command-palette {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 9998;
+            display: none;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 15vh;
+            backdrop-filter: blur(4px);
+        }
+        #command-palette.active { display: flex; animation: fadeIn 0.2s ease; }
+        .command-palette-box {
+            background: var(--bg-card);
+            border-radius: var(--radius-xl);
+            width: 100%;
+            max-width: 600px;
+            overflow: hidden;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+            border: 1px solid var(--border);
+        }
+        .command-palette-input {
+            width: 100%;
+            padding: 18px 20px;
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+            font-size: 1.1rem;
+            background: transparent !important;
+            color: var(--text-main) !important;
+            border-bottom: 1px solid var(--border) !important;
+        }
+        .command-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .command-item:hover, .command-item.selected {
+            background: color-mix(in srgb, var(--primary) 8%, transparent);
+        }
+        .command-icon {
+            width: 36px; height: 36px;
+            border-radius: var(--radius-sm);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem;
+            background: color-mix(in srgb, var(--primary) 12%, transparent);
+            color: var(--primary);
+            flex-shrink: 0;
+        }
+
+        /* ══════════════════════════════════════════════════
+           🆕 TOAST NOTIFICATIONS (enhanced)
+        ══════════════════════════════════════════════════ */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9997;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: center;
+            pointer-events: none;
+        }
+        .toast {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 12px 20px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+            animation: toastIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+            max-width: 400px;
+            text-align: center;
+            pointer-events: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .toast.toast-success { border-left: 4px solid #22c55e; }
+        .toast.toast-warning { border-left: 4px solid #f59e0b; }
+        .toast.toast-error { border-left: 4px solid #ef4444; }
+        .toast.toast-info { border-left: 4px solid var(--primary); }
+        .toast.toast-out { animation: toastOut 0.3s ease forwards; }
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateY(20px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes toastOut {
+            from { opacity: 1; transform: translateY(0) scale(1); }
+            to { opacity: 0; transform: translateY(-10px) scale(0.95); }
+        }
+
+        /* ══════════════════════════════════════════════════
+           🆕 PARTICLE CANVAS
+        ══════════════════════════════════════════════════ */
+        #particle-canvas {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.4;
+        }
+
+        /* ══════════════════════════════════════════════════
+           🆕 SHIMMER LOADING
+        ══════════════════════════════════════════════════ */
+        .shimmer {
+            background: linear-gradient(
+                90deg,
+                var(--border) 0%,
+                color-mix(in srgb, var(--border) 50%, var(--bg-card)) 50%,
+                var(--border) 100%
+            );
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* ══════════════════════════════════════════════════
+           🆕 ENHANCED NAV with morphing
+        ══════════════════════════════════════════════════ */
+        nav.card.scrolled {
+            box-shadow: 0 8px 32px rgba(0,0,0,0.12) !important;
+        }
+
+        /* ══════════════════════════════════════════════════
+           🆕 XP POP ANIMATION
+        ══════════════════════════════════════════════════ */
+        .xp-pop {
+            position: fixed;
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--primary);
+            pointer-events: none;
+            z-index: 9999;
+            animation: xpFloat 1.5s ease forwards;
+            text-shadow: 0 2px 8px color-mix(in srgb, var(--primary) 30%, transparent);
+        }
+        @keyframes xpFloat {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            80% { opacity: 1; transform: translateY(-80px) scale(1.2); }
+            100% { opacity: 0; transform: translateY(-100px) scale(0.8); }
+        }
+
+        /* ══════════════════════════════════════════════════
+           🆕 RIPPLE EFFECT
+        ══════════════════════════════════════════════════ */
+        .ripple-btn {
+            position: relative;
+            overflow: hidden;
+        }
+        .ripple-btn .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transform: scale(0);
+            animation: rippleAnim 0.6s linear;
+            pointer-events: none;
+        }
+        @keyframes rippleAnim {
+            to { transform: scale(4); opacity: 0; }
+        }
+
+        /* ══════════════════════════════════════════════════
+           🆕 GRADIENT BORDERS
+        ══════════════════════════════════════════════════ */
+        .gradient-border {
+            background: var(--bg-card);
+            border: 2px solid transparent;
+            background-clip: padding-box;
+            position: relative;
+        }
+        .gradient-border::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: inherit;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            z-index: -1;
+        }
+
+        /* ══════════════════════════════════════════════════
+           🆕 HERO SECTION DASHBOARD
+        ══════════════════════════════════════════════════ */
+        .hero-greeting {
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-greeting::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg,
+                color-mix(in srgb, var(--primary) 8%, transparent),
+                color-mix(in srgb, var(--accent) 5%, transparent)
+            );
+            border-radius: inherit;
+        }
+
+        /* ══════════════════════════════════════════════════
+           🆕 CHART ENHANCEMENTS
+        ══════════════════════════════════════════════════ */
+        .chart-container {
+            position: relative;
+        }
+        .chart-legend-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        /* ══════════════════════════════════════════════════
+           🆕 KEYBOARD SHORTCUT BADGE
+        ══════════════════════════════════════════════════ */
+        kbd {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 6px;
+            background: var(--border);
+            border-radius: 4px;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            font-weight: 600;
+            border: 1px solid color-mix(in srgb, var(--border) 70%, var(--text-soft));
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        /* ══════════════════════════════════════════════════
+           🆕 LEVEL UP CELEBRATION
+        ══════════════════════════════════════════════════ */
+        #levelup-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.4s ease;
+        }
+        #levelup-overlay.active { display: flex; }
+        .levelup-card {
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+            border-radius: var(--radius-xl);
+            padding: 48px;
+            text-align: center;
+            color: white;
+            max-width: 400px;
+            width: 90%;
+            animation: levelUpPop 0.6s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        @keyframes levelUpPop {
+            from { transform: scale(0.3) rotate(-10deg); opacity: 0; }
+            to { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        .star-burst {
+            animation: starBurst 0.5s ease-out both;
+        }
+        @keyframes starBurst {
+            from { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.3); }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        /* ══════════════════════════════════════════════════
+           🆕 ENHANCED MOBILE BOTTOM BAR
+        ══════════════════════════════════════════════════ */
+        @media (max-width: 1024px) {
+            .mobile-bottom-bar {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: var(--bg-nav);
+                backdrop-filter: blur(20px) saturate(180%);
+                -webkit-backdrop-filter: blur(20px) saturate(180%);
+                border-top: 1px solid var(--border);
+                padding: 8px 0;
+                z-index: 200;
+                display: flex;
+                justify-content: space-around;
+                align-items: center;
+            }
+            .mobile-tab-btn {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 2px;
+                padding: 6px 12px;
+                border-radius: var(--radius-sm);
+                font-size: 0.6rem;
+                font-weight: 600;
+                color: var(--text-soft);
+                background: transparent;
+                border: none;
+                cursor: pointer;
+                transition: all 0.2s;
+                min-width: 48px;
+            }
+            .mobile-tab-btn i { font-size: 1.1rem; }
+            .mobile-tab-btn.active {
+                color: var(--primary);
+            }
+            .mobile-tab-btn.active i {
+                animation: bounce 0.4s cubic-bezier(0.34,1.56,0.64,1);
+            }
+            @keyframes bounce {
+                from { transform: scale(0.7); }
+                to { transform: scale(1); }
+            }
+            main { padding-bottom: 80px !important; }
+        }
+
+        /* ══════════════════════════════════════════════════
+           🆕 SCROLLBAR PROGRESS
+        ══════════════════════════════════════════════════ */
+        #scroll-progress {
+            position: fixed;
+            top: 0; left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            z-index: 9999;
+            width: 0%;
+            transition: width 0.1s linear;
+            box-shadow: 0 0 8px var(--primary);
+        }
+
+        /* ══════════════════════════════════════════════════
+           🆕 MOTIVATIONAL BANNER
+        ══════════════════════════════════════════════════ */
+        .motivation-ticker {
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .motivation-ticker-inner {
+            display: inline-block;
+            animation: ticker 30s linear infinite;
+        }
+        @keyframes ticker {
+            from { transform: translateX(100%); }
+            to { transform: translateX(-100%); }
+        }
+
+        /* ══════════════════════════════════════════════════
+           🆕 STAT CARD ENHANCEMENTS
+        ══════════════════════════════════════════════════ */
+        .stat-card-v2 {
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+        .stat-card-v2 .bg-icon {
+            position: absolute;
+            right: -10px; top: 50%;
+            transform: translateY(-50%);
+            font-size: 6rem;
+            opacity: 0.12;
+        }
+        .stat-card-v2 .value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            font-family: var(--font-display);
+            letter-spacing: -0.04em;
+            line-height: 1;
+        }
+        .stat-card-v2 .trend {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            background: rgba(255,255,255,0.2);
+            padding: 3px 8px;
+            border-radius: 99px;
+        }
+
+        /* ══════════════════════════════════════════════════
+           🆕 DARK MODE TOGGLE ANIMATION
+        ══════════════════════════════════════════════════ */
+        .theme-toggle-sun-moon {
+            width: 44px; height: 24px;
+            background: var(--border);
+            border-radius: 99px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s;
+            border: none;
+        }
+        .theme-toggle-sun-moon::after {
+            content: '☀️';
+            position: absolute;
+            top: 2px; left: 2px;
+            width: 20px; height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+            font-size: 0.65rem;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        [data-theme="dark"] .theme-toggle-sun-moon,
+        [data-theme="midnight"] .theme-toggle-sun-moon {
+            background: var(--primary);
+        }
+        [data-theme="dark"] .theme-toggle-sun-moon::after,
+        [data-theme="midnight"] .theme-toggle-sun-moon::after {
+            content: '🌙';
+            transform: translateX(20px);
+        }
+
+        /* ══════════════════════════════════════════════════
+           🆕 ENHANCED FOOTER
+        ══════════════════════════════════════════════════ */
+        .footer-wave {
+            position: relative;
+            margin-top: 4rem;
+        }
+        .footer-wave::before {
+            content: '';
+            display: block;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            clip-path: polygon(0 50%, 100% 0, 100% 100%, 0 100%);
+            margin-bottom: -1px;
+        }
     </style>
 </head>
 <body>
+    <!-- Scroll Progress Bar -->
+    <div id="scroll-progress"></div>
+
+    <!-- Aurora Background -->
+    <div class="aurora-bg">
+        <div class="aurora-blob"></div>
+        <div class="aurora-blob"></div>
+        <div class="aurora-blob"></div>
+    </div>
+
+    <!-- Particle Canvas -->
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Command Palette (Ctrl+K) -->
+    <div id="command-palette" onclick="if(event.target===this)closeCommandPalette()">
+        <div class="command-palette-box">
+            <input class="command-palette-input" id="command-input" 
+                   placeholder="🔍 Rechercher... (cours, tâches, notes, actions)" 
+                   oninput="filterCommands(this.value)"
+                   onkeydown="handleCommandKey(event)">
+            <div id="command-list" style="max-height:320px; overflow-y:auto; padding:8px 0;"></div>
+            <div style="padding:8px 16px; font-size:0.72rem; opacity:0.5; border-top:1px solid var(--border); display:flex; gap:16px;">
+                <span>↑↓ Naviguer</span><span>↵ Ouvrir</span><span>Esc Fermer</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Level Up Overlay -->
+    <div id="levelup-overlay" onclick="document.getElementById('levelup-overlay').classList.remove('active')">
+        <div class="levelup-card" onclick="event.stopPropagation()">
+            <div class="star-burst text-5xl mb-4">⭐</div>
+            <h2 class="text-3xl font-bold mb-2">NIVEAU <span id="levelup-num">2</span> !</h2>
+            <p class="text-lg opacity-90 mb-1">Tu es maintenant</p>
+            <p class="text-2xl font-bold mb-6" id="levelup-title">🎓 Étudiant</p>
+            <div class="text-6xl mb-4">🎉</div>
+            <button onclick="document.getElementById('levelup-overlay').classList.remove('active')" 
+                    class="px-8 py-3 rounded-xl font-bold text-lg"
+                    style="background:rgba(255,255,255,0.25); border:2px solid rgba(255,255,255,0.5);">
+                Continuer 🚀
+            </button>
+        </div>
+    </div>
+
     <!-- Conteneur pour les émojis flottants -->
     <div id="floating-emojis-container"></div>
 
@@ -1051,7 +1813,7 @@
                         <i class="fas fa-envelope"></i>
                         <span class="hidden xl:inline">Mails</span>
                     </a>
-                    <button onclick="openSettings()" class="nav-pill btn-ghost" title="Paramètres">
+
                         <i class="fas fa-sliders-h"></i>
                     </button>
                 </div>
@@ -1122,7 +1884,7 @@
         <div id="dashboard" class="tab-content active space-y-6">
             
             <!-- Greeting personnalisé -->
-            <div class="card rounded-lg p-6 shadow-lg">
+            <div class="card rounded-lg p-6 shadow-lg hero-greeting">
                 <div class="flex justify-between items-start flex-wrap gap-4">
                     <div>
                         <h2 class="text-3xl font-bold mb-1" id="greeting">👋 Salut champion !</h2>
@@ -1140,6 +1902,24 @@
                             <div id="next-class-mini-countdown" class="font-mono font-bold text-xl" style="color:var(--secondary); letter-spacing:.05em;">--:--</div>
                             <div class="text-xs opacity-50" id="next-class-mini-name">-</div>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 🆕 MOTIVATIONAL TICKER -->
+            <div class="card rounded-lg overflow-hidden" style="border-color:var(--primary);">
+                <div class="motivation-ticker py-2 px-4" style="background: linear-gradient(135deg, var(--primary), var(--secondary));">
+                    <div class="motivation-ticker-inner text-white font-bold text-sm">
+                        &nbsp;&nbsp;&nbsp;🚀 La réussite n'est pas finale, l'échec n'est pas fatal : c'est le courage de continuer qui compte.
+                        &nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;
+                        💪 Chaque expert a d'abord été un débutant.
+                        &nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;
+                        ✨ Ton seul concurrent, c'est qui tu étais hier.
+                        &nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;
+                        🎯 Les rêves ne fonctionnent que si toi tu travailles.
+                        &nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;
+                        🌟 Il n'y a pas d'ascenseur vers le succès, il faut prendre les escaliers.
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     </div>
                 </div>
             </div>
@@ -1284,6 +2064,174 @@
                     <span id="semester-end-label">Fin</span>
                 </div>
             </div>
+            <!-- ═══════════════════════════════════════════
+                 🆕 NOUVELLE RANGÉE : POMODORO + MÉTÉO + NOTES
+            ═══════════════════════════════════════════ -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                
+                <!-- POMODORO TIMER -->
+                <div class="card p-5 glass-card">
+                    <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                        🍅 Pomodoro
+                        <span class="text-xs font-normal opacity-50 ml-auto">Focus Session</span>
+                    </h3>
+                    <div class="flex flex-col items-center">
+                        <div class="pomodoro-pulsing mb-4" id="pomodoro-pulse-wrapper" style="position:relative; display:inline-block;">
+                            <svg width="120" height="120" viewBox="0 0 120 120">
+                                <circle class="pomodoro-ring-bg" cx="60" cy="60" r="54"/>
+                                <circle class="pomodoro-ring-fill" id="pom-ring" cx="60" cy="60" r="54" 
+                                    style="stroke-dasharray:339.29; stroke-dashoffset:0;"/>
+                            </svg>
+                            <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center;">
+                                <div id="pom-time" class="font-mono font-bold text-2xl" style="color:var(--primary);">25:00</div>
+                                <div id="pom-mode" class="text-xs opacity-60 mt-1">Travail</div>
+                            </div>
+                        </div>
+                        <div style="position:relative; margin-top:-32px;"><!-- spacer --></div>
+                        <div class="flex gap-2 mt-2">
+                            <button onclick="pomodoroToggle()" id="pom-btn" class="btn-primary px-5 py-2 ripple-btn">
+                                <i class="fas fa-play" id="pom-btn-icon"></i>
+                                <span id="pom-btn-label">Démarrer</span>
+                            </button>
+                            <button onclick="pomodoroReset()" class="btn-ghost px-4 py-2">
+                                <i class="fas fa-redo-alt"></i>
+                            </button>
+                            <button onclick="pomodoroSkip()" class="btn-ghost px-4 py-2" title="Passer au suivant">
+                                <i class="fas fa-step-forward"></i>
+                            </button>
+                        </div>
+                        <div class="flex gap-3 mt-3 text-xs opacity-60">
+                            <span>Sessions : <strong id="pom-sessions" style="color:var(--primary);">0</strong></span>
+                            <span>Pause dans : <strong id="pom-until-break" style="color:var(--secondary);">4 sessions</strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MÉTÉO & LIEU (Marseille) -->
+                <div class="card p-5 glass-card" style="background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 50%, #075985 100%); color:white; border:none;">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="text-lg font-bold">📍 Marseille</h3>
+                            <p class="text-sm opacity-80">Aix-Marseille Université</p>
+                        </div>
+                        <div class="text-5xl" id="weather-icon">☀️</div>
+                    </div>
+                    <div class="text-5xl font-bold mb-1" id="weather-temp" style="font-family:var(--font-display);">--°</div>
+                    <div class="text-sm opacity-80 mb-3" id="weather-desc">Chargement...</div>
+                    <div class="flex gap-4 text-xs">
+                        <span><i class="fas fa-wind mr-1"></i><span id="weather-wind">--</span> km/h</span>
+                        <span><i class="fas fa-tint mr-1"></i><span id="weather-humidity">--</span>%</span>
+                        <span><i class="fas fa-eye mr-1"></i><span id="weather-feels">--</span>°</span>
+                    </div>
+                    <div class="mt-3 pt-3 border-t border-white border-opacity-20 grid grid-cols-4 gap-1 text-center text-xs" id="weather-forecast">
+                        <!-- forecast injected by JS -->
+                    </div>
+                </div>
+
+                <!-- NOTES RAPIDES (Sticky) -->
+                <div class="card p-5 glass-card">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-lg font-bold flex items-center gap-2">📝 Notes Rapides</h3>
+                        <button onclick="addStickyNote()" class="btn-primary px-3 py-1.5 text-xs ripple-btn">
+                            <i class="fas fa-plus"></i> Ajouter
+                        </button>
+                    </div>
+                    <div id="sticky-notes-container" class="space-y-2 max-h-48 overflow-y-auto">
+                        <p class="text-xs opacity-50 italic text-center py-4">Clique sur + pour ajouter une note 📌</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ═══════════════════════════════════════════
+                 🆕 HABITUDES QUOTIDIENNES
+            ═══════════════════════════════════════════ -->
+            <div class="card p-5 glass-card">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold flex items-center gap-2">
+                        ✅ Habitudes Quotidiennes
+                        <span class="text-xs font-normal opacity-50">Cette semaine</span>
+                    </h3>
+                    <button onclick="openHabitModal()" class="btn-primary text-sm px-4 py-2 ripple-btn">
+                        <i class="fas fa-plus mr-1"></i> Nouvelle habitude
+                    </button>
+                </div>
+                <div id="habits-container">
+                    <div class="grid grid-cols-1 gap-3" id="habits-list">
+                        <p class="text-sm opacity-50 italic text-center py-4">Aucune habitude. Commence dès aujourd'hui ! 💪</p>
+                    </div>
+                </div>
+                <div class="mt-4 p-3 rounded-xl flex items-center gap-3" style="background:var(--border);">
+                    <div class="flex-1">
+                        <div class="text-xs opacity-60 mb-1">Taux de réussite aujourd'hui</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="habits-progress-fill" style="width:0%"></div>
+                        </div>
+                    </div>
+                    <div class="text-xl font-bold" style="color:var(--primary);" id="habits-progress-text">0%</div>
+                </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════════
+                 🆕 COMPTE À REBOURS EXAMENS
+            ═══════════════════════════════════════════ -->
+            <div class="card p-5 glass-card">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold flex items-center gap-2">⏳ Compte à rebours Examens</h3>
+                    <button onclick="openExamModal()" class="btn-primary text-sm px-4 py-2 ripple-btn">
+                        <i class="fas fa-plus mr-1"></i> Ajouter
+                    </button>
+                </div>
+                <div id="exam-countdowns" class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <p class="text-sm opacity-50 italic col-span-full text-center py-4">Aucun examen planifié 🎉</p>
+                </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════════
+                 🆕 SIMULATEUR DE NOTES
+            ═══════════════════════════════════════════ -->
+            <div class="card p-5 glass-card">
+                <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                    🧮 Simulateur de Moyenne
+                    <span class="text-xs font-normal opacity-50">Anticipe tes résultats</span>
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <p class="text-sm opacity-70 mb-4">Si tu obtiens cette note au prochain contrôle :</p>
+                        <div class="flex items-center gap-4 mb-4">
+                            <input type="range" min="0" max="20" step="0.5" value="15" 
+                                   class="simulator-slider flex-1" id="sim-grade-slider"
+                                   oninput="updateSimulator()">
+                            <div class="text-2xl font-bold w-16 text-center" 
+                                 style="color:var(--primary); font-family:var(--font-mono);" id="sim-grade-display">15</div>
+                        </div>
+                        <div class="flex items-center gap-3 mb-4">
+                            <label class="text-sm font-medium">Coefficient :</label>
+                            <input type="number" min="0.5" max="5" step="0.5" value="1" 
+                                   class="w-20 p-2 border rounded-lg text-center font-bold" 
+                                   style="border-color:var(--border);"
+                                   id="sim-coef" oninput="updateSimulator()">
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <label class="text-sm font-medium">Pour la matière :</label>
+                            <select id="sim-course" class="flex-1 p-2 border rounded-lg text-sm" 
+                                    style="border-color:var(--border);" onchange="updateSimulator()">
+                                <option value="">Toutes matières</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="card p-5 flex flex-col justify-center text-center" 
+                         style="background: linear-gradient(135deg, var(--primary), var(--secondary)); color:white;">
+                        <div class="text-sm opacity-90 mb-1">Ta nouvelle moyenne serait</div>
+                        <div class="text-5xl font-bold mb-2" style="font-family:var(--font-display);" id="sim-result">--</div>
+                        <div class="text-sm opacity-80 mb-3">/20</div>
+                        <div class="text-xs opacity-90 p-2 rounded-lg" style="background:rgba(255,255,255,0.2);" id="sim-comment">
+                            Sélectionne une matière pour simuler
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         <!-- COURS & FICHIERS AMÉLIORÉS -->
@@ -1555,19 +2503,154 @@
 
     </main>
 
-    <!-- Footer avec crédits -->
-    <footer class="mt-12 pb-6 text-center">
-        <div class="max-w-7xl mx-auto px-4">
-            <div class="card rounded-lg p-4 shadow-sm" style="background: var(--bg-card); border: 1px solid var(--border);">
-                <div class="flex flex-col items-center gap-2">
+    <!-- 🆕 MOBILE BOTTOM BAR -->
+    <div class="mobile-bottom-bar lg:hidden" id="mobile-bottom-bar">
+        <button class="mobile-tab-btn active" onclick="showTab('dashboard');setMobileActive(this)" data-tab="dashboard">
+            <i class="fas fa-home"></i>
+            <span>Accueil</span>
+        </button>
+        <button class="mobile-tab-btn" onclick="showTab('courses');setMobileActive(this)" data-tab="courses">
+            <i class="fas fa-book"></i>
+            <span>Cours</span>
+        </button>
+        <button class="mobile-tab-btn" onclick="showTab('schedule');setMobileActive(this)" data-tab="schedule">
+            <i class="fas fa-calendar"></i>
+            <span>Planning</span>
+        </button>
+        <button class="mobile-tab-btn" onclick="showTab('grades');setMobileActive(this)" data-tab="grades">
+            <i class="fas fa-star"></i>
+            <span>Notes</span>
+        </button>
+        <button class="mobile-tab-btn" onclick="showTab('tasks');setMobileActive(this)" data-tab="tasks">
+            <i class="fas fa-check-circle"></i>
+            <span>Tâches</span>
+        </button>
+        <button class="mobile-tab-btn" onclick="openSettings()" data-tab="settings">
+            <i class="fas fa-sliders-h"></i>
+            <span>Plus</span>
+        </button>
+    </div>
+
+    <!-- 🆕 HABIT MODAL -->
+    <div id="habitModal" class="modal">
+        <div class="modal-content" style="max-width:480px;">
+            <div class="flex justify-between items-center mb-5">
+                <h3 class="text-2xl font-bold gradient-text">✅ Nouvelle Habitude</h3>
+                <button onclick="closeHabitModal()" class="btn-ghost" style="padding:6px 10px;">&times;</button>
+            </div>
+            <input type="text" id="habit-name-input" placeholder="ex: Lire 30 min, Réviser, Sport..." 
+                   class="w-full p-3 border rounded-xl mb-4" style="border-color:var(--border);">
+            <p class="text-xs font-semibold uppercase opacity-50 mb-2">Emoji</p>
+            <div class="flex gap-2 mb-5 flex-wrap">
+                <button onclick="setHabitEmoji('📚')" class="emoji-btn">📚</button>
+                <button onclick="setHabitEmoji('💪')" class="emoji-btn">💪</button>
+                <button onclick="setHabitEmoji('🏃')" class="emoji-btn">🏃</button>
+                <button onclick="setHabitEmoji('🥗')" class="emoji-btn">🥗</button>
+                <button onclick="setHabitEmoji('😴')" class="emoji-btn">😴</button>
+                <button onclick="setHabitEmoji('🎯')" class="emoji-btn">🎯</button>
+                <button onclick="setHabitEmoji('🎵')" class="emoji-btn">🎵</button>
+                <button onclick="setHabitEmoji('💧')" class="emoji-btn">💧</button>
+                <button onclick="setHabitEmoji('📖')" class="emoji-btn">📖</button>
+                <button onclick="setHabitEmoji('🧘')" class="emoji-btn">🧘</button>
+            </div>
+            <button onclick="saveHabit()" class="btn-primary w-full justify-center ripple-btn">
+                <i class="fas fa-check mr-2"></i> Créer l'habitude
+            </button>
+        </div>
+    </div>
+
+    <!-- 🆕 EXAM COUNTDOWN MODAL -->
+    <div id="examModal" class="modal">
+        <div class="modal-content" style="max-width:480px;">
+            <div class="flex justify-between items-center mb-5">
+                <h3 class="text-2xl font-bold gradient-text">⏳ Ajouter un Examen</h3>
+                <button onclick="closeExamModal()" class="btn-ghost" style="padding:6px 10px;">&times;</button>
+            </div>
+            <input type="text" id="exam-name-input" placeholder="Nom de l'examen (ex: Partiel Maths)" 
+                   class="w-full p-3 border rounded-xl mb-4" style="border-color:var(--border);">
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-2">📅 Date de l'examen</label>
+                <input type="date" id="exam-date-input" class="w-full p-3 border rounded-xl" style="border-color:var(--border);">
+            </div>
+            <div class="mb-5">
+                <label class="block text-sm font-medium mb-2">🎨 Couleur</label>
+                <div class="flex gap-2">
+                    <button onclick="setExamColor('#6366f1')" class="w-8 h-8 rounded-full" style="background:#6366f1;" data-examcolor="#6366f1"></button>
+                    <button onclick="setExamColor('#ef4444')" class="w-8 h-8 rounded-full" style="background:#ef4444;" data-examcolor="#ef4444"></button>
+                    <button onclick="setExamColor('#f59e0b')" class="w-8 h-8 rounded-full" style="background:#f59e0b;" data-examcolor="#f59e0b"></button>
+                    <button onclick="setExamColor('#22c55e')" class="w-8 h-8 rounded-full" style="background:#22c55e;" data-examcolor="#22c55e"></button>
+                    <button onclick="setExamColor('#0ea5e9')" class="w-8 h-8 rounded-full" style="background:#0ea5e9;" data-examcolor="#0ea5e9"></button>
+                    <button onclick="setExamColor('#ec4899')" class="w-8 h-8 rounded-full" style="background:#ec4899;" data-examcolor="#ec4899"></button>
+                </div>
+            </div>
+            <button onclick="saveExam()" class="btn-primary w-full justify-center ripple-btn">
+                <i class="fas fa-plus mr-2"></i> Ajouter l'examen
+            </button>
+        </div>
+    </div>
+
+    <!-- 🆕 ENHANCED FOOTER -->
+    <footer class="footer-wave mt-8 pb-20 lg:pb-8" style="position:relative; z-index:2;">
+        <div style="background: linear-gradient(135deg, var(--primary), var(--secondary)); color:white; padding: 40px 0 20px;">
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+                    <!-- Branding -->
+                    <div>
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 rounded-xl flex items-center justify-center"
+                                 style="background:rgba(255,255,255,0.2);">
+                                <span class="text-xl">🎓</span>
+                            </div>
+                            <div>
+                                <div class="font-bold text-lg" style="font-family:var(--font-display);">AMU Pro</div>
+                                <div class="text-xs opacity-70">Espace Étudiant</div>
+                            </div>
+                        </div>
+                        <p class="text-sm opacity-80">Ton espace académique tout-en-un pour Aix-Marseille Université.</p>
+                    </div>
+                    <!-- Quick Links -->
+                    <div>
+                        <h4 class="font-bold mb-3 text-sm uppercase tracking-wider opacity-80">Liens Utiles</h4>
+                        <div class="space-y-2">
+                            <a href="https://ent.univ-amu.fr/" target="_blank" class="flex items-center gap-2 text-sm opacity-80 hover:opacity-100 transition">
+                                <i class="fas fa-university w-4"></i> ENT AMU
+                            </a>
+                            <a href="https://outlook.cloud.microsoft/mail/?realm=etu.univ-amu.fr" target="_blank" class="flex items-center gap-2 text-sm opacity-80 hover:opacity-100 transition">
+                                <i class="fas fa-envelope w-4"></i> Mails étudiants
+                            </a>
+                            <a href="https://www.univ-amu.fr/" target="_blank" class="flex items-center gap-2 text-sm opacity-80 hover:opacity-100 transition">
+                                <i class="fas fa-globe w-4"></i> Site officiel AMU
+                            </a>
+                        </div>
+                    </div>
+                    <!-- Stats App -->
+                    <div>
+                        <h4 class="font-bold mb-3 text-sm uppercase tracking-wider opacity-80">Raccourcis Clavier</h4>
+                        <div class="grid grid-cols-2 gap-1 text-xs">
+                            <span class="opacity-80"><kbd style="background:rgba(255,255,255,0.2); border-color:rgba(255,255,255,0.3);">Ctrl+K</kbd> Recherche</span>
+                            <span class="opacity-80"><kbd style="background:rgba(255,255,255,0.2); border-color:rgba(255,255,255,0.3);">Alt+1-7</kbd> Onglets</span>
+                            <span class="opacity-80"><kbd style="background:rgba(255,255,255,0.2); border-color:rgba(255,255,255,0.3);">Esc</kbd> Fermer</span>
+                            <span class="opacity-80"><kbd style="background:rgba(255,255,255,0.2); border-color:rgba(255,255,255,0.3);">Alt+D</kbd> Thème sombre</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="border-t border-white border-opacity-20 pt-6 flex flex-col md:flex-row justify-between items-center gap-3">
                     <div class="flex items-center gap-2 text-sm">
                         <span class="opacity-70">Développé avec</span>
-                        <span class="text-red-500 animate-pulse">❤️</span>
+                        <span class="text-red-300 animate-pulse">❤️</span>
                         <span class="opacity-70">par</span>
-                        <span class="font-bold gradient-text">Mathieu Mercera</span>
+                        <span class="font-bold">Mathieu Mercera</span>
+                        <span class="opacity-50">• AMU Pro © 2026</span>
                     </div>
-                    <div class="text-xs opacity-50">
-                        AMU Pro © 2026 - Tous droits réservés
+                    <div class="flex gap-3">
+                        <button onclick="openCommandPalette()" class="px-4 py-2 rounded-xl text-sm font-medium transition hover:bg-white hover:text-gray-900"
+                                style="background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3);">
+                            <i class="fas fa-search mr-2"></i>Recherche rapide
+                        </button>
+                        <button onclick="exportAllData()" class="px-4 py-2 rounded-xl text-sm font-medium transition hover:bg-white hover:text-gray-900"
+                                style="background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3);">
+                            <i class="fas fa-download mr-2"></i>Exporter
+                        </button>
                     </div>
                 </div>
             </div>
@@ -2141,6 +3224,24 @@
             settings: 'key, value'
         });
 
+
+        // ══════════════════════════════════════════════════════════════
+        // 🆕 TOAST NOTIFICATIONS (early init)
+        // ══════════════════════════════════════════════════════════════
+        function showToast(msg, type = 'info', duration = 3500) {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            const toast = document.createElement('div');
+            const icons = { success:'✅', warning:'⚠️', error:'❌', info:'ℹ️' };
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `<span>${icons[type] || 'ℹ️'}</span><span>${msg}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('toast-out');
+                setTimeout(() => toast.remove(), 300);
+            }, duration);
+        }
+
         let selectedCourseColor = '#3b82f6';
         let copiedScheduleCell = null;
         let currentWeekStart = getMonday(new Date());
@@ -2204,6 +3305,8 @@
             document.documentElement.setAttribute('data-theme', theme);
             setSetting('theme', theme);
             updateThemeSwatches(theme);
+            // Update dark toggle icon if it exists
+            try { updateDarkToggleIcon(); } catch(e) {}
         }
 
         async function setAvatar(emoji) {
@@ -5078,15 +6181,11 @@ Cette action est irréversible.`);
             await initSchedule();
             await refreshUI();
             updateGreeting();
-            await updateAchievementsDisplay(); // Charger les succès
+            await updateAchievementsDisplay();
             
-            // Démarrer les animations d'émojis pour le dashboard (onglet par défaut)
             startFloatingEmojis('dashboard');
-            
-            // Démarrer la vérification automatique du streak à minuit
             scheduleStreakCheck();
             
-            // Style des boutons filtres
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     document.querySelectorAll('.filter-btn').forEach(b => {
@@ -5098,10 +6197,781 @@ Cette action est irréversible.`);
                 });
             });
             
-            // Active le premier filtre
             document.querySelector('.filter-btn').style.background = 'var(--primary)';
             document.querySelector('.filter-btn').style.color = 'white';
+
+            // 🆕 INIT NEW FEATURES
+            initScrollProgress();
+            initParticles();
+            initPomodoro();
+            loadHabits();
+            loadStickyNotes();
+            loadExamCountdowns();
+            initCommandPalette();
+            populateSimCourses();
+            fetchWeather();
+            addRippleToButtons();
+            updateDarkToggleIcon();
         })();
+
+        // ══════════════════════════════════════════════════════════════
+        // 🆕 SCROLL PROGRESS BAR
+        // ══════════════════════════════════════════════════════════════
+        function initScrollProgress() {
+            const bar = document.getElementById('scroll-progress');
+            window.addEventListener('scroll', () => {
+                const scrollTop = window.scrollY;
+                const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+                bar.style.width = pct + '%';
+            });
+            // Nav scroll effect
+            const nav = document.querySelector('nav.card');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 10) nav.classList.add('scrolled');
+                else nav.classList.remove('scrolled');
+            });
+        }
+
+        // ══════════════════════════════════════════════════════════════
+        // 🆕 PARTICLE BACKGROUND
+        // ══════════════════════════════════════════════════════════════
+        function initParticles() {
+            const canvas = document.getElementById('particle-canvas');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            class Particle {
+                constructor() { this.reset(); }
+                reset() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.size = Math.random() * 2 + 0.5;
+                    this.speedX = (Math.random() - 0.5) * 0.4;
+                    this.speedY = (Math.random() - 0.5) * 0.4;
+                    this.opacity = Math.random() * 0.5 + 0.1;
+                    this.life = Math.random() * 200 + 100;
+                    this.maxLife = this.life;
+                }
+                update() {
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+                    this.life--;
+                    if (this.life <= 0) this.reset();
+                    if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+                    if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+                }
+                draw() {
+                    const alpha = (this.life / this.maxLife) * this.opacity;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(99,102,241,${alpha})`;
+                    ctx.fill();
+                }
+            }
+
+            for (let i = 0; i < 60; i++) particles.push(new Particle());
+
+            // Draw connections
+            function drawConnections() {
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 120) {
+                            ctx.beginPath();
+                            ctx.strokeStyle = `rgba(99,102,241,${0.06 * (1 - dist/120)})`;
+                            ctx.lineWidth = 0.5;
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.stroke();
+                        }
+                    }
+                }
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => { p.update(); p.draw(); });
+                drawConnections();
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+
+        // ══════════════════════════════════════════════════════════════
+        // 🆕 POMODORO TIMER
+        // ══════════════════════════════════════════════════════════════
+        let pomState = {
+            running: false,
+            interval: null,
+            mode: 'work', // 'work' | 'short' | 'long'
+            timeLeft: 25 * 60,
+            sessions: 0,
+            WORK: 25 * 60,
+            SHORT: 5 * 60,
+            LONG: 15 * 60,
+        };
+        const POM_CIRCUMFERENCE = 2 * Math.PI * 54; // r=54
+
+        function pomodoroToggle() {
+            if (pomState.running) {
+                clearInterval(pomState.interval);
+                pomState.running = false;
+                document.getElementById('pom-btn-icon').className = 'fas fa-play';
+                document.getElementById('pom-btn-label').textContent = 'Reprendre';
+                document.getElementById('pomodoro-pulse-wrapper').classList.remove('pomodoro-pulsing');
+            } else {
+                pomState.running = true;
+                document.getElementById('pom-btn-icon').className = 'fas fa-pause';
+                document.getElementById('pom-btn-label').textContent = 'Pause';
+                document.getElementById('pomodoro-pulse-wrapper').classList.add('pomodoro-pulsing');
+                pomState.interval = setInterval(pomodoroTick, 1000);
+            }
+        }
+
+        function pomodoroTick() {
+            pomState.timeLeft--;
+            updatePomodoroDisplay();
+            if (pomState.timeLeft <= 0) {
+                clearInterval(pomState.interval);
+                pomState.running = false;
+                // Session complete
+                if (pomState.mode === 'work') {
+                    pomState.sessions++;
+                    document.getElementById('pom-sessions').textContent = pomState.sessions;
+                    showToast('🍅 Pomodoro terminé ! Prends une pause !', 'success');
+                    launchConfetti();
+                    // Auto switch to break
+                    if (pomState.sessions % 4 === 0) {
+                        pomState.mode = 'long';
+                        pomState.timeLeft = pomState.LONG;
+                        document.getElementById('pom-mode').textContent = 'Grande pause';
+                    } else {
+                        pomState.mode = 'short';
+                        pomState.timeLeft = pomState.SHORT;
+                        document.getElementById('pom-mode').textContent = 'Petite pause';
+                    }
+                } else {
+                    pomState.mode = 'work';
+                    pomState.timeLeft = pomState.WORK;
+                    document.getElementById('pom-mode').textContent = 'Travail';
+                    showToast('💪 Retour au travail !', 'info');
+                }
+                document.getElementById('pom-btn-icon').className = 'fas fa-play';
+                document.getElementById('pom-btn-label').textContent = 'Démarrer';
+                document.getElementById('pomodoro-pulse-wrapper').classList.remove('pomodoro-pulsing');
+                const sessionsLeft = 4 - (pomState.sessions % 4);
+                document.getElementById('pom-until-break').textContent = sessionsLeft + ' sessions';
+                updatePomodoroDisplay();
+            }
+        }
+
+        function pomodoroReset() {
+            clearInterval(pomState.interval);
+            pomState.running = false;
+            pomState.mode = 'work';
+            pomState.timeLeft = pomState.WORK;
+            document.getElementById('pom-btn-icon').className = 'fas fa-play';
+            document.getElementById('pom-btn-label').textContent = 'Démarrer';
+            document.getElementById('pom-mode').textContent = 'Travail';
+            document.getElementById('pomodoro-pulse-wrapper').classList.remove('pomodoro-pulsing');
+            updatePomodoroDisplay();
+        }
+
+        function pomodoroSkip() {
+            clearInterval(pomState.interval);
+            pomState.running = false;
+            pomState.timeLeft = 0;
+            pomodoroTick();
+        }
+
+        function updatePomodoroDisplay() {
+            const min = Math.floor(pomState.timeLeft / 60).toString().padStart(2,'0');
+            const sec = (pomState.timeLeft % 60).toString().padStart(2,'0');
+            document.getElementById('pom-time').textContent = `${min}:${sec}`;
+            
+            const total = pomState.mode === 'work' ? pomState.WORK : (pomState.mode === 'short' ? pomState.SHORT : pomState.LONG);
+            const progress = 1 - (pomState.timeLeft / total);
+            const ring = document.getElementById('pom-ring');
+            if (ring) ring.style.strokeDashoffset = POM_CIRCUMFERENCE * (1 - progress);
+        }
+
+        function initPomodoro() { updatePomodoroDisplay(); }
+
+        // ══════════════════════════════════════════════════════════════
+        // 🆕 WEATHER (Open-Meteo API - Free, no key needed!)
+        // ══════════════════════════════════════════════════════════════
+        async function fetchWeather() {
+            try {
+                const resp = await fetch('https://api.open-meteo.com/v1/forecast?latitude=43.2965&longitude=5.3698&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min&wind_speed_unit=kmh&timezone=Europe%2FParis&forecast_days=4');
+                if (!resp.ok) throw new Error('Weather API error');
+                const data = await resp.json();
+                const cur = data.current;
+
+                document.getElementById('weather-temp').textContent = Math.round(cur.temperature_2m) + '°';
+                document.getElementById('weather-feels').textContent = Math.round(cur.apparent_temperature);
+                document.getElementById('weather-wind').textContent = Math.round(cur.wind_speed_10m);
+                document.getElementById('weather-humidity').textContent = cur.relative_humidity_2m;
+                document.getElementById('weather-icon').textContent = weatherCodeToEmoji(cur.weather_code);
+                document.getElementById('weather-desc').textContent = weatherCodeToDesc(cur.weather_code);
+                
+                // Forecast
+                const fc = document.getElementById('weather-forecast');
+                const days = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+                fc.innerHTML = data.daily.time.map((d, i) => {
+                    const date = new Date(d);
+                    return `<div><div class="opacity-70">${days[date.getDay()]}</div><div>${weatherCodeToEmoji(data.daily.weather_code[i])}</div><div class="font-bold">${Math.round(data.daily.temperature_2m_max[i])}°</div></div>`;
+                }).join('');
+            } catch(e) {
+                document.getElementById('weather-desc').textContent = 'Météo indisponible';
+                document.getElementById('weather-temp').textContent = '--°';
+            }
+        }
+
+        function weatherCodeToEmoji(code) {
+            if (code === 0) return '☀️';
+            if (code <= 2) return '🌤️';
+            if (code <= 3) return '☁️';
+            if (code <= 49) return '🌫️';
+            if (code <= 55) return '🌧️';
+            if (code <= 67) return '🌨️';
+            if (code <= 77) return '🌨️';
+            if (code <= 82) return '🌧️';
+            if (code <= 86) return '🌨️';
+            if (code <= 95) return '⛈️';
+            return '🌩️';
+        }
+
+        function weatherCodeToDesc(code) {
+            if (code === 0) return 'Ciel dégagé';
+            if (code <= 2) return 'Partiellement nuageux';
+            if (code <= 3) return 'Nuageux';
+            if (code <= 49) return 'Brumeux';
+            if (code <= 55) return 'Bruine légère';
+            if (code <= 67) return 'Pluie';
+            if (code <= 77) return 'Neige';
+            if (code <= 82) return 'Averses';
+            if (code <= 95) return 'Orage';
+            return 'Orage violent';
+        }
+
+        // ══════════════════════════════════════════════════════════════
+        // 🆕 STICKY NOTES
+        // ══════════════════════════════════════════════════════════════
+        const STICKY_COLORS = ['#fef9c3','#fce7f3','#e0f2fe','#dcfce7','#fef3c7','#f3e8ff'];
+        let stickyNotes = [];
+
+        function loadStickyNotes() {
+            try { stickyNotes = JSON.parse(localStorage.getItem('amupro_sticky') || '[]'); }
+            catch(e) { stickyNotes = []; }
+            renderStickyNotes();
+        }
+
+        function saveStickyNotes() {
+            localStorage.setItem('amupro_sticky', JSON.stringify(stickyNotes));
+        }
+
+        function addStickyNote() {
+            const color = STICKY_COLORS[stickyNotes.length % STICKY_COLORS.length];
+            stickyNotes.unshift({ id: Date.now(), text: '', color, createdAt: new Date().toISOString() });
+            saveStickyNotes();
+            renderStickyNotes();
+            setTimeout(() => {
+                const firstTextarea = document.querySelector('#sticky-notes-container textarea');
+                if (firstTextarea) firstTextarea.focus();
+            }, 50);
+        }
+
+        function renderStickyNotes() {
+            const container = document.getElementById('sticky-notes-container');
+            if (!container) return;
+            if (stickyNotes.length === 0) {
+                container.innerHTML = '<p class="text-xs opacity-50 italic text-center py-4">Clique sur + pour ajouter une note 📌</p>';
+                return;
+            }
+            container.innerHTML = stickyNotes.map(note => `
+                <div class="sticky-note" style="background:${note.color};">
+                    <button onclick="deleteStickyNote(${note.id})" 
+                            style="position:absolute; top:6px; right:8px; background:none; border:none; cursor:pointer; opacity:0.5; color:rgba(0,0,0,0.6);" 
+                            title="Supprimer">×</button>
+                    <textarea rows="3" style="color:rgba(0,0,0,0.75);"
+                        onchange="updateStickyNote(${note.id}, this.value)"
+                        placeholder="Écris ta note...">${note.text}</textarea>
+                    <div style="font-size:0.6rem; opacity:0.4; margin-top:4px;">
+                        ${new Date(note.createdAt).toLocaleDateString('fr-FR')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateStickyNote(id, text) {
+            const note = stickyNotes.find(n => n.id === id);
+            if (note) { note.text = text; saveStickyNotes(); }
+        }
+
+        function deleteStickyNote(id) {
+            stickyNotes = stickyNotes.filter(n => n.id !== id);
+            saveStickyNotes();
+            renderStickyNotes();
+        }
+
+        // ══════════════════════════════════════════════════════════════
+        // 🆕 HABITS TRACKER
+        // ══════════════════════════════════════════════════════════════
+        let habits = [];
+        let selectedHabitEmoji = '📚';
+
+        function loadHabits() {
+            try { habits = JSON.parse(localStorage.getItem('amupro_habits') || '[]'); }
+            catch(e) { habits = []; }
+            renderHabits();
+        }
+
+        function saveHabits() { localStorage.setItem('amupro_habits', JSON.stringify(habits)); }
+
+        function setHabitEmoji(emoji) {
+            selectedHabitEmoji = emoji;
+            document.querySelectorAll('#habitModal .emoji-btn').forEach(b => b.style.background = '');
+            event.target.style.background = 'var(--primary)';
+            event.target.style.color = 'white';
+        }
+
+        function openHabitModal() { document.getElementById('habitModal').classList.add('active'); }
+        function closeHabitModal() { document.getElementById('habitModal').classList.remove('active'); }
+
+        function saveHabit() {
+            const name = document.getElementById('habit-name-input').value.trim();
+            if (!name) return showToast('⚠️ Donne un nom à ton habitude', 'warning');
+            
+            habits.push({
+                id: Date.now(),
+                name,
+                emoji: selectedHabitEmoji,
+                days: {} // { "2026-02-14": true }
+            });
+            saveHabits();
+            renderHabits();
+            closeHabitModal();
+            document.getElementById('habit-name-input').value = '';
+            showToast('✅ Habitude ajoutée !', 'success');
+        }
+
+        function toggleHabitDay(habitId, dateStr) {
+            const habit = habits.find(h => h.id === habitId);
+            if (!habit) return;
+            habit.days[dateStr] = !habit.days[dateStr];
+            saveHabits();
+            renderHabits();
+            if (habit.days[dateStr]) {
+                showXPPop('+10 XP');
+                showToast(`${habit.emoji} ${habit.name} ✓`, 'success');
+            }
+        }
+
+        function deleteHabit(habitId) {
+            habits = habits.filter(h => h.id !== habitId);
+            saveHabits();
+            renderHabits();
+        }
+
+        function renderHabits() {
+            const container = document.getElementById('habits-list');
+            if (!container) return;
+
+            const today = new Date();
+            const week = [];
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date(today);
+                d.setDate(d.getDate() - i);
+                week.push(d);
+            }
+            const dayNames = ['D','L','M','M','J','V','S'];
+
+            if (habits.length === 0) {
+                container.innerHTML = '<p class="text-sm opacity-50 italic text-center py-4">Aucune habitude. Commence dès aujourd'hui ! 💪</p>';
+                document.getElementById('habits-progress-text').textContent = '0%';
+                document.getElementById('habits-progress-fill').style.width = '0%';
+                return;
+            }
+
+            const todayStr = today.toISOString().split('T')[0];
+            let doneTodayCount = 0;
+            habits.forEach(h => { if (h.days[todayStr]) doneTodayCount++; });
+            const pct = habits.length > 0 ? Math.round((doneTodayCount / habits.length) * 100) : 0;
+            document.getElementById('habits-progress-text').textContent = pct + '%';
+            document.getElementById('habits-progress-fill').style.width = pct + '%';
+
+            container.innerHTML = habits.map(habit => {
+                const streak = calculateHabitStreak(habit);
+                const weekHtml = week.map(d => {
+                    const ds = d.toISOString().split('T')[0];
+                    const isToday = ds === todayStr;
+                    const done = habit.days[ds];
+                    return `<div class="habit-day ${done ? 'done' : ''} ${isToday ? 'today' : ''}" 
+                                 onclick="toggleHabitDay(${habit.id}, '${ds}')"
+                                 title="${d.toLocaleDateString('fr-FR')}">
+                                ${dayNames[d.getDay()]}
+                            </div>`;
+                }).join('');
+                return `
+                    <div class="card p-4 flex items-center gap-4">
+                        <div class="text-2xl flex-shrink-0">${habit.emoji}</div>
+                        <div class="flex-1">
+                            <div class="font-bold mb-2">${habit.name}
+                                ${streak > 0 ? `<span class="ml-2 text-xs px-2 py-0.5 rounded-full font-bold text-white" style="background:linear-gradient(135deg,#f59e0b,#ef4444);">🔥 ${streak}j</span>` : ''}
+                            </div>
+                            <div class="flex gap-1">${weekHtml}</div>
+                        </div>
+                        <button onclick="deleteHabit(${habit.id})" class="text-red-300 hover:text-red-500 transition ml-2">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function calculateHabitStreak(habit) {
+            let streak = 0;
+            const today = new Date();
+            for (let i = 0; i < 365; i++) {
+                const d = new Date(today);
+                d.setDate(d.getDate() - i);
+                const ds = d.toISOString().split('T')[0];
+                if (habit.days[ds]) streak++;
+                else if (i > 0) break;
+            }
+            return streak;
+        }
+
+        // ══════════════════════════════════════════════════════════════
+        // 🆕 EXAM COUNTDOWNS
+        // ══════════════════════════════════════════════════════════════
+        let exams = [];
+        let selectedExamColor = '#6366f1';
+
+        function loadExamCountdowns() {
+            try { exams = JSON.parse(localStorage.getItem('amupro_exams') || '[]'); }
+            catch(e) { exams = []; }
+            renderExamCountdowns();
+        }
+
+        function saveExams() { localStorage.setItem('amupro_exams', JSON.stringify(exams)); }
+
+        function setExamColor(color) {
+            selectedExamColor = color;
+            document.querySelectorAll('[data-examcolor]').forEach(b => {
+                b.style.outline = b.dataset.examcolor === color ? '3px solid white' : 'none';
+                b.style.outlineOffset = '2px';
+            });
+        }
+
+        function openExamModal() {
+            const d = document.getElementById('examModal');
+            const dateInput = document.getElementById('exam-date-input');
+            const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate()+1);
+            dateInput.value = tomorrow.toISOString().split('T')[0];
+            d.classList.add('active');
+        }
+        function closeExamModal() { document.getElementById('examModal').classList.remove('active'); }
+
+        function saveExam() {
+            const name = document.getElementById('exam-name-input').value.trim();
+            const date = document.getElementById('exam-date-input').value;
+            if (!name || !date) return showToast('⚠️ Remplis tous les champs', 'warning');
+            exams.push({ id: Date.now(), name, date, color: selectedExamColor });
+            saveExams();
+            renderExamCountdowns();
+            closeExamModal();
+            document.getElementById('exam-name-input').value = '';
+            showToast('⏳ Examen ajouté !', 'success');
+        }
+
+        function deleteExam(id) {
+            exams = exams.filter(e => e.id !== id);
+            saveExams();
+            renderExamCountdowns();
+        }
+
+        function renderExamCountdowns() {
+            const container = document.getElementById('exam-countdowns');
+            if (!container) return;
+
+            const now = new Date();
+            const upcoming = exams
+                .filter(e => new Date(e.date) >= now)
+                .sort((a,b) => new Date(a.date) - new Date(b.date));
+
+            if (upcoming.length === 0) {
+                container.innerHTML = '<p class="text-sm opacity-50 italic col-span-full text-center py-4">Aucun examen planifié 🎉</p>';
+                return;
+            }
+
+            container.innerHTML = upcoming.map(exam => {
+                const examDate = new Date(exam.date);
+                const diff = examDate - now;
+                const days = Math.floor(diff / (1000*60*60*24));
+                const hrs = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
+                const urgency = days <= 3 ? '🔴' : days <= 7 ? '🟡' : '🟢';
+                return `
+                    <div class="exam-countdown-card" style="background:linear-gradient(135deg,${exam.color},${exam.color}99);">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <p class="text-xs opacity-80">${urgency} ${examDate.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})}</p>
+                                <h4 class="font-bold text-lg mt-1">${exam.name}</h4>
+                            </div>
+                            <button onclick="deleteExam(${exam.id})" class="opacity-60 hover:opacity-100 transition text-white">
+                                <i class="fas fa-times text-sm"></i>
+                            </button>
+                        </div>
+                        <div class="flex gap-2">
+                            <div class="exam-digit">${days}</div>
+                            <div class="self-center font-bold opacity-70">j</div>
+                            <div class="exam-digit">${hrs}</div>
+                            <div class="self-center font-bold opacity-70">h</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Update countdowns every minute
+        setInterval(renderExamCountdowns, 60000);
+
+        // ══════════════════════════════════════════════════════════════
+        // 🆕 GRADE SIMULATOR
+        // ══════════════════════════════════════════════════════════════
+        async function populateSimCourses() {
+            const courses = await db.courses.toArray();
+            const sel = document.getElementById('sim-course');
+            if (!sel) return;
+            sel.innerHTML = '<option value="">Toutes matières</option>' +
+                courses.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+        }
+
+        async function updateSimulator() {
+            const gradeSlider = document.getElementById('sim-grade-slider');
+            const coefInput = document.getElementById('sim-coef');
+            const courseSelect = document.getElementById('sim-course');
+            if (!gradeSlider) return;
+            
+            const newGrade = parseFloat(gradeSlider.value);
+            const coef = parseFloat(coefInput.value) || 1;
+            const courseId = parseInt(courseSelect.value);
+            
+            document.getElementById('sim-grade-display').textContent = newGrade;
+            
+            // Calculate projected average
+            const grades = await db.grades.toArray();
+            if (grades.length === 0) {
+                document.getElementById('sim-result').textContent = newGrade.toFixed(1);
+                document.getElementById('sim-comment').textContent = 'Aucune note existante — cette note serait ta moyenne actuelle.';
+                return;
+            }
+            
+            let allGrades = [...grades, { value: newGrade, coef, courseId: courseId || (await db.courses.toArray())[0]?.id }];
+            
+            if (courseId) {
+                const courseGrades = allGrades.filter(g => g.courseId === courseId);
+                if (courseGrades.length === 0) {
+                    document.getElementById('sim-result').textContent = '--';
+                    return;
+                }
+                const sum = courseGrades.reduce((a,b) => a + b.value * (b.coef||1), 0);
+                const coefSum = courseGrades.reduce((a,b) => a + (b.coef||1), 0);
+                const avg = sum/coefSum;
+                document.getElementById('sim-result').textContent = avg.toFixed(2);
+                const current = grades.filter(g => g.courseId === courseId);
+                const currAvg = current.length > 0 ? current.reduce((a,b) => a+b.value*(b.coef||1),0)/current.reduce((a,b) => a+(b.coef||1),0) : 0;
+                const diff = avg - currAvg;
+                document.getElementById('sim-comment').innerHTML = current.length > 0 
+                    ? `${diff >= 0 ? '📈' : '📉'} ${diff >= 0 ? '+' : ''}${diff.toFixed(2)} par rapport à la moyenne actuelle (${currAvg.toFixed(2)}/20)`
+                    : 'Première note pour cette matière';
+            } else {
+                const sum = allGrades.reduce((a,b) => a + b.value * (b.coef||1), 0);
+                const coefSum = allGrades.reduce((a,b) => a + (b.coef||1), 0);
+                const avg = sum/coefSum;
+                document.getElementById('sim-result').textContent = avg.toFixed(2);
+                document.getElementById('sim-comment').textContent = avg >= 14 ? '🌟 Excellent !' : avg >= 10 ? '✓ Validé' : '⚠️ Attention';
+            }
+        }
+
+        // ══════════════════════════════════════════════════════════════
+        // 🆕 COMMAND PALETTE (Ctrl+K)
+        // ══════════════════════════════════════════════════════════════
+        const COMMANDS = [
+            { icon:'🏠', label:'Dashboard', action:()=>showTab('dashboard'), keys:['dashboard','accueil','home'] },
+            { icon:'📚', label:'Mes Cours', action:()=>showTab('courses'), keys:['cours','matières'] },
+            { icon:'📅', label:'Planning / Agenda', action:()=>showTab('schedule'), keys:['planning','agenda','emploi'] },
+            { icon:'🎯', label:'Notes', action:()=>showTab('grades'), keys:['notes','notes','moyennes'] },
+            { icon:'📊', label:'Statistiques', action:()=>showTab('stats'), keys:['stats','statistiques'] },
+            { icon:'✅', label:'Tâches', action:()=>showTab('tasks'), keys:['taches','tâches','todo'] },
+            { icon:'🏆', label:'Succès', action:()=>showTab('achievements'), keys:['succes','succès','xp'] },
+            { icon:'➕', label:'Nouveau cours', action:()=>openCourseModal(), keys:['nouveau cours','ajouter cours'] },
+            { icon:'📝', label:'Ajouter une note', action:()=>{showTab('grades');}, keys:['ajouter note','nouvelle note'] },
+            { icon:'✔️', label:'Nouvelle tâche', action:()=>quickAddTask(), keys:['nouvelle tache','ajouter tache'] },
+            { icon:'⏳', label:'Ajouter un examen', action:()=>openExamModal(), keys:['examen','exam','partiel'] },
+            { icon:'🍅', label:'Minuteur Pomodoro', action:()=>{showTab('dashboard'); showToast('👆 Le Pomodoro est sur le Dashboard','info');}, keys:['pomodoro','minuteur','focus'] },
+            { icon:'⚙️', label:'Paramètres', action:()=>openSettings(), keys:['paramètres','settings','theme'] },
+            { icon:'🌙', label:'Mode sombre', action:()=>setTheme('dark'), keys:['sombre','dark','nuit'] },
+            { icon:'☀️', label:'Mode clair', action:()=>setTheme('light'), keys:['clair','light','jour'] },
+            { icon:'🌌', label:'Thème Galaxy', action:()=>setTheme('galaxy'), keys:['galaxy'] },
+            { icon:'💾', label:'Exporter les données', action:()=>exportAllData(), keys:['exporter','backup','données'] },
+            { icon:'🏫', label:'ENT AMU', action:()=>window.open('https://ent.univ-amu.fr/','_blank'), keys:['ent','amu','université'] },
+            { icon:'📧', label:'Mails AMU', action:()=>window.open('https://outlook.cloud.microsoft/mail/?realm=etu.univ-amu.fr','_blank'), keys:['mail','outlook','email'] },
+        ];
+
+        let commandIndex = 0;
+        let filteredCommands = [...COMMANDS];
+
+        function initCommandPalette() {
+            document.addEventListener('keydown', e => {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                    e.preventDefault();
+                    openCommandPalette();
+                }
+                if (e.key === 'Escape') closeCommandPalette();
+            });
+        }
+
+        function openCommandPalette() {
+            const palette = document.getElementById('command-palette');
+            palette.classList.add('active');
+            document.getElementById('command-input').value = '';
+            filteredCommands = [...COMMANDS];
+            commandIndex = 0;
+            renderCommands();
+            setTimeout(() => document.getElementById('command-input').focus(), 50);
+        }
+
+        function closeCommandPalette() {
+            document.getElementById('command-palette').classList.remove('active');
+        }
+
+        function filterCommands(query) {
+            const q = query.toLowerCase();
+            filteredCommands = COMMANDS.filter(c => 
+                c.label.toLowerCase().includes(q) || 
+                c.keys.some(k => k.includes(q))
+            );
+            commandIndex = 0;
+            renderCommands();
+        }
+
+        function renderCommands() {
+            const list = document.getElementById('command-list');
+            if (filteredCommands.length === 0) {
+                list.innerHTML = '<div style="padding:20px;text-align:center;opacity:0.5;font-size:0.875rem;">Aucun résultat</div>';
+                return;
+            }
+            list.innerHTML = filteredCommands.map((c, i) => `
+                <div class="command-item ${i === commandIndex ? 'selected' : ''}" onclick="executeCommand(${i})">
+                    <div class="command-icon">${c.icon}</div>
+                    <span style="font-size:0.9rem; font-weight:600;">${c.label}</span>
+                </div>
+            `).join('');
+        }
+
+        function executeCommand(index) {
+            const cmd = filteredCommands[index];
+            if (cmd) {
+                cmd.action();
+                closeCommandPalette();
+            }
+        }
+
+        function handleCommandKey(e) {
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                commandIndex = Math.min(commandIndex + 1, filteredCommands.length - 1);
+                renderCommands();
+                document.querySelectorAll('.command-item')[commandIndex]?.scrollIntoView({block:'nearest'});
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                commandIndex = Math.max(commandIndex - 1, 0);
+                renderCommands();
+                document.querySelectorAll('.command-item')[commandIndex]?.scrollIntoView({block:'nearest'});
+            } else if (e.key === 'Enter') {
+                executeCommand(commandIndex);
+            }
+        }
+
+        // showToast defined earlier in file
+
+        // ══════════════════════════════════════════════════════════════
+        // 🆕 XP POP ANIMATION
+        // ══════════════════════════════════════════════════════════════
+        function showXPPop(text, x, y) {
+            const el = document.createElement('div');
+            el.className = 'xp-pop';
+            el.textContent = text;
+            el.style.left = (x || window.innerWidth/2 - 30) + 'px';
+            el.style.top = (y || window.innerHeight/2) + 'px';
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 1500);
+        }
+
+        // ══════════════════════════════════════════════════════════════
+        // 🆕 QUICK DARK TOGGLE
+        // ══════════════════════════════════════════════════════════════
+        function quickToggleDark() {
+            const theme = document.documentElement.getAttribute('data-theme');
+            const isDark = ['dark','midnight','matrix','neon','cyberpunk','galaxy','lava','batman','ironman','hulk','spiderman','nord','chrome','gold','copper','steel','ice'].includes(theme);
+            setTheme(isDark ? 'light' : 'dark');
+            updateDarkToggleIcon();
+        }
+
+        function updateDarkToggleIcon() {
+            const icon = document.getElementById('darkToggleIcon');
+            if (!icon) return;
+            const theme = document.documentElement.getAttribute('data-theme');
+            const isDark = ['dark','midnight','matrix','neon','cyberpunk','galaxy'].includes(theme);
+            icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+        }
+
+        // ══════════════════════════════════════════════════════════════
+        // 🆕 RIPPLE EFFECT ON BUTTONS
+        // ══════════════════════════════════════════════════════════════
+        function addRippleToButtons() {
+            document.querySelectorAll('.btn-primary, .ripple-btn').forEach(btn => {
+                btn.classList.add('ripple-btn');
+                btn.addEventListener('click', function(e) {
+                    const r = document.createElement('span');
+                    r.classList.add('ripple');
+                    const rect = this.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    r.style.width = r.style.height = size + 'px';
+                    r.style.left = (e.clientX - rect.left - size/2) + 'px';
+                    r.style.top = (e.clientY - rect.top - size/2) + 'px';
+                    this.appendChild(r);
+                    setTimeout(() => r.remove(), 600);
+                });
+            });
+        }
+
+        // ══════════════════════════════════════════════════════════════
+        // 🆕 MOBILE BOTTOM BAR
+        // ══════════════════════════════════════════════════════════════
+        function setMobileActive(btn) {
+            document.querySelectorAll('.mobile-tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        // ══════════════════════════════════════════════════════════════
+        // 🆕 ENHANCED showNotification (keep backward compat + new toast)
+        // ══════════════════════════════════════════════════════════════
+        const _originalShowNotification = showNotification;
+        // Enhance confetti with XP pop
+        const _originalLaunchConfetti = launchConfetti;
+
     </script>
 </body>
 </html>
